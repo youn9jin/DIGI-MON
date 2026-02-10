@@ -1,0 +1,6 @@
+// DIGI-MON 루트: 모노레포 컨테이너 (Spring Boot 프로젝트는 apps/api)
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}

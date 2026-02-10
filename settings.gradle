@@ -1,0 +1,2 @@
+rootProject.name = 'DIGI-MON'
+include 'apps:api'
