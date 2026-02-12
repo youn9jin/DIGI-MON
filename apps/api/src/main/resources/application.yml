@@ -4,10 +4,13 @@ server:
 spring:
   application:
     name: digimon-api
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
+  # DB 설정은 application-local.yml (로컬 전용, 미커밋) 또는 환경 변수 사용
   datasource:
     url: jdbc:postgresql://localhost:5432/digi-mon
-    username: postgres
-    password: postgrespw
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
