@@ -4,6 +4,14 @@ server:
 spring:
   application:
     name: digimon-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/digi-mon
+    username: postgres
+    password: postgrespw
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
 
 management:
   endpoints:
