@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 export default function LandingHero() {
   return (
@@ -25,20 +26,25 @@ export default function LandingHero() {
               </span>
             </h1>
 
-            {/* CTA */}
+            {/*  CTA: /survey 로 이동 */}
             <div className="mt-6 flex justify-center md:mt-8">
-              <button
-                type="button"
-                className="h-[56px] w-full max-w-[420px] rounded-[20px] px-4 text-[18px] font-semibold text-[#2e2e2e]
-                           transition-opacity hover:opacity-90
-                           md:h-[73px] md:max-w-[453px] md:text-[22px]"
+              <Link
+                href="/survey"
+                className="
+                  flex items-center justify-center
+                  h-[56px] w-full max-w-[420px]
+                  rounded-[20px] px-4
+                  text-[18px] font-semibold text-[#2e2e2e]
+                  transition-opacity hover:opacity-90
+                  md:h-[73px] md:max-w-[453px] md:text-[22px]
+                "
                 style={{
                   backgroundImage:
                     "linear-gradient(106.54deg, rgba(176, 201, 101, 0.9) 13.215%, rgba(255, 255, 255, 0.9) 127.46%)",
                 }}
               >
                 지금 내 가게 상황 확인하기
-              </button>
+              </Link>
             </div>
           </div>
 
