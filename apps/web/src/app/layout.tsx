@@ -1,13 +1,9 @@
 import "./globals.css";
-import Header from "@/components/common/Header";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body>
-        <Header />
-        {children}
-      </body>
+      <body className="min-h-screen overflow-y-auto">{children}</body>
     </html>
   );
 }
