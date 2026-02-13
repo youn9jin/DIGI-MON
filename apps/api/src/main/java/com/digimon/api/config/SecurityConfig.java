@@ -1,4 +1,4 @@
-package com.digimon.api.security;
+package com.digimon.api.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

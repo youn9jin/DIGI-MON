@@ -1,4 +1,4 @@
-package com.digimon.api.exception;
+package com.digimon.api.global;
 
 import java.util.HashMap;
 import java.util.Map;
