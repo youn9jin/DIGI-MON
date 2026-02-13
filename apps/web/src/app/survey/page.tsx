@@ -57,10 +57,13 @@ export default function SurveyPage() {
           />
         </div>
 
-        {/* 진행바*/}
+        {/* 진행바 */}
         <div className="mt-10 w-full max-w-[597px]">
-          <div className="h-[8px] w-full rounded-[41px] border border-[#b0c965] bg-white">
-            <div className="h-full w-[16.66%] rounded-[41px] bg-[#b0c965]" />
+          <div className="h-[8px] w-full rounded-[41px] border border-[#b0c965] bg-white overflow-hidden">
+            <div
+              className="h-full rounded-[41px] bg-[#b0c965] transition-[width] duration-300"
+              style={{ width: selected ? "22%" : "0%" }}
+            />
           </div>
         </div>
       </main>
