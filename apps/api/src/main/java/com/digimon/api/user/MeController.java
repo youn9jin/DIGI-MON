@@ -1,6 +1,8 @@
 package com.digimon.api.user;
 
 import com.digimon.api.auth.FirebaseTokenService;
+import com.digimon.api.helper.HelperProfileRepository;
+import com.digimon.api.owner.OwnerProfileRepository;
 import com.google.firebase.auth.FirebaseToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +16,16 @@ public class MeController {
 
     private final FirebaseTokenService firebaseTokenService;
     private final UserService userService;
+    private final OwnerProfileRepository ownerProfileRepository;
+    private final HelperProfileRepository helperProfileRepository;
 
-    public MeController(FirebaseTokenService firebaseTokenService, UserService userService) {
+    public MeController(FirebaseTokenService firebaseTokenService, UserService userService,
+                        OwnerProfileRepository ownerProfileRepository,
+                        HelperProfileRepository helperProfileRepository) {
         this.firebaseTokenService = firebaseTokenService;
         this.userService = userService;
+        this.ownerProfileRepository = ownerProfileRepository;
+        this.helperProfileRepository = helperProfileRepository;
     }
 
     @GetMapping("/me")
@@ -42,8 +50,20 @@ public class MeController {
             res.put("role", user.getRole());         // null 가능
             res.put("onboarded", user.isOnboarded());
 
+            List<String> missing = new ArrayList<>();
             if (user.getRole() == null) {
-                res.put("missing", List.of("role"));
+                missing.add("role");
+            } else if (user.getRole() == Role.OWNER) {
+                if (!ownerProfileRepository.existsById(user.getId())) {
+                    missing.add("ownerProfile");
+                }
+            } else if (user.getRole() == Role.HELPER) {
+                if (!helperProfileRepository.existsById(user.getId())) {
+                    missing.add("helperProfile");
+                }
+            }
+            if (!missing.isEmpty()) {
+                res.put("missing", missing);
             }
 
             return ResponseEntity.ok(res);
