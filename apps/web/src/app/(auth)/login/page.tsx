@@ -2,8 +2,46 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { signInWithPopup } from "firebase/auth";
+import { auth, googleProvider } from "@/lib/firebase";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
+
+  const handleGoogleLogin = async () => {
+    try {
+      // 1) Firebase Google 로그인
+      const result = await signInWithPopup(auth, googleProvider);
+
+      // 2) Firebase ID Token 얻기
+      const idToken = await result.user.getIdToken();
+
+      // 3) 백엔드 호출 (/api/me)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/me`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+
+      // 4) 응답 처리
+      if (res.status === 401) {
+        console.error("401 UNAUTHORIZED: 토큰 없음/만료/검증 실패");
+        return;
+      }
+
+      const data = await res.json();
+      console.log("BACKEND RESPONSE:", data);
+
+      // 5) 임시 라우팅 (나중에 missing 기반 분기로 바꾸면 됨)
+      if (data?.missing?.includes("role")) router.push("/onboarding/role");
+      else router.push("/");
+    } catch (err) {
+      console.error("구글 로그인 실패:", err);
+    }
+  };
+
   return (
     <main
       className="
@@ -76,7 +114,7 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {/* 버튼*/}
+        {/* 버튼 */}
         <div className="mt-8 md:mt-[47px] flex justify-center">
           <button
             type="button"
@@ -97,6 +135,7 @@ export default function LoginPage() {
         <div className="mt-4 md:mt-[24px] flex justify-center">
           <button
             type="button"
+            onClick={handleGoogleLogin}
             className="
               w-full md:w-[477px]
               h-[56px] md:h-[73px]
@@ -108,7 +147,13 @@ export default function LoginPage() {
               transition
             "
           >
-            <Image src="/images/google-icon.png" alt="Google" width={26} height={26} className="md:w-[30px] md:h-[30px]" />
+            <Image
+              src="/images/google-icon.png"
+              alt="Google"
+              width={26}
+              height={26}
+              className="md:w-[30px] md:h-[30px]"
+            />
             <span className="text-[15px] md:text-[18px] font-medium text-black">
               구글 계정으로 로그인하기
             </span>
@@ -123,7 +168,7 @@ export default function LoginPage() {
         </div>
       </section>
 
-      {/* 도움 요청하기*/}
+      {/* 도움 요청하기 */}
       <div className="fixed bottom-6 right-4 md:bottom-[44px] md:right-[64px]">
         <button
           type="button"
