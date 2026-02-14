@@ -76,7 +76,7 @@ export default function LoginPage() {
           </button>
         </div>
 
-        {/* 버튼: 모바일은 full, 데스크톱은 477px */}
+        {/* 버튼*/}
         <div className="mt-8 md:mt-[47px] flex justify-center">
           <button
             type="button"
@@ -123,7 +123,7 @@ export default function LoginPage() {
         </div>
       </section>
 
-      {/* 도움 요청하기: 모바일에서는 살짝 더 안쪽 */}
+      {/* 도움 요청하기*/}
       <div className="fixed bottom-6 right-4 md:bottom-[44px] md:right-[64px]">
         <button
           type="button"

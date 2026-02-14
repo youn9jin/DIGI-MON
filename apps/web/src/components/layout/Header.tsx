@@ -17,12 +17,11 @@ export default function Header() {
         {/* 왼쪽: 로고 + DIGI-MON */}
         <div className="flex items-center gap-3">
           <div className="relative h-[30px] w-[30px]">
-            <Image
+          <Image
               src="/images/logo.png"
-              alt="DIGI-MON"
-              fill
-              className="object-contain"
-              priority
+              alt="logo"
+              width={120}
+              height={40}
             />
           </div>
 

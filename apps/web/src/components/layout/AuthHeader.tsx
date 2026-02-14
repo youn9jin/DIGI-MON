@@ -15,11 +15,12 @@ export default function AuthHeader() {
       <div className="mx-auto flex h-full max-w-6xl items-center justify-center px-4 md:px-8">
         <div className="flex items-center gap-3">
           <div className="relative h-[30px] w-[30px]">
-            <Image
+          <Image
               src="/images/logo.png"
               alt="DIGI-MON"
-              fill
-              className="object-contain"
+              width={30}
+              height={30}
+              className="h-auto"
               priority
             />
           </div>

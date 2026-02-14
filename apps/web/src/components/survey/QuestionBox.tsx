@@ -14,7 +14,7 @@ type QuestionBoxProps = {
   onSubmit?: () => void;
 
   helpLinkLabel?: string;
-  onHelpClick?: () => void; 
+  onHelpClick?: () => void;
 };
 
 export default function QuestionBox({
@@ -42,16 +42,19 @@ export default function QuestionBox({
 
   return (
     <>
-      <section className="w-full max-w-[814px] rounded-[40px] bg-white/95 shadow-[0px_4px_4px_2px_rgba(176,201,101,0.2)] px-6 py-8 md:px-10 md:py-10">
-        <p className="text-[#b0c965] text-[22px] md:text-[25px] font-semibold">
+      <section className="w-full max-w-[814px] rounded-[40px] bg-white/95 shadow-[0px_4px_4px_2px_rgba(176,201,101,0.2)] px-[48px] py-[60px]">
+        {/* 진행 상태 */}
+        <p className="text-[#b0c965] text-[25px] font-semibold">
           {totalSteps}문제 중 {step}번째 질문
         </p>
 
-        <h2 className="mt-4 text-[#2e2e2e] text-[18px] md:text-[22px] font-semibold">
+        {/* 질문 제목 */}
+        <h2 className="mt-[11px] text-[#2e2e2e] text-[22px] font-semibold">
           {title}
         </h2>
 
-        <div className="mt-8 space-y-4">
+        {/* 선택지 목록 */}
+        <div className="mt-[28px] space-y-[11px]">
           {options.map((opt) => (
             <SurveyOption
               key={opt}
@@ -62,48 +65,34 @@ export default function QuestionBox({
           ))}
         </div>
 
-        <div className="mt-10">
+        {/* 하단 영역 */}
+        <div className="mt-[51px]">
+          {/* 도움말 링크 */}
           {helpLinkLabel && (
-            <div className="flex w-full justify-end">
+            <div className="flex w-full justify-end mb-[28px]">
               <button
                 type="button"
                 onClick={handleHelpClick}
-                className="text-[12px] text-[#535353] underline"
+                className="text-[12px] font-medium text-[#535353] underline hover:text-[#2e2e2e]"
               >
                 {helpLinkLabel}
               </button>
             </div>
           )}
 
-          <div className={helpLinkLabel ? "mt-3" : "mt-0"}>
-            <div className="flex justify-center">
-              <button
-                type="button"
-                disabled={!canSubmit}
-                onClick={onSubmit}
-                className={[
-                  "flex items-center justify-center",
-                  "rounded-[15px]",
-                  "text-[16px] font-medium whitespace-nowrap",
-                  "w-[161px] h-[45px]",
-                  canSubmit
-                    ? "text-[#2e2e2e] hover:opacity-95 transition border-0"
-                    : "bg-white text-[#2e2e2e]/50 cursor-not-allowed",
-                ].join(" ")}
-                style={
-                  canSubmit
-                    ? {
-                        backgroundImage:
-                          "linear-gradient(153.74761036584698deg, rgb(255, 255, 255) 23.938%, rgb(176, 201, 101) 122.54%)",
-                      }
-                    : {
-                        border: "0.6px solid #DEDEDE",
-                      }
-                }
-              >
-                선택 완료
-              </button>
-            </div>
+          {/* 선택 완료 버튼 */}
+          <div className="flex justify-center">
+            <button
+              type="button"
+              disabled={!canSubmit}
+              onClick={onSubmit}
+              className="px-[65px] py-[17px] rounded-[15px] text-[16px] font-medium text-[#2e2e2e] whitespace-nowrap transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundImage: "linear-gradient(153.74761036584698deg, rgb(255, 255, 255) 0.938%, rgb(176, 201, 101) 122.54%)",
+              }}
+            >
+              선택 완료
+            </button>
           </div>
         </div>
       </section>
