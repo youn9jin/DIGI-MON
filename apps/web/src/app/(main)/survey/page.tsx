@@ -4,30 +4,36 @@ import Image from "next/image";
 import { useState } from "react";
 import QuestionBox from "@/components/survey/QuestionBox";
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 5;
 
 const STEP_1 = {
-  title: "사장님 가게의 업종을 골라주세요.",
-  options: [
-    "제조업",
-    "도매 및 소매업",
-    "숙박 및 음식점업",
-    "건설업",
-    "정보통신업",
-    "예술, 스포츠 및 여가 관련 서비스업",
-  ],
-  helpLinkLabel: "세부 기준이 궁금해요" as const,
-};
+  title: "구글 지도에서 가게 이름을 검색하면 바로 찾을 수 있나요?",
+  options: ["바로 나온다", "잘 모르겠다", "안 나온다"],
+} as const;
 
 const STEP_2 = {
+  title: "기본 정보(가게 위치, 영업시간 등)가 정확하게 보이나요?",
+  options: ["다 맞게 있다", "일부만 있거나 틀림", "없다 / 모르겠다"],
+} as const;
+
+const STEP_3 = {
   title:
-    "현재 가게 정보가 온라인에 얼마나 정리되어 있나요?",
+    "가게에서 판매하는 품목이나 제공 서비스가 사진이나 설명으로 잘 보이나요?",
+  options: ["충분히 있다", "조금만 있다", "거의 없다"],
+} as const;
+
+const STEP_4 = {
+  title: "온라인 상으로 가게 소식을 전할 수 있는 방법이 있나요?",
+  options: ["있다 (카카오 채널, 메시지 등)", "있는지 모르겠다", "없다"],
+} as const;
+
+const STEP_5 = {
+  title: "지금 가장 먼저 해결하고 싶은 것은 무엇인가요?",
   options: [
-    "전혀 정리되지 않음(검색해도 나오지 않음)",
-    "기본 정보만 확인 가능함(이름, 위치)",
-    "판매 품목 및 사진 일부 확인 가능함",
-    "정보 대부분 정리되어있음",
-    "항상 직접 관리하고 있음",
+    "가게 접근성 높이기",
+    "가게를 좋아보이게 하기",
+    "연락이 잘 오게 하기",
+    "잘 모르겠다",
   ],
 } as const;
 
@@ -36,11 +42,23 @@ export default function SurveyPage() {
   const [answers, setAnswers] = useState<Record<number, string | null>>({
     1: null,
     2: null,
+    3: null,
+    4: null,
+    5: null,
   });
 
-  const stepConfig = currentStep === 1 ? STEP_1 : STEP_2;
+  const stepConfig =
+    currentStep === 1
+      ? STEP_1
+      : currentStep === 2
+      ? STEP_2
+      : currentStep === 3
+      ? STEP_3
+      : currentStep === 4
+      ? STEP_4
+      : STEP_5;
+
   const selected = answers[currentStep] ?? null;
-  const isStep1 = currentStep === 1;
 
   const handleSelect = (value: string) => {
     setAnswers((prev) => ({ ...prev, [currentStep]: value }));
@@ -55,15 +73,17 @@ export default function SurveyPage() {
   };
 
   const progressPercent =
-    (currentStep - 1) / TOTAL_STEPS * 100 +
+    ((currentStep - 1) / TOTAL_STEPS) * 100 +
     (selected ? (1 / TOTAL_STEPS) * 100 : 0);
 
   return (
-    <div className="relative min-h-screen bg-white overflow-x-hidden">
-      <div className="absolute inset-0 flex justify-center">
-        <div className="mt-[-20px] w-full max-w-[1517px] rounded-[30px] bg-[#fafafa]" />
+    <div className="relative min-h-[100svh] bg-white overflow-x-hidden">
+      {/* ✅ 배경 패널: transform으로만 위로 올림 (레이아웃/스크롤 깨짐 방지) */}
+      <div className="fixed inset-0 -z-10 flex justify-center pointer-events-none">
+        <div className="h-full w-full max-w-[1517px] rounded-[30px] bg-[#fafafa] -translate-y-[20px]" />
       </div>
 
+      {/* 배경 이미지 */}
       <div className="absolute inset-x-0 top-[185px] flex justify-center pointer-events-none">
         <div className="w-full max-w-[1432px]">
           <Image
@@ -91,8 +111,6 @@ export default function SurveyPage() {
             selected={selected}
             onSelect={handleSelect}
             onSubmit={handleSubmit}
-            helpLinkLabel={isStep1 ? STEP_1.helpLinkLabel : undefined}
-            onHelpClick={isStep1 ? () => console.log("open help") : undefined}
           />
         </div>
 
