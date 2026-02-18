@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import QuestionBox from "@/components/survey/QuestionBox";
 
 const TOTAL_STEPS = 5;
@@ -38,6 +39,8 @@ const STEP_5 = {
 } as const;
 
 export default function SurveyPage() {
+  const router = useRouter();
+
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState<Record<number, string | null>>({
     1: null,
@@ -65,11 +68,21 @@ export default function SurveyPage() {
   };
 
   const handleSubmit = () => {
+    if (!selected) return;
+
     if (currentStep < TOTAL_STEPS) {
       setCurrentStep((prev) => prev + 1);
-    } else {
-      console.log("survey complete", answers);
+      return;
     }
+
+    // ✅ 설문 완료: 임시 저장 + 결과 페이지로 이동
+    try {
+      sessionStorage.setItem("surveyAnswers", JSON.stringify(answers));
+    } catch (e) {
+      console.warn("sessionStorage save failed:", e);
+    }
+
+    router.push("/survey/result");
   };
 
   const progressPercent =
