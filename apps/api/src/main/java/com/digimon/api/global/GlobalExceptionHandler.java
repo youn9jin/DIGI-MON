@@ -1,5 +1,7 @@
 package com.digimon.api.global;
 
+import com.digimon.api.auth.EmailAlreadyExistsException;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -11,6 +13,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleEmailAlreadyExists() {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(Map.of("message", "EMAIL_ALREADY_EXISTS"));
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {

@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -18,15 +20,25 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "provider", nullable = false, columnDefinition = "auth_provider")
+    private AuthProvider provider;
+
+    @Column(name = "firebase_uid", unique = true)
     private String firebaseUid;
 
+    @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(name = "password_hash")
+    private String passwordHash;
 
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;   // OWNER / HELPER / null 가능
+    private String phone;
+
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private Role role;
 
     private boolean onboarded = false;
 
