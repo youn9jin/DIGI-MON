@@ -1,15 +1,16 @@
 package com.digimon.api.global;
 
 import com.digimon.api.auth.EmailAlreadyExistsException;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -21,31 +22,38 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
-        Map<String, String> details = ex.getBindingResult().getFieldErrors().stream()
-                .collect(Collectors.toMap(
-                        e -> e.getField(),
-                        e -> e.getDefaultMessage() != null ? e.getDefaultMessage() : "invalid",
-                        (a, b) -> a));
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(buildErrorBody("VALIDATION_ERROR", "Validation failed", details));
+    public ResponseEntity<ResponseWrapper<Void>> handleValidation(MethodArgumentNotValidException ex) {
+        List<ValidationErrorDetail> details = ex.getBindingResult().getFieldErrors().stream()
+                .map(e -> new ValidationErrorDetail(
+                        e.getField(),
+                        e.getDefaultMessage() != null ? e.getDefaultMessage() : "invalid"))
+                .collect(Collectors.toList());
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "VALIDATION_ERROR",
+                "Invalid request body",
+                details);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleMessageNotReadable(HttpMessageNotReadableException ex) {
+        String reason = ex.getMessage() != null && ex.getMessage().length() > 200
+                ? "Invalid JSON or enum value"
+                : ex.getMessage();
+        List<ValidationErrorDetail> details = List.of(new ValidationErrorDetail("request", reason));
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "VALIDATION_ERROR",
+                "Invalid request body",
+                details);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleException(Exception ex) {
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(buildErrorBody("INTERNAL_ERROR", ex.getMessage(), null));
-    }
-
-    private Map<String, Object> buildErrorBody(String code, String message, Object details) {
-        Map<String, Object> error = new HashMap<>();
-        error.put("code", code);
-        error.put("message", message);
-        if (details != null) {
-            error.put("details", details);
-        }
-        return Map.of("error", error);
+    public ResponseEntity<ResponseWrapper<Void>> handleException(Exception ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "INTERNAL_SERVER_ERROR",
+                "Unexpected error occurred",
+                null);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 }
