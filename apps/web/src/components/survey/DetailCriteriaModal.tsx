@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 type DetailCriteriaModalProps = {
   open: boolean;
   onClose: () => void;
@@ -9,30 +11,45 @@ export default function DetailCriteriaModal({
   open,
   onClose,
 }: DetailCriteriaModalProps) {
+  useEffect(() => {
+    if (!open) return;
+
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    const prevBodyOverflow = document.body.style.overflow;
+
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = prevHtmlOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+    };
+  }, [open]);
+
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-center justify-center p-4">
+    <div
+      className="fixed inset-0 z-[999] flex items-center justify-center p-4 overflow-hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="detail-criteria-title"
+    >
       {/* dim */}
-      <div
-        className="absolute inset-0 bg-black/40"
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/40 cursor-default"
         onClick={onClose}
-        aria-hidden
+        aria-label="close modal background"
       />
 
-      {/* modal box*/}
-      <div
-        className="relative z-[1000] w-full max-w-[613px] max-h-[85vh] bg-white rounded-t-[24px] rounded-b-[12px] border border-[#a0c49d] shadow-[0px_4px_20px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="detail-criteria-title"
-      >
-        {/* content area*/}
+      {/* modal box */}
+      <div className="relative z-[1000] w-full max-w-[613px] max-h-[85vh] bg-white rounded-t-[24px] rounded-b-[12px] border border-[#a0c49d] shadow-[0px_4px_20px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+        {/* content area */}
         <div
           id="detail-criteria-title"
           className="px-8 pt-8 pb-8 overflow-y-auto text-left flex-1"
         >
-          {/* 1. 도입 문장  */}
           <p className="text-[15px] leading-[22px] text-black">
             소상공인은{" "}
             <span className="font-semibold text-black">
@@ -43,7 +60,6 @@ export default function DetailCriteriaModal({
 
           <div className="h-5" />
 
-          {/* 2. 상시 근로자란?*/}
           <p className="text-[16px] font-bold leading-[22px] text-black">
             상시 근로자란?
           </p>
@@ -67,7 +83,6 @@ export default function DetailCriteriaModal({
 
           <div className="h-5" />
 
-          {/* 3. 소기업이란?*/}
           <p className="text-[16px] font-bold leading-[22px] text-black">
             소기업이란?
           </p>
@@ -86,7 +101,6 @@ export default function DetailCriteriaModal({
 
           <div className="h-5" />
 
-          {/* 4. 연평균 매출액 기준*/}
           <p className="text-[16px] font-bold leading-[22px] text-black">
             연평균 매출액 기준
           </p>

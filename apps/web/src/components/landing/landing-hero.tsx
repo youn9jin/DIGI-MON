@@ -5,19 +5,32 @@ import Link from "next/link";
 
 export default function LandingHero() {
   return (
-    <div className="min-h-screen w-full bg-white overflow-x-hidden">
-      
+    <div className="w-full bg-white overflow-x-hidden">
       <main className="mx-auto max-w-6xl px-4 md:px-8">
         <section className="relative flex min-h-[calc(100vh-70px)] flex-col items-center justify-start pt-10 md:pt-14">
           
-          {/* Title */}
-          <div className="w-full max-w-4xl text-center">
+          <div className="pointer-events-none absolute left-1/2 top-[210px] z-0 w-[min(1100px,95vw)] -translate-x-1/2 md:top-[240px]">
+            <div className="relative aspect-[968/540] w-full">
+              <Image
+                src="/images/main-hero.png"
+                alt="메인 일러스트"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+          </div>
+
+          <div className="relative z-10 w-full max-w-4xl text-center">
             <h1 className="font-semibold text-[#2e2e2e]">
+              {/* 1st line */}
               <span className="block text-[36px] leading-[1.15] sm:text-[46px] md:text-[70px] md:leading-[72px]">
                 사장님 가게,
               </span>
 
-              <span className="mt-2 block text-[28px] leading-[1.2] sm:text-[36px] md:text-[60px] md:leading-[72px]">
+              <span className="block h-[18px] md:h-[28px]" aria-hidden="true" />
+
+              <span className="block text-[28px] leading-[1.2] sm:text-[36px] md:text-[60px] md:leading-[72px]">
                 지금 뭐부터 하면 좋을지
               </span>
 
@@ -26,7 +39,7 @@ export default function LandingHero() {
               </span>
             </h1>
 
-            {/*  CTA: /survey 로 이동 */}
+            {/* CTA */}
             <div className="mt-6 flex justify-center md:mt-8">
               <Link
                 href="/survey"
@@ -48,21 +61,7 @@ export default function LandingHero() {
             </div>
           </div>
 
-          {/* Hero Image */}
-          <div className="mt-10 w-full max-w-4xl md:mt-14">
-            <div className="relative aspect-[968/540] w-full">
-              <Image
-                src="/images/main-hero.png"
-                alt="메인 일러스트"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-          </div>
-
-          {/* Scroll Indicator */}
-          <div className="mt-10 flex items-center justify-center pb-10 md:mt-12">
+          <div className="absolute bottom-10 left-1/2 z-10 -translate-x-1/2">
             <div className="relative h-[21px] w-[46px]">
               <Image
                 src="/images/scroll.svg"
@@ -73,6 +72,7 @@ export default function LandingHero() {
             </div>
           </div>
 
+          <div className="h-[420px] md:h-[520px]" aria-hidden="true" />
         </section>
       </main>
     </div>

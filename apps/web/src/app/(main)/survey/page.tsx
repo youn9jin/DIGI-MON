@@ -75,7 +75,6 @@ export default function SurveyPage() {
       return;
     }
 
-    // ✅ 설문 완료: 임시 저장 + 결과 페이지로 이동
     try {
       sessionStorage.setItem("surveyAnswers", JSON.stringify(answers));
     } catch (e) {
@@ -90,27 +89,21 @@ export default function SurveyPage() {
     (selected ? (1 / TOTAL_STEPS) * 100 : 0);
 
   return (
-    <div className="relative min-h-[100svh] bg-white overflow-x-hidden">
-      {/* ✅ 배경 패널: transform으로만 위로 올림 (레이아웃/스크롤 깨짐 방지) */}
-      <div className="fixed inset-0 -z-10 flex justify-center pointer-events-none">
-        <div className="h-full w-full max-w-[1517px] rounded-[30px] bg-[#fafafa] -translate-y-[20px]" />
+    <div className="relative min-h-screen w-full bg-[#fafafa]">
+      {/* 배경 일러스트 */}
+      <div className="absolute left-1/2 -translate-x-1/2 top-[185px] w-full max-w-[1432px] pointer-events-none">
+        <Image
+          src="/images/survey-bg.png"
+          alt="배경 이미지"
+          width={1432}
+          height={799}
+          className="w-full h-auto object-contain"
+          priority
+        />
       </div>
 
-      {/* 배경 이미지 */}
-      <div className="absolute inset-x-0 top-[185px] flex justify-center pointer-events-none">
-        <div className="w-full max-w-[1432px]">
-          <Image
-            src="/images/survey-bg.png"
-            alt="배경 이미지"
-            width={1432}
-            height={799}
-            className="w-full h-auto object-cover"
-            priority
-          />
-        </div>
-      </div>
-
-      <main className="relative z-10 flex flex-col items-center px-4 pt-[150px] pb-16">
+      {/* 컨텐츠 */}
+      <main className="relative z-10 flex flex-col items-center px-4 pt-[140px] pb-[120px]">
         <p className="text-center text-[16px] md:text-[18px] text-[#6e6e6e] max-w-[720px]">
           로그인 후 &apos;내 가게&apos;에서 언제든지 정보를 수정할 수 있어요!
         </p>
