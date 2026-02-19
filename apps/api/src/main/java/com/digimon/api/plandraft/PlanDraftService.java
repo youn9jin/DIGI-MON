@@ -1,6 +1,6 @@
 package com.digimon.api.plandraft;
 
-import com.digimon.api.plandraft.ai.AiPlanGenerator;
+import com.digimon.api.ai.AiPlanGenerator;
 import com.digimon.api.plandraft.dto.CreatePlanDraftResponse;
 import com.digimon.api.plandraft.dto.InitialPlanDto;
 import com.digimon.api.plandraft.dto.SurveyDto;
