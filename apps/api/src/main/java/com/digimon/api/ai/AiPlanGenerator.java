@@ -1,4 +1,4 @@
-package com.digimon.api.plandraft.ai;
+package com.digimon.api.ai;
 
 import com.digimon.api.plandraft.DigitalLevel;
 import com.digimon.api.plandraft.dto.InitialPlanDto;
