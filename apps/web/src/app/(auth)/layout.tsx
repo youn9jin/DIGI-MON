@@ -1,9 +1,9 @@
-import AuthHeader from "@/components/layout/AuthHeader";
+import LogoHeader from "@/components/layout/LogoHeader";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-[#fafafa]">
-      <AuthHeader />
+      <LogoHeader />
       {children}
     </div>
   );
