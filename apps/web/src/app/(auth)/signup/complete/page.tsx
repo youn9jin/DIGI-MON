@@ -7,9 +7,9 @@ export default function SignupCompletePage() {
   return (
     <main className="min-h-screen w-full bg-[#FAFAFA]">
       <div className="mx-auto w-full max-w-[1440px] px-6 pt-[70px] pb-16">
-        <div className="flex flex-col items-center justify-center mt-[120px]">
+        <div className="flex flex-col items-center justify-center mt-[60px]">
           
-          <div className="relative w-[194px] h-[166px]">
+          <div className="relative w-[320px] h-[260px]">
             <Image
               src="/images/signup-complete.png"
               alt="회원가입 완료"
@@ -19,7 +19,7 @@ export default function SignupCompletePage() {
             />
           </div>
 
-          <h1 className="mt-[40px] text-[45px] font-semibold text-black text-center">
+          <h1 className="mt-[8px] text-[45px] font-semibold text-black text-center">
             회원가입이 완료되었습니다
           </h1>
 
