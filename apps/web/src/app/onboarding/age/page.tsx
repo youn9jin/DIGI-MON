@@ -23,8 +23,7 @@ export default function OnboardingAgeGroupPage() {
             localStorage.setItem("digimon_age_group", selected);
         } catch {}
 
-        // TODO: 다음 페이지로 변경
-        router.push("/onboarding/next");
+        router.push("/onboarding/complete");
     };
 
     return (
