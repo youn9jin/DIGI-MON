@@ -1,6 +1,10 @@
 package com.digimon.api.global;
 
 import com.digimon.api.auth.EmailAlreadyExistsException;
+import com.digimon.api.auth.UnauthorizedException;
+import com.digimon.api.plandraft.AttachTokenInvalidOrExpiredException;
+import com.digimon.api.plandraft.DraftAlreadyAttachedException;
+import com.digimon.api.plandraft.DraftNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -19,6 +23,42 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleEmailAlreadyExists() {
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .body(Map.of("message", "EMAIL_ALREADY_EXISTS"));
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleUnauthorized(UnauthorizedException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "UNAUTHORIZED",
+                ex.getMessage() != null ? ex.getMessage() : "Invalid or missing token",
+                null);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
+    @ExceptionHandler(DraftNotFoundException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleDraftNotFound() {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "DRAFT_NOT_FOUND",
+                "Plan draft not found",
+                null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(AttachTokenInvalidOrExpiredException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleAttachTokenInvalid() {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "ATTACH_TOKEN_INVALID_OR_EXPIRED",
+                "Attach token is invalid, expired, or already used",
+                null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    @ExceptionHandler(DraftAlreadyAttachedException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleDraftAlreadyAttached() {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "DRAFT_ALREADY_ATTACHED",
+                "Draft is already attached to another user",
+                null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
