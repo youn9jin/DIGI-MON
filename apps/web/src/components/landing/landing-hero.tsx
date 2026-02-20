@@ -12,7 +12,7 @@ export default function LandingHero() {
             <div className="pointer-events-none absolute left-1/2 top-[210px] z-0 w-[min(1100px,95vw)] -translate-x-1/2 md:top-[240px]">
               <div className="relative aspect-[968/540] w-full">
                 <Image
-                    src="/images/main-hero.png"
+                    src="/images/main-hero.svg"
                     alt="메인 일러스트"
                     fill
                     className="object-contain"

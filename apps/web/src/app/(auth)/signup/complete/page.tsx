@@ -9,9 +9,9 @@ export default function SignupCompletePage() {
       <div className="mx-auto w-full max-w-[1440px] px-6 pt-[70px] pb-16">
         <div className="flex flex-col items-center justify-center mt-[60px]">
           
-          <div className="relative w-[320px] h-[260px]">
+          <div className="relative w-[194px] h-[166px]">
             <Image
-              src="/images/signup-complete.png"
+              src="/images/complete.svg"
               alt="회원가입 완료"
               fill
               style={{ objectFit: "contain" }}

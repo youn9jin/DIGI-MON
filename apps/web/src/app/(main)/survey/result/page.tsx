@@ -80,25 +80,35 @@ export default function SurveyResultPage() {
         <main className="w-full bg-[#FAFAFA]">
             <div className="mx-auto w-full max-w-[1440px] px-6 md:px-10 lg:px-[121px]">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between lg:min-h-[calc(100vh-70px)] py-14 gap-12 lg:gap-6">
-                    {/* ── 왼쪽: 텍스트 블록 ── */}
+
+                    {/* ── LEFT ── */}
                     <div className="flex flex-col lg:max-w-[560px]">
                         <h1
                             className="font-bold text-black whitespace-nowrap"
-                            style={{ fontSize: "clamp(26px, 3.5vw, 50px)", lineHeight: "1.56" }}
+                            style={{
+                                fontSize: "clamp(26px, 3.5vw, 50px)",
+                                lineHeight: "1.56",
+                            }}
                         >
                             사장님에게 딱 맞는 액션플랜은...
                         </h1>
 
                         <p
                             className="mt-10 font-bold text-black"
-                            style={{ fontSize: "clamp(24px, 3vw, 42px)", lineHeight: "1.55" }}
+                            style={{
+                                fontSize: "clamp(24px, 3vw, 42px)",
+                                lineHeight: "1.55",
+                            }}
                         >
                             {primaryAction?.title ?? "액션플랜을 불러오는 중..."}
                         </p>
 
                         <p
                             className="mt-3 font-semibold text-[#868686]"
-                            style={{ fontSize: "clamp(14px, 1.7vw, 24px)", lineHeight: "1.46" }}
+                            style={{
+                                fontSize: "clamp(14px, 1.7vw, 24px)",
+                                lineHeight: "1.46",
+                            }}
                         >
                             {primaryAction?.summary ?? "잠시만 기다려주세요."}
                             <br />
@@ -122,47 +132,52 @@ export default function SurveyResultPage() {
                         </Link>
                     </div>
 
-                    {/* ── 오른쪽: 카드 3개 ── */}
+                    {/* ── RIGHT CARDS ── */}
                     <div className="flex-shrink-0 self-center lg:self-auto">
                         <div className="w-[min(405px,90vw)] mx-auto flex flex-col items-center gap-5">
+
+                            {/* CARD 1 */}
                             <GlassCard className="w-[80%] aspect-[324/293] mx-auto lg:translate-x-[4px]">
                                 <div className="relative w-[42%] h-[58%]">
                                     <Image
-                                        src="/images/result-menu.png"
+                                        src="/images/result-menu.svg"
                                         alt="메뉴판 뱃지"
                                         fill
-                                        sizes="180px"
+                                        sizes="(max-width: 768px) 60vw, 180px"
                                         style={{ objectFit: "contain" }}
                                         priority
                                     />
                                 </div>
                             </GlassCard>
 
+                            {/* CARD 2 */}
                             <GlassCard className="w-full aspect-[405/366] mx-auto">
                                 <div className="relative w-[58%] h-[72%]">
                                     <Image
-                                        src="/images/result-googlemap.png"
+                                        src="/images/result-googlemap.svg"
                                         alt="구글 지도 아이콘"
                                         fill
-                                        sizes="240px"
+                                        sizes="(max-width: 768px) 80vw, 240px"
                                         style={{ objectFit: "contain" }}
                                         priority
                                     />
                                 </div>
                             </GlassCard>
 
+                            {/* CARD 3 */}
                             <GlassCard className="w-[80%] aspect-[324/293] mx-auto lg:translate-x-[4px]">
                                 <div className="relative w-[60%] h-[60%]">
                                     <Image
-                                        src="/images/result-review.png"
+                                        src="/images/result-review.svg"
                                         alt="리뷰 뱃지"
                                         fill
-                                        sizes="200px"
+                                        sizes="(max-width: 768px) 60vw, 200px"
                                         style={{ objectFit: "contain" }}
                                         priority
                                     />
                                 </div>
                             </GlassCard>
+
                         </div>
                     </div>
                 </div>

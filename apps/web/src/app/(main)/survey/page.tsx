@@ -272,7 +272,7 @@ export default function SurveyPage() {
       <div className="relative min-h-screen w-full bg-[#fafafa]">
         <div className="absolute left-1/2 -translate-x-1/2 top-[185px] w-full max-w-[1432px] pointer-events-none">
           <Image
-              src="/images/survey-bg.png"
+              src="/images/survey-bg.svg"
               alt="배경 이미지"
               width={1432}
               height={799}

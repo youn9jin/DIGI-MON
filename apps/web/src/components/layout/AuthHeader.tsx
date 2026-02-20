@@ -54,7 +54,7 @@ export default function AuthHeader() {
                 {/* 왼쪽: 로고 */}
                 <Link href="/" className="flex items-center gap-3">
                     <div className="relative h-[30px] w-[30px]">
-                        <Image src="/images/logo.png" alt="logo" width={120} height={40} />
+                        <Image src="/images/logo.svg" alt="logo" width={19} height={30} />
                     </div>
                     <span className="text-[20px] font-semibold text-[#353535] whitespace-nowrap">
             DIGI-MON
