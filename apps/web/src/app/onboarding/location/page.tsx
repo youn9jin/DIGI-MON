@@ -17,9 +17,7 @@ export default function OnboardingLocationPage() {
             localStorage.setItem("digimon_store_location", location.trim());
         } catch {}
 
-        // TODO: 다음 단계 라우트로 변경
-        alert(`가게 위치 저장 완료: ${location.trim()}`);
-        // router.push("/onboarding/next");
+        router.push("/onboarding/age");
     };
 
     return (
