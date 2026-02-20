@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import SurveyOption from "@/components/survey/SurveyOption";
-import DetailCriteriaModal from "@/components/survey/DetailCriteriaModal";
+import DetailCriteriaModal from "@/components/onboarding/DetailCriteriaModal";
 
 type QuestionBoxProps = {
   step: number;
@@ -83,9 +83,9 @@ export default function QuestionBox({
           {/* 선택 완료 버튼 */}
           <div className="flex justify-center">
             <button
-              type="button"
-              disabled={!canSubmit}
-              onClick={onSubmit}
+                type="button"
+                disabled={!canSubmit}
+                onClick={() => onSubmit?.()}
               className="px-[65px] py-[17px] rounded-[15px] text-[16px] font-medium text-[#2e2e2e] whitespace-nowrap transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
                 backgroundImage: "linear-gradient(153.74761036584698deg, rgb(255, 255, 255) 0.938%, rgb(176, 201, 101) 122.54%)",

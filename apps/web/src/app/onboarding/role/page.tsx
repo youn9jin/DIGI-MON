@@ -7,11 +7,16 @@ import { useRouter } from "next/navigation";
 export default function OnboardingRolePage() {
     const router = useRouter();
 
-    const selectRole = (role: "OWNER" | "HELPER") => {
+    const handleOwner = () => {
         try {
-            localStorage.setItem("digimon_role", role);
+            localStorage.setItem("digimon_role", "OWNER");
         } catch {}
-        alert(role === "OWNER" ? "사장님 선택!" : "도우미 선택!");
+        router.push("/onboarding/industry");
+    };
+
+    const handleHelper = () => {
+        // ✅ 도우미 온보딩은 일단 제외
+        alert("도우미 온보딩은 준비 중이에요!");
     };
 
     return (
@@ -28,14 +33,12 @@ export default function OnboardingRolePage() {
               min-h-[772px]
             "
                     >
-                        {/* 제목 */}
                         <h1 className="text-left text-[22px] md:text-[25px] font-bold leading-[32px] md:leading-[35px] text-black">
                             DIGI-MON 서비스를 이용하려면
                             <br />
                             역할 선택이 필요해요
                         </h1>
 
-                        {/* 카드 영역 */}
                         <div className="mt-10 grid grid-cols-1 gap-8 md:mt-[55px] md:grid-cols-2 md:gap-[30px]">
                             {/* 사장님 */}
                             <div className="flex flex-col items-center">
@@ -59,7 +62,7 @@ export default function OnboardingRolePage() {
 
                                 <button
                                     type="button"
-                                    onClick={() => selectRole("OWNER")}
+                                    onClick={handleOwner}
                                     className="
                     mt-6 h-[74px] w-full max-w-[308px]
                     rounded-[20px]
@@ -96,7 +99,7 @@ export default function OnboardingRolePage() {
 
                                 <button
                                     type="button"
-                                    onClick={() => selectRole("HELPER")}
+                                    onClick={handleHelper}
                                     className="
                     mt-6 h-[74px] w-full max-w-[308px]
                     rounded-[20px]
@@ -113,7 +116,7 @@ export default function OnboardingRolePage() {
                             </div>
                         </div>
 
-                        {/* ✅ Figma 맞춤: 좌하단 링크 (문구/위치/정렬 수정) */}
+                        {/* (원래 있던 뒤로가기 링크는 너가 수정해둔 버전 유지해도 OK) */}
                         <Link
                             href="/landing-hero-auth"
                             className="
@@ -124,14 +127,7 @@ export default function OnboardingRolePage() {
                 text-[15px] leading-[20px] text-black
               "
                         >
-                            {/* 작은 화살표 아이콘 */}
-                            <svg
-                                width="10"
-                                height="10"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                aria-hidden
-                            >
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden>
                                 <path
                                     d="M15 18l-6-6 6-6"
                                     stroke="currentColor"
@@ -145,23 +141,6 @@ export default function OnboardingRolePage() {
                     </section>
                 </div>
             </div>
-
-            {/* 도움 요청하기 버튼 */}
-            <button
-                type="button"
-                onClick={() => router.push("/help")}
-                className="
-          fixed bottom-8 right-8 z-20
-          h-[74px] w-[193px]
-          rounded-[50px]
-          bg-[#E0F0AF]
-          shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)]
-          text-[18px] font-semibold text-[#585858]
-          hover:opacity-90 transition
-        "
-            >
-                도움 요청하기
-            </button>
         </main>
     );
 }
