@@ -16,10 +16,16 @@ export default function LoginPage() {
 
   /**
    * Firebase 로그인 후 → 백엔드 인증 공통 처리
-   * (임시) 온보딩 분기 무시하고 무조건 메인으로 이동
+   * ✅ 로그인 성공하면 온보딩 intro로 이동
    */
   const loginToBackend = async (idToken: string) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/me`, {
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+    if (!apiBase) {
+      alert("NEXT_PUBLIC_API_BASE_URL이 설정되지 않았습니다.");
+      return;
+    }
+
+    const res = await fetch(`${apiBase}/api/me`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${idToken}`,
@@ -32,11 +38,18 @@ export default function LoginPage() {
       return;
     }
 
-    const data = await res.json();
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`BACKEND ERROR ${res.status}:`, body);
+      alert("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+
+    const data = await res.json().catch(() => null);
     console.log("BACKEND RESPONSE:", data);
 
-    // ✅ (임시) 일단 되는지만 확인: 무조건 메인 페이지로
-    router.replace("/");
+    // ✅ 로그인 성공 → 온보딩 intro로 이동
+    router.replace("/onboarding/intro");
   };
 
   /**
@@ -57,7 +70,7 @@ export default function LoginPage() {
       // 2) 토큰 발급
       const idToken = await result.user.getIdToken();
 
-      // 3) 백엔드 인증
+      // 3) 백엔드 인증 + 온보딩 이동
       await loginToBackend(idToken);
     } catch (err: any) {
       console.error("이메일 로그인 실패:", err);
