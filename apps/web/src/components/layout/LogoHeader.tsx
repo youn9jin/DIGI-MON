@@ -16,9 +16,9 @@ export default function LogoHeader() {
         <div className="flex items-center gap-3">
           <div className="relative h-[30px] w-[30px]">
           <Image
-              src="/images/logo.png"
+              src="/images/logo.svg"
               alt="DIGI-MON"
-              width={30}
+              width={19}
               height={30}
               className="h-auto"
               priority

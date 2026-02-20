@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+
   images: {
     remotePatterns: [
       {
@@ -12,6 +13,15 @@ const nextConfig: NextConfig = {
         pathname: "/api/mcp/asset/**",
       },
     ],
+  },
+
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "http://localhost:8080/api/:path*",
+      },
+    ];
   },
 };
 

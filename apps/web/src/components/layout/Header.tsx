@@ -18,10 +18,10 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <div className="relative h-[30px] w-[30px]">
           <Image
-              src="/images/logo.png"
+              src="/images/logo.svg"
               alt="logo"
-              width={120}
-              height={40}
+              width={19}
+              height={30}
             />
           </div>
 

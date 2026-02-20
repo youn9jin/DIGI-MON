@@ -153,7 +153,7 @@ export default function LoginPage() {
                 disabled={loading}
                 className="w-full md:w-[477px] h-[56px] md:h-[73px] rounded-[16px] md:rounded-[20px] border border-[#BDBDBD] bg-white flex items-center justify-center gap-3 md:gap-4 hover:bg-[#FAFAFA] transition disabled:opacity-50"
             >
-              <Image src="/images/google-icon.png" alt="Google" width={26} height={26} />
+              <Image src="/images/google-icon.svg" alt="Google" width={26} height={26} />
               <span className="text-[15px] md:text-[18px] font-medium text-black">
               구글 계정으로 로그인하기
             </span>
