@@ -33,9 +33,7 @@ export default function OnboardingIndustryPage() {
             localStorage.setItem("digimon_industry", selected);
         } catch {}
 
-        // TODO: 다음 페이지 연결
-        alert(`업종 선택 완료: ${selected}`);
-        // router.push("/onboarding/next");
+        router.push("/onboarding/store-name");
     };
 
     return (
