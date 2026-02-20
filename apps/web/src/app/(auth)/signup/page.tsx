@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { auth } from "@/lib/firebase";
 import {
   createUserWithEmailAndPassword,
@@ -15,7 +15,7 @@ export default function SignupPage() {
     name: "",
     email: "",
     password: "",
-    phone: "",
+    passwordConfirm: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -23,13 +23,11 @@ export default function SignupPage() {
   const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const onChange =
-      (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm((prev) => ({ ...prev, [key]: e.target.value }));
-      };
+    (key: keyof typeof form) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setForm((prev) => ({ ...prev, [key]: e.target.value }));
+    };
 
-  /**
-   * Firebase ID Token을 서버에 전달 → users 자동 생성/갱신
-   */
   const syncUserWithBackend = async (idToken: string) => {
     if (!apiBase) {
       alert("NEXT_PUBLIC_API_BASE_URL이 설정되지 않았습니다.");
@@ -38,9 +36,7 @@ export default function SignupPage() {
 
     const res = await fetch(`${apiBase}/api/me`, {
       method: "GET",
-      headers: {
-        Authorization: `Bearer ${idToken}`,
-      },
+      headers: { Authorization: `Bearer ${idToken}` },
     });
 
     if (res.status === 401) {
@@ -59,36 +55,49 @@ export default function SignupPage() {
     return res.json();
   };
 
+  const canSubmit = useMemo(() => {
+    if (!form.name.trim()) return false;
+    if (!form.email.trim()) return false;
+    if (!form.password.trim()) return false;
+    if (!form.passwordConfirm.trim()) return false;
+    if (form.password !== form.passwordConfirm) return false;
+    return true;
+  }, [form]);
+
   const handleEmailSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!form.name.trim()) return alert("이름을 입력해주세요.");
     if (!form.email.trim()) return alert("이메일을 입력해주세요.");
     if (!form.password.trim()) return alert("비밀번호를 입력해주세요.");
+    if (!form.passwordConfirm.trim())
+      return alert("비밀번호 확인을 입력해주세요.");
+    if (form.password !== form.passwordConfirm)
+      return alert("비밀번호가 일치하지 않습니다.");
 
     try {
       setLoading(true);
 
-      // 1️⃣ Firebase 회원가입
+      // 1) Firebase 회원가입
       const result = await createUserWithEmailAndPassword(
-          auth,
-          form.email.trim(),
-          form.password
+        auth,
+        form.email.trim(),
+        form.password
       );
 
-      // 2️⃣ Firebase 프로필 이름 설정
+      // 2) 표시명(가게 이름) 설정
       await updateProfile(result.user, {
         displayName: form.name.trim(),
       });
 
-      // 3️⃣ ID Token 발급
+      // 3) ID Token
       const idToken = await result.user.getIdToken();
 
-      // 4️⃣ 서버 동기화 (/api/me)
+      // 4) 백엔드 동기화
       const me = await syncUserWithBackend(idToken);
       if (!me) return;
 
-      // 5️⃣ 완료 페이지 이동
+      // 5) 완료 페이지
       router.push("/signup/complete");
     } catch (err: any) {
       console.error("회원가입 실패:", err);
@@ -106,78 +115,109 @@ export default function SignupPage() {
   };
 
   return (
-      <main className="min-h-screen w-full bg-[#FAFAFA]">
+    <main className="min-h-screen w-full bg-[#FAFAFA]">
         <div className="mx-auto w-full max-w-[1440px] px-6 pt-[70px] pb-16">
-          <div className="flex justify-center">
-            <section
-                className="
+        <div className="flex justify-center">
+          <section
+            className="
+              relative
               w-full max-w-[849px]
               rounded-[40px] bg-white
               shadow-[0px_2px_2px_0px_#B0C965]
               px-[clamp(20px,5.2vw,75px)]
               pt-[55px] pb-[56px]
             "
-            >
-              <h1 className="text-center font-bold text-[30px] leading-[38px] text-black">
-                DIGI-MON 회원가입
-              </h1>
+          >
+            {/* 타이틀 (2줄) */}
+            <h1 className="text-center text-[30px] font-bold leading-[38px] text-black">
+              <span className="block">DIGI-MON 회원가입</span>
+              <span className="block">(사장님)</span>
+            </h1>
 
-              <form onSubmit={handleEmailSignup} className="mt-[70px]">
-                <div className="flex flex-col gap-[44px]">
-
-                  <div>
-                    <label className="block font-medium text-[20px] text-[#737373]">
-                      이름
-                    </label>
-                    <input
+            <form onSubmit={handleEmailSignup} className="mt-[70px]">
+              <div className="flex flex-col gap-[44px]">
+                {/* 가게 이름 */}
+                <div>
+                  <label className="block text-[20px] font-medium text-[#737373]">
+                    이름
+                  </label>
+                  <input
                         value={form.name}
                         onChange={onChange("name")}
-                        className="mt-[18px] w-full border-b border-[#CFCFCF] pb-[10px] outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-medium text-[20px] text-[#737373]">
-                      이메일
-                    </label>
-                    <input
-                        type="email"
-                        value={form.email}
-                        onChange={onChange("email")}
-                        className="mt-[18px] w-full border-b border-[#CFCFCF] pb-[10px] outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-medium text-[20px] text-[#737373]">
-                      비밀번호
-                    </label>
-                    <input
-                        type="password"
-                        value={form.password}
-                        onChange={onChange("password")}
-                        className="mt-[18px] w-full border-b border-[#CFCFCF] pb-[10px] outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block font-medium text-[20px] text-[#737373]">
-                      전화번호
-                    </label>
-                    <input
-                        value={form.phone}
-                        onChange={onChange("phone")}
-                        className="mt-[18px] w-full border-b border-[#CFCFCF] pb-[10px] outline-none"
-                    />
-                  </div>
-
+                    className="mt-[18px] w-full border-b border-[#CFCFCF] pb-[10px] outline-none"
+                  />
                 </div>
 
-                <button
-                    type="submit"
-                    disabled={loading}
-                    className="
-                  mt-[65px]
+                {/* 이메일 */}
+                <div>
+                  <label className="block text-[20px] font-medium text-[#737373]">
+                    이메일(ID)
+                  </label>
+                  <input
+                    type="email"
+                    value={form.email}
+                    onChange={onChange("email")}
+                    className="mt-[18px] w-full border-b border-[#CFCFCF] pb-[10px] outline-none"
+                  />
+                </div>
+
+                {/* 비밀번호 */}
+                <div>
+                  <label className="block text-[20px] font-medium text-[#737373]">
+                    비밀번호
+                  </label>
+                  <input
+                    type="password"
+                    value={form.password}
+                    onChange={onChange("password")}
+                    className="mt-[18px] w-full border-b border-[#CFCFCF] pb-[10px] outline-none"
+                  />
+                </div>
+
+                {/* 비밀번호 확인 */}
+                <div>
+                  <label className="block text-[20px] font-medium text-[#737373]">
+                    비밀번호 확인
+                  </label>
+                  <input
+                    type="password"
+                    value={form.passwordConfirm}
+                    onChange={onChange("passwordConfirm")}
+                    className="mt-[18px] w-full border-b border-[#CFCFCF] pb-[10px] outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* 이전 화면으로 (Figma: 좌하단) */}
+              <button
+                type="button"
+                onClick={() => router.back()}
+                className="mt-3 inline-flex items-center gap-1 text-[15px] leading-[20px] text-black"
+              >
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  aria-hidden
+                >
+                  <path
+                    d="M15 18l-6-6 6-6"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                이전 화면으로
+              </button>
+
+              {/* 확인 버튼 (Figma: 확인) */}
+              <button
+                type="submit"
+                disabled={loading || !canSubmit}
+                className="
+                  mt-[45px]
                   mx-auto block
                   h-[74px] w-[308px]
                   rounded-[20px]
@@ -185,17 +225,34 @@ export default function SignupPage() {
                   hover:opacity-90 transition
                   disabled:opacity-50
                 "
-                    style={{
-                      background:
-                          "linear-gradient(90deg, #B0C965 0%, #FFFFFF 147.56%)",
-                    }}
-                >
-                  {loading ? "가입 중..." : "다음"}
-                </button>
-              </form>
-            </section>
-          </div>
+                style={{
+                  background:
+                    "linear-gradient(90deg, #B0C965 0%, #FFFFFF 147.56%)",
+                }}
+              >
+                {loading ? "가입 중..." : "확인"}
+              </button>
+            </form>
+          </section>
         </div>
-      </main>
+      </div>
+
+      {/* 도움 요청하기 버튼 */}
+      <button
+        type="button"
+        onClick={() => router.push("/help")}
+        className="
+          fixed bottom-8 right-8
+          h-[74px] w-[193px]
+          rounded-[50px]
+          bg-[#E0F0AF]
+          shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)]
+          text-[18px] font-semibold text-[#585858]
+          hover:opacity-90 transition
+        "
+      >
+        도움 요청하기
+      </button>
+    </main>
   );
 }

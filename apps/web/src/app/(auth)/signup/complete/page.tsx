@@ -38,7 +38,7 @@ export default function SignupCompletePage() {
                 "linear-gradient(106.54deg, rgba(176,201,101,0.9) 13.2%, rgba(255,255,255,0.9) 127.46%)",
             }}
           >
-            로그인하러 가기
+            로그인 후 지도에 가게 등록하기
           </Link>
         </div>
       </div>
