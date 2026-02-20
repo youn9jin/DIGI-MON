@@ -1,9 +1,13 @@
 package com.digimon.api.plandraft;
 
+import com.digimon.api.auth.UnauthorizedException;
+import com.digimon.api.plandraft.dto.AttachRequest;
+import com.digimon.api.plandraft.dto.AttachResponse;
 import com.digimon.api.plandraft.dto.CreatePlanDraftResponse;
 import com.digimon.api.plandraft.dto.InitialPlanDto;
 import com.digimon.api.plandraft.dto.PrimaryActionDto;
 import com.digimon.api.plandraft.dto.SurveyDto;
+import com.digimon.api.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +23,8 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -35,6 +41,9 @@ class PlanDraftControllerTest {
 
     @MockBean
     PlanDraftService planDraftService;
+
+    @MockBean
+    PlanDraftAttachService planDraftAttachService;
 
     @Test
     @DisplayName("survey 누락 시 400 VALIDATION_ERROR")
@@ -111,5 +120,107 @@ class PlanDraftControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.error.code").value("VALIDATION_ERROR"));
+    }
+
+    // --- POST /api/plan-drafts/{draftId}/attach ---
+
+    @Test
+    @DisplayName("attach: Authorization 없으면 401 UNAUTHORIZED")
+    void attach_noAuth_returns401() throws Exception {
+        doThrow(new UnauthorizedException("Invalid or missing token"))
+                .when(planDraftAttachService).resolveCurrentUser(isNull());
+
+        mockMvc.perform(post("/api/plan-drafts/1/attach")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"attachToken\":\"valid-token\"}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.error.code").value("UNAUTHORIZED"));
+    }
+
+    @Test
+    @DisplayName("attach: attachToken blank면 400 VALIDATION_ERROR")
+    void attach_blankToken_returns400() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        when(planDraftAttachService.resolveCurrentUser(any())).thenReturn(user);
+
+        mockMvc.perform(post("/api/plan-drafts/1/attach")
+                        .header("Authorization", "Bearer any-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"attachToken\":\"\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("VALIDATION_ERROR"));
+    }
+
+    @Test
+    @DisplayName("attach: draft 없으면 404 DRAFT_NOT_FOUND")
+    void attach_draftNotFound_returns404() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        when(planDraftAttachService.resolveCurrentUser(any())).thenReturn(user);
+        when(planDraftAttachService.attach(eq(999L), any(AttachRequest.class), eq(user)))
+                .thenThrow(new DraftNotFoundException(999L));
+
+        mockMvc.perform(post("/api/plan-drafts/999/attach")
+                        .header("Authorization", "Bearer any-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"attachToken\":\"valid-token\"}"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error.code").value("DRAFT_NOT_FOUND"));
+    }
+
+    @Test
+    @DisplayName("attach: 성공 시 200 및 draftId, attached:true")
+    void attach_success_returns200() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        when(planDraftAttachService.resolveCurrentUser(any())).thenReturn(user);
+        when(planDraftAttachService.attach(eq(101L), any(AttachRequest.class), eq(user)))
+                .thenReturn(new AttachResponse(101L, true));
+
+        mockMvc.perform(post("/api/plan-drafts/101/attach")
+                        .header("Authorization", "Bearer any-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"attachToken\":\"valid-token\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.draftId").value(101))
+                .andExpect(jsonPath("$.data.attached").value(true))
+                .andExpect(jsonPath("$.error").value((Object) null));
+    }
+
+    @Test
+    @DisplayName("attach: 이미 다른 유저에게 붙어 있으면 409 DRAFT_ALREADY_ATTACHED")
+    void attach_alreadyAttachedToOther_returns409() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        when(planDraftAttachService.resolveCurrentUser(any())).thenReturn(user);
+        when(planDraftAttachService.attach(eq(101L), any(AttachRequest.class), eq(user)))
+                .thenThrow(new DraftAlreadyAttachedException());
+
+        mockMvc.perform(post("/api/plan-drafts/101/attach")
+                        .header("Authorization", "Bearer any-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"attachToken\":\"valid-token\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error.code").value("DRAFT_ALREADY_ATTACHED"));
+    }
+
+    @Test
+    @DisplayName("attach: 토큰 무효/만료/이미 사용이면 409 ATTACH_TOKEN_INVALID_OR_EXPIRED")
+    void attach_invalidToken_returns409() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        when(planDraftAttachService.resolveCurrentUser(any())).thenReturn(user);
+        when(planDraftAttachService.attach(eq(101L), any(AttachRequest.class), eq(user)))
+                .thenThrow(new AttachTokenInvalidOrExpiredException());
+
+        mockMvc.perform(post("/api/plan-drafts/101/attach")
+                        .header("Authorization", "Bearer any-token")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"attachToken\":\"wrong-token\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.error.code").value("ATTACH_TOKEN_INVALID_OR_EXPIRED"));
     }
 }
