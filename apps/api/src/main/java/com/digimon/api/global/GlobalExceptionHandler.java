@@ -61,6 +61,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
+    @ExceptionHandler(ValidationErrorException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleValidationError(ValidationErrorException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "VALIDATION_ERROR",
+                "Invalid request body",
+                ex.getDetails());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseWrapper<Void>> handleValidation(MethodArgumentNotValidException ex) {
         List<ValidationErrorDetail> details = ex.getBindingResult().getFieldErrors().stream()
