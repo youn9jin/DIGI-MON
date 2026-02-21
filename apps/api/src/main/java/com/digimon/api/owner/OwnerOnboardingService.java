@@ -123,7 +123,7 @@ public class OwnerOnboardingService {
         }
 
         profile.setStoreName(storeName);
-        profile.setBusinessType(industryTag);
+        profile.setIndustryTag(industryTag);
         profile.setAgeGroup(ageGroup);
         profile.setCountryCode(countryCode);
         profile.setRegionText(adminArea);
@@ -144,7 +144,7 @@ public class OwnerOnboardingService {
         );
         OwnerProfileResponse ownerProfileResponse = new OwnerProfileResponse(
                 profile.getStoreName(),
-                profile.getBusinessType(),
+                OwnerProfile.resolveIndustryTag(profile),
                 profile.getAgeGroup(),
                 location,
                 profile.getOpenedAt()

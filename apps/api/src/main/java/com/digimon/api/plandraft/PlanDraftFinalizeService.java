@@ -109,7 +109,7 @@ public class PlanDraftFinalizeService {
 
         AiOwnerProfileDto ownerProfileDto = AiOwnerProfileDto.builder()
                 .storeName(profile.getStoreName())
-                .industryTag(profile.getBusinessType())
+                .industryTag(OwnerProfile.resolveIndustryTag(profile))
                 .ageGroup(profile.getAgeGroup())
                 .location(new AiOwnerProfileDto.AiLocationDto(
                         profile.getCountryCode(),
