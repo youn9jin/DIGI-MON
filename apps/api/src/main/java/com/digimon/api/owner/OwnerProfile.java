@@ -27,6 +27,11 @@ public class OwnerProfile {
     @Column(name = "store_name")
     private String storeName;
 
+    /** 업종. 저장/조회의 source of truth. */
+    @Column(name = "industry_tag")
+    private String industryTag;
+
+    /** 레거시/임시. 업종 저장에는 사용하지 않음. 조회 fallback용만 유지. */
     @Column(name = "business_type")
     private String businessType;
 
@@ -53,4 +58,13 @@ public class OwnerProfile {
 
     @Column(name = "updated_at")
     private OffsetDateTime updatedAt;
+
+    /**
+     * 응답/조회 시 사용. industry_tag가 있으면 사용, null이면 레거시 business_type fallback.
+     * 저장 시에는 항상 industry_tag만 사용한다.
+     */
+    public static String resolveIndustryTag(OwnerProfile profile) {
+        if (profile == null) return null;
+        return profile.getIndustryTag() != null ? profile.getIndustryTag() : profile.getBusinessType();
+    }
 }

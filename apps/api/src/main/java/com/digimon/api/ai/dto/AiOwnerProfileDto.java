@@ -15,7 +15,7 @@ import lombok.Setter;
 public class AiOwnerProfileDto {
 
     private String storeName;
-    /** industryTag. DB business_type 매핑 */
+    /** industryTag. DB industry_tag (null이면 business_type fallback) 기준으로 채움 */
     private String industryTag;
     private String ageGroup;
     private AiLocationDto location;
