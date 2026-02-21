@@ -121,7 +121,6 @@ export default function ActionPlanStep1Page() {
                 </section>
             </div>
 
-            {/* ✅ ✅ 버튼 2개: 뷰포트 기준 오른쪽 아래 고정 */}
             <div className="fixed right-6 bottom-6 lg:right-[45px] lg:bottom-[35px] z-50">
                 <div className="flex items-center gap-6">
                     {/* 완료 버튼 (큰 버튼) */}
@@ -133,8 +132,7 @@ export default function ActionPlanStep1Page() {
                                 "linear-gradient(90deg, rgba(176,201,101,0.88) 37.355%, rgba(245,245,245,0.88) 138.23%)",
                         }}
                         onClick={() => {
-                            // TODO: 완료 처리(예: step-2로 이동하거나 action-plan로 복귀)
-                            router.push("/action-plan");
+                            router.push("/action-plan/step-1/complete");
                         }}
                     >
                         지도 서비스 열기를 완료했어요
