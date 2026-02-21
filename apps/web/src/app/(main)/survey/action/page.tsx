@@ -78,7 +78,7 @@ export default function SurveyActionPage() {
 
                         <div className="mt-8 flex flex-col sm:flex-row flex-wrap gap-4">
                             <Link
-                                href="/store/register"
+                                href="/action-plan"
                                 className="flex items-center justify-center rounded-[20px] font-semibold text-[#2E2E2E] hover:opacity-90 transition-opacity whitespace-nowrap"
                                 style={{
                                     height: "73px",
@@ -118,7 +118,7 @@ export default function SurveyActionPage() {
                         >
                             <div className="relative" style={{ width: "40%", paddingBottom: "58%" }}>
                                 <Image
-                                    src="/images/result-menu.svg"   // ✅ SVG로 변경
+                                    src="/images/result-menu.svg"
                                     alt="메뉴 아이콘"
                                     fill
                                     sizes="(max-width: 768px) 35vw, 160px"
@@ -135,7 +135,7 @@ export default function SurveyActionPage() {
                         >
                             <div className="relative" style={{ width: "57%", paddingBottom: "70%" }}>
                                 <Image
-                                    src="/images/result-googlemap.svg" // ✅ SVG로 변경
+                                    src="/images/result-googlemap.svg"
                                     alt="구글 지도 아이콘"
                                     fill
                                     sizes="(max-width: 768px) 50vw, 260px"
