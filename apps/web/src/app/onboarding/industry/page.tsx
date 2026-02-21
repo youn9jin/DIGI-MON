@@ -6,22 +6,24 @@ import { useRouter } from "next/navigation";
 import SurveyOption from "@/components/survey/SurveyOption";
 import DetailCriteriaModal from "@/components/onboarding/DetailCriteriaModal";
 
+type IndustryOption = { label: string; code: string };
+
 export default function OnboardingIndustryPage() {
     const router = useRouter();
 
-    const options = useMemo(
+    const options = useMemo<IndustryOption[]>(
         () => [
-            "제조업",
-            "도매 및 소매업",
-            "숙박 및 음식점업",
-            "건설업",
-            "정보통신업",
-            "예술, 스포츠 및 여가관련 서비스업",
+            { label: "제조업", code: "ELECTRONICS_MANUFACTURING" },
+            { label: "도매 및 소매업", code: "WHOLESALE_RETAIL" },
+            { label: "숙박 및 음식점업", code: "ACCOMMODATION_FOOD" },
+            { label: "건설업", code: "CONSTRUCTION" },
+            { label: "정보통신업", code: "INFORMATION_COMMUNICATION" },
+            { label: "예술, 스포츠 및 여가관련 서비스업", code: "ARTS_SPORTS_LEISURE" },
         ],
         []
     );
 
-    const [selected, setSelected] = useState<string | null>(null);
+    const [selected, setSelected] = useState<IndustryOption | null>(null);
     const [openHelp, setOpenHelp] = useState(false);
 
     const canSubmit = !!selected;
@@ -30,7 +32,7 @@ export default function OnboardingIndustryPage() {
         if (!selected) return;
 
         try {
-            localStorage.setItem("digimon_industry", selected);
+            localStorage.setItem("digimon_industry", selected.code);
         } catch {}
 
         router.push("/onboarding/store-name");
@@ -51,30 +53,25 @@ export default function OnboardingIndustryPage() {
               flex flex-col
             "
                     >
-                        {/*타이틀*/}
                         <h1 className="text-left text-[22px] md:text-[25px] font-bold leading-[32px] md:leading-[35px] text-black">
                             DIGI-MON 서비스를 이용하려면
                             <br />
                             사장님 가게 업종 선택이 필요해요
                         </h1>
 
-                        {/*선택지*/}
                         <div className="mt-10 md:mt-[45px] space-y-[11px]">
                             {options.map((opt) => (
                                 <SurveyOption
-                                    key={opt}
-                                    label={opt}
-                                    selected={selected === opt}
+                                    key={opt.code}
+                                    label={opt.label}
+                                    selected={selected?.code === opt.code}
                                     onClick={() => setSelected(opt)}
-                                    // 업종 페이지 폭에 맞추기(필요 시)
                                     className="max-w-none"
                                 />
                             ))}
                         </div>
 
-                        {/* 하단 영역 */}
                         <div className="mt-auto pt-10">
-                            {/* 좌/우 링크 */}
                             <div className="flex items-center justify-between">
                                 <Link
                                     href="/onboarding/role"
@@ -101,7 +98,6 @@ export default function OnboardingIndustryPage() {
                                 </button>
                             </div>
 
-                            {/* 선택 완료 버튼 */}
                             <div className="mt-6 flex justify-center">
                                 <button
                                     type="button"
@@ -124,13 +120,11 @@ export default function OnboardingIndustryPage() {
                             </div>
                         </div>
 
-                        {/* 모달 */}
                         <DetailCriteriaModal open={openHelp} onClose={() => setOpenHelp(false)} />
                     </section>
                 </div>
             </div>
 
-            {/* 도움 요청하기 버튼 */}
             <button
                 type="button"
                 onClick={() => router.push("/help")}
