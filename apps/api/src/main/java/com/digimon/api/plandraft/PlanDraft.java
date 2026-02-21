@@ -52,6 +52,13 @@ public class PlanDraft {
     @Column(name = "user_id")
     private Long userId;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "final_plan", columnDefinition = "jsonb")
+    private Map<String, Object> finalPlan;
+
+    @Column(name = "finalized_at")
+    private OffsetDateTime finalizedAt;
+
     @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
