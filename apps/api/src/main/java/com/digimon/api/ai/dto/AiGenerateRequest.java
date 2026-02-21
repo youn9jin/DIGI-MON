@@ -1,7 +1,6 @@
 package com.digimon.api.ai.dto;
 
 import com.digimon.api.plandraft.DigitalLevel;
-import com.digimon.api.plandraft.dto.SurveyDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,5 +23,12 @@ public class AiGenerateRequest {
     /** Backend가 설문 룰로 계산한 값. AI는 계산하지 않음(필수) */
     private DigitalLevel digitalLevel;
 
-    private SurveyDto survey;
+    /** PRE_LOGIN: SurveyDto, FINALIZE: Map from plan_drafts.survey */
+    private Object survey;
+
+    /** FINALIZE 시 필수. DB owner_profiles에서 조립 */
+    private Object ownerProfile;
+
+    /** FINALIZE 시 필수. plan_drafts.initial_plan (로그인 전 생성 결과) */
+    private Object initialPlan;
 }

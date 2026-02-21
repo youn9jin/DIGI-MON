@@ -83,6 +83,41 @@ public class HttpAiPlanGenerator implements AiPlanGenerator {
     }
 
     /**
+     * FINALIZE 단계: POST /internal/plan/generate with stage=FINALIZE.
+     * 타임아웃 3초. 실패/파싱 실패 시 null 반환 → 호출측에서 Template fallback 사용.
+     */
+    public Object generateFinalPlan(AiGenerateRequest request) {
+        if (request == null || request.getStage() != AiStage.FINALIZE) {
+            log.warn("[AI] finalize skipped: invalid request or stage");
+            return null;
+        }
+        String requestId = request.getRequestId() != null ? request.getRequestId() : UUID.randomUUID().toString();
+        String baseUrl = properties.getBaseUrl().replaceAll("/$", "");
+        String url = baseUrl + PATH;
+
+        log.info("[AI] finalize start requestId={} url={} draftId/caller", requestId, url);
+
+        try {
+            AiGenerateResponse response = restClient.post()
+                    .uri(url)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(request)
+                    .retrieve()
+                    .body(AiGenerateResponse.class);
+
+            if (response == null || response.getFinalPlan() == null) {
+                log.warn("[AI] finalize empty response requestId={}", requestId);
+                return null;
+            }
+            log.info("[AI] finalize success requestId={}", requestId);
+            return response.getFinalPlan();
+        } catch (Exception e) {
+            log.warn("[AI] finalize failed requestId={} error={}", requestId, e.getMessage());
+            return null;
+        }
+    }
+
+    /**
      * AI 호출 불가(비활성/타임아웃/연결실패/파싱실패) 시 Fallback에서 사용하기 위한 예외.
      */
     public static class AiUnavailableException extends RuntimeException {

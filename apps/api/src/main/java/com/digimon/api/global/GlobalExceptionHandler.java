@@ -1,7 +1,9 @@
 package com.digimon.api.global;
 
 import com.digimon.api.auth.EmailAlreadyExistsException;
+import com.digimon.api.auth.ForbiddenException;
 import com.digimon.api.auth.UnauthorizedException;
+import com.digimon.api.owner.OnboardingNotCompletedException;
 import com.digimon.api.plandraft.AttachTokenInvalidOrExpiredException;
 import com.digimon.api.plandraft.DraftAlreadyAttachedException;
 import com.digimon.api.plandraft.DraftNotFoundException;
@@ -32,6 +34,24 @@ public class GlobalExceptionHandler {
                 ex.getMessage() != null ? ex.getMessage() : "Invalid or missing token",
                 null);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleForbidden(ForbiddenException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "FORBIDDEN",
+                ex.getMessage() != null ? ex.getMessage() : "No permission to finalize this draft",
+                null);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    }
+
+    @ExceptionHandler(OnboardingNotCompletedException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleOnboardingNotCompleted() {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "ONBOARDING_NOT_COMPLETED",
+                "Owner onboarding must be completed before finalize",
+                null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
     @ExceptionHandler(DraftNotFoundException.class)
