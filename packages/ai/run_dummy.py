@@ -72,69 +72,42 @@ def generate_initial_plan(owner_data, survey_data, digital_level):
     response = model.generate_content(final_prompt)
     
     try:
-        # JSON 블록 추출
         json_match = re.search(r'\{.*\}', response.text, re.DOTALL)
         if json_match:
             return json.loads(json_match.group())
         return json.loads(response.text)
     except Exception as e:
         print(f"❌ AI 플랜 생성 실패: {e}")
-        return {}
+        return {"initialPlan": []}
 
-def process_draft_request(request_data):
-    """
-    명세서의 '서버 동작 규칙'을 수행하는 메인 함수
-    """
     
-    # 1. 기본 정보 추출
+@app.post("/internal/plan/generate")
+async def create_draft_endpoint(request_data: dict = Body(...)):
+    """
+    intialPlan만 반환하도록
+    """
+    # 1. 요청 데이터 추출
     survey = request_data.get("survey", {})
     digital_level = request_data.get("digitalLevel", "LEVEL0")
     
-    # requestId를 guestKey로 사용 (없으면 새로 생성)
-    guest_key = request_data.get("requestId") or request_data.get("guestKey") or str(uuid.uuid4())
-    
-    # 가게 이름 받아오기
-    store_name = request_data.get("storeName", "사장님") 
+    # 백엔드에서 넘겨주는 기본 정보 
+    store_name = request_data.get("storeName", "사장님")
     business_type = request_data.get("businessType", "소상공인")
     
-    # 3. AI용 오너 데이터 구성 
     owner_context = {
         "store_name": store_name,
         "business_type": business_type,
         "digitalLevel": digital_level
     }
-    
-    # 4. 액션플랜 생성
+
+    # 2. AI 플랜 생성 
     initial_plan_result = generate_initial_plan(owner_context, survey, digital_level)
-    
-    # 5. attachToken 및 만료시간 생성 (명세: TTL 1~24시간)
-    attach_token = str(uuid.uuid4())
-    expires_at = (datetime.utcnow() + timedelta(hours=24)).isoformat() + "Z"
-    
-    # draft_id 우선 임의로 만들기
-    temp_draft_id = int(time.time() * 1000) + random.randint(1, 999)
-    
-    # 6. 최종 명세서 규격 Response 구성 
+
+    # 3. initialPlan만 반환 
     return {
-      "success": True,
-      "data": {
-        "guestKey": guest_key,
-        "draftId": temp_draft_id, 
-        "attachToken": attach_token,
-        "attachTokenExpiresAt": expires_at,
-        "digitalLevel": digital_level,
-        "initialPlan": initial_plan_result.get("initialPlan", {})
-      },
-      "error": None
+        "initialPlan": initial_plan_result.get("initialPlan", [])
     }
     
-@app.post("/api/drafts")
-async def create_draft_endpoint(request_data: dict = Body(...)):
-    """
-    프론트엔드에서 JSON 데이터를 보내면 이 함수가 실행됩니다.
-    """
-    final_response = process_draft_request(request_data)
-    return final_response
 
 if __name__ == "__main__":
     import uvicorn
