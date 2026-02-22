@@ -6,9 +6,12 @@ import com.digimon.api.ai.dto.AiStage;
 import com.digimon.api.plandraft.DigitalLevel;
 import com.digimon.api.plandraft.dto.PlanActionDto;
 import com.digimon.api.plandraft.dto.SurveyDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -31,9 +34,11 @@ public class HttpAiPlanGenerator implements AiPlanGenerator {
 
     private final AiProperties properties;
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
 
-    public HttpAiPlanGenerator(AiProperties properties) {
+    public HttpAiPlanGenerator(AiProperties properties, ObjectMapper objectMapper) {
         this.properties = properties;
+        this.objectMapper = objectMapper;
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout(Duration.ofMillis(properties.getTimeoutMs()));
         factory.setReadTimeout(Duration.ofMillis(properties.getTimeoutMs()));
@@ -60,15 +65,39 @@ public class HttpAiPlanGenerator implements AiPlanGenerator {
                 .survey(survey)
                 .build();
 
-        log.info("[AI] plan generate start requestId={} url={} digitalLevel={}", requestId, url, digitalLevel);
+        String bodyJson;
+        try {
+            bodyJson = objectMapper.writeValueAsString(body);
+        } catch (JsonProcessingException e) {
+            bodyJson = "(serialize failed)";
+        }
+        log.info("[AI] plan generate start requestId={} url={} digitalLevel={} body={}", requestId, url, digitalLevel, bodyJson);
 
         try {
-            AiGenerateResponse response = restClient.post()
+            // Accept: application/json 명시
+            ResponseEntity<String> entity = restClient.post()
                     .uri(url)
                     .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
                     .body(body)
                     .retrieve()
-                    .body(AiGenerateResponse.class);
+                    .toEntity(String.class);
+
+            String rawBody = entity.getBody();
+            int status = entity.getStatusCode().value();
+
+            if (status < 200 || status >= 300 || rawBody == null) {
+                log.warn("[AI] plan generate non-2xx requestId={} status={} rawBody={}", requestId, status, rawBody);
+                throw new AiUnavailableException("AI returned " + status + ": " + rawBody);
+            }
+
+            AiGenerateResponse response;
+            try {
+                response = objectMapper.readValue(rawBody, AiGenerateResponse.class);
+            } catch (Exception e) {
+                log.warn("[AI] plan generate parse failed requestId={} rawBody={}", requestId, rawBody);
+                throw new AiUnavailableException("AI response parse failed: " + e.getMessage(), e);
+            }
 
             if (response == null || response.getInitialPlan() == null || response.getInitialPlan().isEmpty()) {
                 log.warn("[AI] plan generate empty response requestId={}", requestId);
@@ -77,6 +106,8 @@ public class HttpAiPlanGenerator implements AiPlanGenerator {
 
             log.info("[AI] plan generate success requestId={}", requestId);
             return response.getInitialPlan();
+        } catch (AiUnavailableException e) {
+            throw e;
         } catch (Exception e) {
             log.warn("[AI] plan generate failed requestId={} error={}", requestId, e.getMessage());
             throw new AiUnavailableException("AI call failed: " + e.getMessage(), e);

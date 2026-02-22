@@ -11,6 +11,7 @@ import random
 
 from fastapi import FastAPI, Body
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 
 app = FastAPI()
 
@@ -84,8 +85,9 @@ def generate_initial_plan(owner_data, survey_data, digital_level):
 @app.post("/internal/plan/generate")
 async def create_draft_endpoint(request_data: dict = Body(...)):
     """
-    intialPlan만 반환하도록
+    initialPlan만 반환. Spring 호출 시 콘솔에 한 줄 로그 (uvicorn 액세스 로그와 함께 확인용).
     """
+    print("[AI] /internal/plan/generate called from Spring (request received)")
     # 1. 요청 데이터 추출
     survey = request_data.get("survey", {})
     digital_level = request_data.get("digitalLevel", "LEVEL0")
@@ -100,13 +102,17 @@ async def create_draft_endpoint(request_data: dict = Body(...)):
         "digitalLevel": digital_level
     }
 
-    # 2. AI 플랜 생성 
+    # 2. AI 플랜 생성
     initial_plan_result = generate_initial_plan(owner_context, survey, digital_level)
 
-    # 3. initialPlan만 반환 
-    return {
-        "initialPlan": initial_plan_result.get("initialPlan", [])
-    }
+    # 3. initialPlan만 반환 — Content-Type을 반드시 application/json 으로 (Spring 파싱 오류 방지)
+    payload = {"initialPlan": initial_plan_result.get("initialPlan", [])}
+    body_bytes = json.dumps(payload, ensure_ascii=False).encode("utf-8")
+    return Response(
+        content=body_bytes,
+        media_type="application/json; charset=utf-8",
+        headers={"Content-Type": "application/json; charset=utf-8"},
+    )
     
 
 if __name__ == "__main__":
