@@ -1,9 +1,11 @@
 package com.digimon.api.ai;
 
 import com.digimon.api.plandraft.DigitalLevel;
-import com.digimon.api.plandraft.dto.InitialPlanDto;
+import com.digimon.api.plandraft.dto.PlanActionDto;
 import com.digimon.api.plandraft.dto.SurveyDto;
 import org.slf4j.Logger;
+
+import java.util.List;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
@@ -31,15 +33,14 @@ public class FallbackAiPlanGenerator implements AiPlanGenerator {
     }
 
     @Override
-    public InitialPlanDto generateInitialPlan(SurveyDto survey, DigitalLevel digitalLevel) {
+    public List<PlanActionDto> generateInitialPlan(SurveyDto survey, DigitalLevel digitalLevel) {
         if (!properties.isEnabled()) {
             log.info("[AI] disabled → template used (digimon.ai.enabled=false)");
             return templateAiPlanGenerator.generateInitialPlan(survey, digitalLevel);
         }
 
         try {
-            InitialPlanDto result = httpAiPlanGenerator.generateInitialPlan(survey, digitalLevel);
-            return result;
+            return httpAiPlanGenerator.generateInitialPlan(survey, digitalLevel);
         } catch (Exception e) {
             log.warn("[AI] fallback to template reason={}", e.getMessage());
             return templateAiPlanGenerator.generateInitialPlan(survey, digitalLevel);

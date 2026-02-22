@@ -8,6 +8,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -36,9 +37,10 @@ public class PlanDraft {
     @Column(name = "digital_level", nullable = false, columnDefinition = "digital_level")
     private DigitalLevel digitalLevel;
 
+    /** JSON 배열. [ { actionCode, title, summary, estimatedMinutes, steps: [ { step_title, description } ] }, ... ] */
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "initial_plan", nullable = false, columnDefinition = "jsonb")
-    private Map<String, Object> initialPlan;
+    private List<Map<String, Object>> initialPlan;
 
     @Column(name = "attach_token", nullable = false)
     private String attachToken;
