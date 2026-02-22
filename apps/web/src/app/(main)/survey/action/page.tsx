@@ -30,11 +30,23 @@ export default function SurveyActionPage() {
 
     useEffect(() => {
         try {
-            const raw = sessionStorage.getItem("planDraftResponse");
+            // ✅ finalize 결과는 finalPlanResponse에 저장됨
+            const raw = sessionStorage.getItem("finalPlanResponse");
             if (!raw) return;
+
             const parsed = JSON.parse(raw);
-            const pa = parsed?.initialPlan?.primaryAction;
-            if (pa?.title) setPrimaryAction(pa);
+
+            // ✅ finalize 응답 구조: finalPlan.primaryAction
+            const pa = parsed?.finalPlan?.primaryAction;
+
+            if (pa?.title) {
+                setPrimaryAction({
+                    actionCode: pa.actionCode,
+                    title: pa.title,
+                    summary: pa.summary,
+                    estimatedMinutes: pa.estimatedMinutes,
+                });
+            }
         } catch (e) {
             console.warn(e);
         }

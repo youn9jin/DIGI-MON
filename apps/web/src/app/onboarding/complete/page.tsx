@@ -4,17 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuthUser } from "@/lib/useAuthUser";
-
-const API_PATH = "/api/owners/onboarding";
+import { attachAnonymousDraftIfExists } from "@/lib/planDraftAttach";
+import { finalizePlanDraft } from "@/lib/planDraftFinalize";
 
 const LS_KEYS = {
     industry: "digimon_industry",
     storeName: "digimon_store_name",
-    adminArea: "digimon_store_location", // location input -> adminArea로 매핑
+    adminArea: "digimon_store_location",
     ageGroup: "digimon_age_group",
 };
 
-//age 라벨 -> enum
+// age 라벨 -> enum
 const AGE_LABEL_TO_ENUM: Record<string, string> = {
     "10대": "AGE_10S",
     "20대": "AGE_20S",
@@ -25,6 +25,7 @@ const AGE_LABEL_TO_ENUM: Record<string, string> = {
 };
 
 type SaveState = "idle" | "saving" | "success" | "error";
+type FinalizeState = "idle" | "finalizing" | "success" | "error";
 
 function normalizeAgeEnum(value: string) {
     const v = (value || "").trim();
@@ -41,12 +42,16 @@ export default function OnboardingCompletePage() {
     const { user, ready, isLoggedIn } = useAuthUser();
 
     const [saveState, setSaveState] = useState<SaveState>("idle");
+    const [finalizeState, setFinalizeState] = useState<FinalizeState>("idle");
     const [errorMsg, setErrorMsg] = useState("");
+
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const onboardingUrl = apiBase ? `${apiBase}/api/owners/onboarding` : "";
 
     const payload = useMemo(() => {
         if (typeof window === "undefined") return null;
 
-        const industryTag = (localStorage.getItem(LS_KEYS.industry) || "").trim(); // ✅ enum
+        const industryTag = (localStorage.getItem(LS_KEYS.industry) || "").trim(); // enum
         const ageRaw = localStorage.getItem(LS_KEYS.ageGroup) || "";
         const ageGroup = normalizeAgeEnum(ageRaw);
 
@@ -66,6 +71,7 @@ export default function OnboardingCompletePage() {
     }, []);
 
     async function saveOnboardingOnce() {
+        if (!apiBase) throw new Error("NEXT_PUBLIC_API_BASE_URL이 설정되지 않았습니다.");
         if (!payload) throw new Error("온보딩 데이터가 없습니다.");
         if (!ready) throw new Error("로그인 상태를 확인 중입니다.");
         if (!isLoggedIn || !user) throw new Error("로그인이 필요합니다.");
@@ -84,7 +90,7 @@ export default function OnboardingCompletePage() {
 
         const token = await user.getIdToken();
 
-        const res = await fetch(API_PATH, {
+        const res = await fetch(onboardingUrl, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -99,7 +105,7 @@ export default function OnboardingCompletePage() {
             return;
         }
 
-        let msg = `저장 실패 (HTTP ${res.status})`;
+        let msg = `온보딩 저장 실패 (HTTP ${res.status})`;
         try {
             const json = await res.json();
             msg = json?.error?.message || json?.message || msg;
@@ -109,19 +115,58 @@ export default function OnboardingCompletePage() {
         setErrorMsg(msg);
     }
 
-    // complete 진입 시 1회 호출
+    async function finalizeOnce() {
+        setFinalizeState("finalizing");
+        setErrorMsg("");
+
+        try {
+            // ✅ 1) 먼저 attach 시도 (익명 draft -> 내 계정에 귀속)
+            await attachAnonymousDraftIfExists();
+
+            // ✅ 2) 그 다음 finalize
+            await finalizePlanDraft();
+
+            setFinalizeState("success");
+        } catch (e: any) {
+            setFinalizeState("error");
+            setErrorMsg(e?.message || "finalize 중 오류가 발생했습니다.");
+        }
+    }
+
+    // complete 진입 시:
+    // 1) onboarding 저장 1회
+    // 2) 성공하면 finalize 1회
     useEffect(() => {
         if (!ready) return;
         if (saveState !== "idle") return;
 
         saveOnboardingOnce().catch((e) => {
             setSaveState("error");
-            setErrorMsg(e?.message || "저장 중 오류가 발생했습니다.");
+            setErrorMsg(e?.message || "온보딩 저장 중 오류가 발생했습니다.");
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [ready]);
 
-    const canGoNext = saveState === "success";
+    useEffect(() => {
+        if (saveState !== "success") return;
+        if (finalizeState !== "idle") return;
+
+        finalizeOnce();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [saveState]);
+
+    const canGoNext = saveState === "success" && finalizeState === "success";
+
+    const titleText =
+        saveState === "saving"
+            ? "가게 정보를 저장하는 중입니다..."
+            : saveState === "error"
+                ? "가게 정보 저장에 실패했습니다"
+                : finalizeState === "finalizing"
+                    ? "맞춤 실행 플랜을 생성하는 중입니다..."
+                    : finalizeState === "error"
+                        ? "실행 플랜 생성에 실패했습니다"
+                        : "가게 정보 등록이 완료되었습니다";
 
     return (
         <main className="min-h-[calc(100vh-70px)] w-full bg-[#FAFAFA]">
@@ -138,20 +183,18 @@ export default function OnboardingCompletePage() {
                     </div>
 
                     <h1 className="mt-[30px] text-[45px] font-semibold leading-[38px] text-black text-center">
-                        {saveState === "saving"
-                            ? "가게 정보를 저장하는 중입니다..."
-                            : saveState === "error"
-                                ? "가게 정보 저장에 실패했습니다"
-                                : "가게 정보 등록이 완료되었습니다"}
+                        {titleText}
                     </h1>
 
-                    {saveState === "error" && (
+                    {(saveState === "error" || finalizeState === "error") && (
                         <div className="mt-4 max-w-[560px] text-center">
                             <p className="text-[15px] text-red-600">{errorMsg}</p>
                             <button
                                 type="button"
                                 onClick={() => {
+                                    // 다시 시도: onboarding부터 다시
                                     setSaveState("idle");
+                                    setFinalizeState("idle");
                                     setErrorMsg("");
                                 }}
                                 className="mt-4 h-[45px] px-6 rounded-[12px] bg-white border border-red-200 text-red-600 hover:opacity-90 transition"
@@ -196,7 +239,11 @@ export default function OnboardingCompletePage() {
                                     "linear-gradient(106.541684deg, rgba(176,201,101,0.9) 13.215%, rgba(255,255,255,0.9) 127.46%)",
                             }}
                         >
-                            {saveState === "saving" ? "저장 중..." : "저장 완료 후 이동 가능"}
+                            {saveState === "saving"
+                                ? "저장 중..."
+                                : finalizeState === "finalizing"
+                                    ? "플랜 생성 중..."
+                                    : "저장 완료 후 이동 가능"}
                         </button>
                     )}
                 </div>
