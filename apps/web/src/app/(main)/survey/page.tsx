@@ -41,6 +41,7 @@ const STEP_5 = {
 } as const;
 
 const DRAFT_STORAGE_KEY = "digimon_draft";
+const SESSION_RESULT_KEY = "planDraftResponse";
 
 type DraftLocal = {
   guestKey: string;
@@ -49,20 +50,21 @@ type DraftLocal = {
   attachTokenExpiresAt: string;
 };
 
+type PlanAction = {
+  actionCode: string;
+  title: string;
+  summary: string;
+  estimatedMinutes: number;
+  steps?: Array<{ step_title: string; description: string }>;
+};
+
 type PlanDraftResponse = {
   guestKey: string;
   draftId: number;
   attachToken: string;
   attachTokenExpiresAt: string;
   digitalLevel: string;
-  initialPlan: {
-    primaryAction: {
-      actionCode: string;
-      title: string;
-      summary: string;
-      estimatedMinutes: number;
-    };
-  };
+  initialPlan: PlanAction[];
 };
 
 function buildSurveyPayload(answers: Record<number, string | null>) {
@@ -147,26 +149,25 @@ function safeWriteDraftLocal(data: DraftLocal) {
 function safeWriteSessionResult(data: {
   draftId: number;
   digitalLevel: string;
-  initialPlan: PlanDraftResponse["initialPlan"];
+  initialPlan: PlanAction[];
 }) {
   try {
-    sessionStorage.setItem("planDraftResponse", JSON.stringify(data));
+    sessionStorage.setItem(SESSION_RESULT_KEY, JSON.stringify(data));
   } catch (e) {
     console.warn("sessionStorage save failed:", e);
   }
 }
 
 async function createPlanDraft(
-    answers: Record<number, string | null>
+  answers: Record<number, string | null>
 ): Promise<PlanDraftResponse> {
   const payloadBase = buildSurveyPayload(answers);
   if (!payloadBase) throw new Error("설문 답변이 완성되지 않았어요.");
 
   const local = safeReadDraftLocal();
-  const body = local?.guestKey
-      ? { guestKey: local.guestKey, ...payloadBase }
-      : payloadBase;
+  const body = local?.guestKey ? { guestKey: local.guestKey, ...payloadBase } : payloadBase;
 
+  console.log("[createPlanDraft] 요청 전송");
   const res = await fetch("/api/plan-drafts", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -174,10 +175,20 @@ async function createPlanDraft(
   });
 
   const json = await res.json().catch(() => null);
+  console.log("[createPlanDraft] 응답:", {
+    status: res.status,
+    success: json?.success,
+    hasData: !!json?.data,
+    initialPlanLength: Array.isArray(json?.data?.initialPlan) ? json.data.initialPlan.length : 0,
+  });
 
   if (!res.ok || !json?.success) {
     const msg = json?.error?.message || `요청 실패 (${res.status})`;
     throw new Error(msg);
+  }
+
+  if (!json?.data) {
+    throw new Error("응답 데이터가 없어요.");
   }
 
   return json.data as PlanDraftResponse;
