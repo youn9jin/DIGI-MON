@@ -1,5 +1,6 @@
 package com.digimon.api.global;
 
+import com.digimon.api.auth.AuthAccountConflictException;
 import com.digimon.api.auth.EmailAlreadyExistsException;
 import com.digimon.api.auth.ForbiddenException;
 import com.digimon.api.auth.UnauthorizedException;
@@ -20,6 +21,15 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AuthAccountConflictException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleAuthAccountConflict(AuthAccountConflictException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "AUTH_ACCOUNT_CONFLICT",
+                ex.getMessage() != null ? ex.getMessage() : "Email already linked to another account",
+                null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handleEmailAlreadyExists() {

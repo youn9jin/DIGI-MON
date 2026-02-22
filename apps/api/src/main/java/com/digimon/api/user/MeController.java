@@ -1,5 +1,6 @@
 package com.digimon.api.user;
 
+import com.digimon.api.auth.AuthAccountConflictException;
 import com.digimon.api.auth.FirebaseTokenService;
 import com.digimon.api.helper.HelperProfileRepository;
 import com.digimon.api.owner.OwnerProfileRepository;
@@ -68,6 +69,8 @@ public class MeController {
 
             return ResponseEntity.ok(res);
 
+        } catch (AuthAccountConflictException e) {
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
                     "message", "Invalid ID token",
