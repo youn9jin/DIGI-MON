@@ -1,8 +1,30 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthUser } from "@/lib/useAuthUser";
 
 export default function OnboardingIntroPage() {
+    const router = useRouter();
+    const { ready, isLoggedIn, meReady, onboarded, role } = useAuthUser();
+
+    useEffect(() => {
+        if (!ready) return;
+        if (!isLoggedIn) {
+            router.replace("/login");
+            return;
+        }
+        if (!meReady) return;
+
+        // ✅ 온보딩 완료면 intro 들어오지 못하게 스킵
+        if (onboarded && role === "OWNER") {
+            router.replace("/survey/action"); // 또는 "/action-plan"
+        }
+    }, [ready, isLoggedIn, meReady, onboarded, role, router]);
+
+    // meReady까지 기다렸다가 렌더(깜빡임 방지)
+    if (!ready || (isLoggedIn && !meReady)) return null;
     return (
         <div className="w-full bg-[#FAFAFA] overflow-hidden">
             <div className="mx-auto max-w-6xl px-4 md:px-8">
