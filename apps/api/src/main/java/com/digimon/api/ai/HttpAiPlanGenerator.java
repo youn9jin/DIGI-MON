@@ -4,7 +4,7 @@ import com.digimon.api.ai.dto.AiGenerateRequest;
 import com.digimon.api.ai.dto.AiGenerateResponse;
 import com.digimon.api.ai.dto.AiStage;
 import com.digimon.api.plandraft.DigitalLevel;
-import com.digimon.api.plandraft.dto.InitialPlanDto;
+import com.digimon.api.plandraft.dto.PlanActionDto;
 import com.digimon.api.plandraft.dto.SurveyDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -42,7 +43,7 @@ public class HttpAiPlanGenerator implements AiPlanGenerator {
     }
 
     @Override
-    public InitialPlanDto generateInitialPlan(SurveyDto survey, DigitalLevel digitalLevel) {
+    public List<PlanActionDto> generateInitialPlan(SurveyDto survey, DigitalLevel digitalLevel) {
         if (!properties.isEnabled()) {
             throw new AiUnavailableException("AI disabled (digimon.ai.enabled=false)");
         }
@@ -69,7 +70,7 @@ public class HttpAiPlanGenerator implements AiPlanGenerator {
                     .retrieve()
                     .body(AiGenerateResponse.class);
 
-            if (response == null || response.getInitialPlan() == null) {
+            if (response == null || response.getInitialPlan() == null || response.getInitialPlan().isEmpty()) {
                 log.warn("[AI] plan generate empty response requestId={}", requestId);
                 throw new AiUnavailableException("AI returned empty initialPlan");
             }

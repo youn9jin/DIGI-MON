@@ -1,15 +1,17 @@
 package com.digimon.api.ai.dto;
 
-import com.digimon.api.plandraft.dto.InitialPlanDto;
+import com.digimon.api.plandraft.dto.PlanActionDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
- * AI 응답. digitalLevel은 포함하지 않음(Backend가 관리).
- * FINALIZE 시 JSON 형태: { "finalPlan": { "primaryAction": {...}, "steps": [...] } }
- * → 이 클래스로 역직렬화 시 finalPlan 필드에 해당 객체가 매핑됨.
+ * AI 응답. JSON only, wrapper(success/data) 없음.
+ * PRE_LOGIN: { "initialPlan": [ PlanActionDto, ... ] }
+ * FINALIZE: { "finalPlan": { ... } } (finalPlan은 Object로 파싱).
  */
 @Getter
 @Setter
@@ -17,9 +19,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AiGenerateResponse {
 
-    /** stage=PRE_LOGIN 시 필수 */
-    private InitialPlanDto initialPlan;
+    /** PRE_LOGIN 시 필수. AI는 initialPlan 배열만 반환. */
+    private List<PlanActionDto> initialPlan;
 
-    /** stage=FINALIZE 시 반환. JSON 키 "finalPlan"과 매핑. PRE_LOGIN 단계에서는 null */
+    /** FINALIZE 시 반환. PRE_LOGIN 단계에서는 null */
     private Object finalPlan;
 }

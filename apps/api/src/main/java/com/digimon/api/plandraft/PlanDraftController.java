@@ -3,8 +3,8 @@ package com.digimon.api.plandraft;
 import com.digimon.api.global.ResponseWrapper;
 import com.digimon.api.plandraft.dto.AttachRequest;
 import com.digimon.api.plandraft.dto.AttachResponse;
-import com.digimon.api.plandraft.dto.CreatePlanDraftRequest;
-import com.digimon.api.plandraft.dto.CreatePlanDraftResponse;
+import com.digimon.api.plandraft.dto.PlanDraftCreateRequest;
+import com.digimon.api.plandraft.dto.PlanDraftCreateResponse;
 import com.digimon.api.user.User;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -25,9 +25,9 @@ public class PlanDraftController {
     }
 
     @PostMapping("/plan-drafts")
-    public ResponseEntity<ResponseWrapper<CreatePlanDraftResponse>> createPlanDraft(
-            @Valid @RequestBody CreatePlanDraftRequest request) {
-        CreatePlanDraftResponse data = planDraftService.createDraft(request.getGuestKey(), request.getSurvey());
+    public ResponseEntity<ResponseWrapper<PlanDraftCreateResponse>> createPlanDraft(
+            @Valid @RequestBody PlanDraftCreateRequest request) {
+        PlanDraftCreateResponse data = planDraftService.createDraft(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ResponseWrapper.success(data));

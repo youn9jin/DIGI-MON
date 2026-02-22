@@ -1,8 +1,9 @@
 package com.digimon.api.plandraft;
 
 import com.digimon.api.ai.AiPlanGenerator;
-import com.digimon.api.plandraft.dto.CreatePlanDraftResponse;
-import com.digimon.api.plandraft.dto.InitialPlanDto;
+import com.digimon.api.plandraft.dto.PlanActionDto;
+import com.digimon.api.plandraft.dto.PlanDraftCreateRequest;
+import com.digimon.api.plandraft.dto.PlanDraftCreateResponse;
 import com.digimon.api.plandraft.dto.SurveyDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,11 +11,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class PlanDraftService {
+
+    /** attachToken 만료 TTL(시간). 기본 6시간 */
+    private static final int ATTACH_TOKEN_TTL_HOURS = 6;
 
     private final PlanDraftRepository planDraftRepository;
     private final AiPlanGenerator aiPlanGenerator;
@@ -29,28 +35,31 @@ public class PlanDraftService {
     }
 
     @Transactional
-    public CreatePlanDraftResponse createDraft(String requestGuestKey, SurveyDto surveyDto) {
-        String guestKey = (requestGuestKey != null && !requestGuestKey.isBlank())
-                ? requestGuestKey.trim()
+    public PlanDraftCreateResponse createDraft(PlanDraftCreateRequest request) {
+        String guestKey = (request.getGuestKey() != null && !request.getGuestKey().isBlank())
+                ? request.getGuestKey().trim()
                 : UUID.randomUUID().toString();
 
         planDraftRepository.expireActiveByGuestKey(guestKey, DraftStatus.ACTIVE, DraftStatus.EXPIRED);
 
+        SurveyDto surveyDto = request.getSurvey();
         DigitalLevel digitalLevel = DigitalLevelCalculator.calculate(surveyDto);
-        InitialPlanDto initialPlanDto = aiPlanGenerator.generateInitialPlan(surveyDto, digitalLevel);
+        List<PlanActionDto> initialPlanList = aiPlanGenerator.generateInitialPlan(surveyDto, digitalLevel);
 
         String attachToken = UUID.randomUUID().toString();
-        OffsetDateTime attachTokenExpiresAt = OffsetDateTime.now().plusHours(12);
+        OffsetDateTime attachTokenExpiresAt = OffsetDateTime.now().plusHours(ATTACH_TOKEN_TTL_HOURS);
 
         Map<String, Object> surveyMap = surveyDtoToMap(surveyDto);
-        Map<String, Object> initialPlanMap = objectMapper.convertValue(initialPlanDto, new TypeReference<Map<String, Object>>() {});
+        List<Map<String, Object>> initialPlanStorage = initialPlanList.stream()
+                .map(dto -> objectMapper.convertValue(dto, new TypeReference<Map<String, Object>>() {}))
+                .collect(Collectors.toList());
 
         PlanDraft draft = new PlanDraft();
         draft.setGuestKey(guestKey);
         draft.setStatus(DraftStatus.ACTIVE);
         draft.setSurvey(surveyMap);
         draft.setDigitalLevel(digitalLevel);
-        draft.setInitialPlan(initialPlanMap);
+        draft.setInitialPlan(initialPlanStorage);
         draft.setAttachToken(attachToken);
         draft.setAttachTokenExpiresAt(attachTokenExpiresAt);
         draft.setAttachTokenUsedAt(null);
@@ -58,13 +67,13 @@ public class PlanDraftService {
 
         draft = planDraftRepository.save(draft);
 
-        return new CreatePlanDraftResponse(
+        return new PlanDraftCreateResponse(
                 draft.getGuestKey(),
                 draft.getId(),
                 draft.getAttachToken(),
                 draft.getAttachTokenExpiresAt(),
                 draft.getDigitalLevel(),
-                initialPlanDto
+                initialPlanList
         );
     }
 

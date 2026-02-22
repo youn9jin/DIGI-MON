@@ -3,9 +3,10 @@ package com.digimon.api.plandraft;
 import com.digimon.api.auth.UnauthorizedException;
 import com.digimon.api.plandraft.dto.AttachRequest;
 import com.digimon.api.plandraft.dto.AttachResponse;
-import com.digimon.api.plandraft.dto.CreatePlanDraftResponse;
-import com.digimon.api.plandraft.dto.InitialPlanDto;
-import com.digimon.api.plandraft.dto.PrimaryActionDto;
+import com.digimon.api.plandraft.dto.PlanActionDto;
+import com.digimon.api.plandraft.dto.PlanDraftCreateRequest;
+import com.digimon.api.plandraft.dto.PlanDraftCreateResponse;
+import com.digimon.api.plandraft.dto.PlanStepDto;
 import com.digimon.api.plandraft.dto.SurveyDto;
 import com.digimon.api.user.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -61,22 +63,24 @@ class PlanDraftControllerTest {
     }
 
     @Test
-    @DisplayName("유효한 요청 시 201 및 success/data 반환")
+    @DisplayName("유효한 요청 시 201 및 success/data 반환 (initialPlan은 리스트)")
     void createPlanDraft_validRequest_returns201() throws Exception {
-        CreatePlanDraftResponse response = new CreatePlanDraftResponse(
+        PlanActionDto action = new PlanActionDto(
+                "GOOGLE_MAPS_REGISTER",
+                "구글 지도에 가게 등록하기",
+                "근처 검색 유입을 늘리기 위한 첫 단계예요",
+                10,
+                List.of(new PlanStepDto("가게 정보 확인", "구글 지도에서 확인해 주세요."))
+        );
+        PlanDraftCreateResponse response = new PlanDraftCreateResponse(
                 "uuid-guest-123",
                 101L,
                 "uuid-token-abc",
                 OffsetDateTime.now().plusHours(24),
                 DigitalLevel.LEVEL0,
-                new InitialPlanDto(new PrimaryActionDto(
-                        "GOOGLE_MAPS_REGISTER",
-                        "구글 지도에 가게 등록하기",
-                        "근처 검색 유입을 늘리기 위한 첫 단계예요",
-                        10
-                ))
+                List.of(action)
         );
-        when(planDraftService.createDraft(eq(null), any(SurveyDto.class)))
+        when(planDraftService.createDraft(any(PlanDraftCreateRequest.class)))
                 .thenReturn(response);
 
         Map<String, Object> request = Map.of(
@@ -98,7 +102,9 @@ class PlanDraftControllerTest {
                 .andExpect(jsonPath("$.data.draftId").value(101))
                 .andExpect(jsonPath("$.data.attachToken").value("uuid-token-abc"))
                 .andExpect(jsonPath("$.data.digitalLevel").value("LEVEL0"))
-                .andExpect(jsonPath("$.data.initialPlan.primaryAction.actionCode").value("GOOGLE_MAPS_REGISTER"))
+                .andExpect(jsonPath("$.data.initialPlan").isArray())
+                .andExpect(jsonPath("$.data.initialPlan[0].actionCode").value("GOOGLE_MAPS_REGISTER"))
+                .andExpect(jsonPath("$.data.initialPlan[0].steps[0].step_title").value("가게 정보 확인"))
                 .andExpect(jsonPath("$.error").value((Object) null));
     }
 
