@@ -48,7 +48,14 @@ export default function LoginPage() {
     const data = await res.json().catch(() => null);
     console.log("BACKEND RESPONSE:", data);
 
-    // ✅ 로그인 성공 → 온보딩 intro로 이동
+    const onboarded = Boolean(data?.onboarded);
+    const role = String(data?.role ?? "").trim().toUpperCase();
+
+    if (onboarded && role === "OWNER") {
+      router.replace("/survey/action"); // 또는 "/action-plan"
+      return;
+    }
+
     router.replace("/onboarding/intro");
   };
 
