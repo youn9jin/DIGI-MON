@@ -7,104 +7,128 @@ import { useAuthUser } from "@/lib/useAuthUser";
 
 export default function OnboardingIntroPage() {
     const router = useRouter();
-    const { ready, isLoggedIn, meReady, onboarded, role } = useAuthUser();
+    const { ready, isLoggedIn, meReady, me } = useAuthUser();
+
+    const onboarded = Boolean(me?.onboarded);
+    const role = String(me?.role ?? "").toUpperCase();
 
     useEffect(() => {
         if (!ready) return;
+
+        // 로그인 안 했으면 로그인으로
         if (!isLoggedIn) {
             router.replace("/login");
             return;
         }
+
+        // /api/me 로딩 끝날 때까지 기다림
         if (!meReady) return;
 
-        // ✅ 온보딩 완료면 intro 들어오지 못하게 스킵
+        // ✅ 온보딩 완료면 intro 못 들어오게 스킵
         if (onboarded && role === "OWNER") {
             router.replace("/survey/action"); // 또는 "/action-plan"
         }
     }, [ready, isLoggedIn, meReady, onboarded, role, router]);
 
-    // meReady까지 기다렸다가 렌더(깜빡임 방지)
+    // 깜빡임 방지
     if (!ready || (isLoggedIn && !meReady)) return null;
+
     return (
-        <div className="w-full bg-[#FAFAFA] overflow-hidden">
-            <div className="mx-auto max-w-6xl px-4 md:px-8">
-                <section className="relative flex min-h-[calc(100vh-70px)] flex-col items-center justify-start pt-10 md:pt-14">
-                    {/* 중앙 카드 */}
-                    <div
-                        className="
-              relative
-              w-full max-w-[849px]
-              rounded-[40px] bg-white
-              shadow-[0px_2px_2px_0px_#B0C965]
-              px-[clamp(20px,5.2vw,75px)]
-              pt-[55px] pb-[56px]
-              min-h-[772px]
-            "
-                    >
-                        {/* Placeholder */}
-                        <div className="mx-auto max-w-[640px] pt-10 text-center">
-                            <h1 className="text-[28px] font-bold text-[#222]">
-                                온보딩 페이지 (설명)
+        <main className="w-full bg-[#FAFAFA]">
+            <div className="mx-auto w-full max-w-[1440px] px-6 md:px-10 lg:px-[101px]">
+                <section className="min-h-[calc(100vh-70px)] flex flex-col justify-center py-12">
+                    {/* 2-column (desktop) / 1-column (mobile) */}
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10 lg:gap-16">
+                        {/* LEFT */}
+                        <div className="flex-1 min-w-0">
+                            {/* Title (Figma: 42px, line-height 65px) */}
+                            <h1
+                                className="font-bold text-black"
+                                style={{
+                                    fontSize: "clamp(26px, 3vw, 42px)",
+                                    lineHeight: "clamp(38px, 4.5vw, 65px)",
+                                }}
+                            >
+                                {/* ✅ 첫 줄은 데스크탑에서 한 줄로 보이게 */}
+                                <span className="block lg:whitespace-nowrap">
+                  DIGI-MON 서비스를 효과적으로 이용하려면
+                </span>
+                                <span className="block">가게 정보 입력이 필요해요</span>
                             </h1>
 
-                            <p className="mt-4 text-[16px] leading-[26px] text-[#666]">
-                                Figma 디자인이 아직 확정되지 않아
-                                <br />
-                                페이지 틀만 먼저 구현해두었습니다.
+                            {/* Subtitle (opacity 40%) */}
+                            <p
+                                className="mt-5 font-medium text-[#353535]"
+                                style={{
+                                    opacity: 0.4,
+                                    fontSize: "clamp(14px, 1.6vw, 24px)",
+                                    lineHeight: "clamp(22px, 2.6vw, 35px)",
+                                }}
+                            >
+                                사장님 가게 맞춤 액션 플랜 제공에 필요한 과정이에요
                             </p>
+
+                            {/* Buttons */}
+                            <div className="mt-10 flex flex-col sm:flex-row gap-4 sm:gap-6">
+                                {/* 온보딩 시작 버튼 (Figma: gradient-to-r #B0C965 42% -> #F5F5F5 148%) */}
+                                <Link
+                                    href="/onboarding/role"
+                                    className="
+                    inline-flex items-center justify-center
+                    rounded-[20px]
+                    text-black
+                    hover:opacity-90 transition
+                    font-medium
+                  "
+                                    style={{
+                                        width: "clamp(260px, 38vw, 459px)",
+                                        height: "74px",
+                                        background: "#C9D99A",
+                                        fontSize: "22px",
+                                    }}
+                                >
+                                    정보 입력하고 맞춤 액션 플랜 보기
+                                </Link>
+
+                                {/* 온보딩 거부/대체 버튼 (Figma: 106deg rgba(176,201,101,0.9)->white) */}
+                                <Link
+                                    href="/survey/action"
+                                    className="
+                    inline-flex items-center justify-center
+                    rounded-[20px]
+                    hover:opacity-90 transition
+                    font-medium text-[#2E2E2E]
+                  "
+                                    style={{
+                                        width: "clamp(260px, 38vw, 453px)",
+                                        height: "73.5px",
+                                        background: "#ECEDE7",
+                                        fontSize: "22px",
+                                    }}
+                                >
+                                    맞춤 정보 없이 볼게요
+                                </Link>
+                            </div>
                         </div>
 
-                        {/* ✅ 다음 버튼: 역할 선택으로 이동 */}
-                        <Link
-                            href="/onboarding/role"
-                            className="
-                absolute left-1/2 bottom-[88px]
-                -translate-x-1/2
-                flex items-center justify-center
-                h-[74px] w-[308px]
-                rounded-[20px]
-                text-[20px] font-medium text-[#313131]
-                hover:opacity-90 transition
-              "
-                            style={{
-                                background:
-                                    "linear-gradient(90deg, #B0C965 0%, #FFFFFF 147.56%)",
-                            }}
-                        >
-                            다음
-                        </Link>
-
-                        {/* 좌하단: 돌아가기 */}
-                        <Link
-                            href="/landing-hero"
-                            className="
-                absolute left-[26px] bottom-[26px]
-                inline-flex items-center gap-1
-                text-[15px] leading-[20px] text-black
-              "
-                        >
-                            ← 설문 결과 화면으로 돌아가기
-                        </Link>
+                        {/* RIGHT CARD (Figma: 405 x 366, bg rgba(255,255,255,0.7), shadow) */}
+                        <div className="flex-shrink-0 self-center lg:self-auto">
+                            <div
+                                className="
+                  rounded-[20px]
+                  bg-[rgba(255,255,255,0.7)]
+                  shadow-[0px_2px_4px_0px_rgba(0,0,0,0.25)]
+                  border border-black/5
+                "
+                                style={{
+                                    width: "min(405px, 92vw)",
+                                    aspectRatio: "405 / 366",
+                                }}
+                            />
+                        </div>
                     </div>
-
-                    {/* 도움 요청하기 버튼 */}
-                    <Link
-                        href="/help"
-                        className="
-              fixed bottom-8 right-8 z-20
-              flex items-center justify-center
-              h-[74px] w-[193px]
-              rounded-[50px]
-              bg-[#E0F0AF]
-              shadow-[0px_2px_2px_0px_rgba(0,0,0,0.25)]
-              text-[18px] font-semibold text-[#585858]
-              hover:opacity-90 transition
-            "
-                    >
-                        도움 요청하기
-                    </Link>
                 </section>
             </div>
-        </div>
+        </main>
     );
 }
