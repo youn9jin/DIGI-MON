@@ -1,14 +1,11 @@
 def get_priority_rules(survey):
-    """
-    서버 명세 Enum 값을 기반으로 우선순위 규칙과 점수를 결정합니다.
-    """
     priorities = []
 
     # Q5: 사장님의 핵심 목표
-    goal = survey.get('q5_primary_goal', 'NOT_SURE')
+    goal = survey.get('q5PrimaryGoal', 'NOT_SURE')
 
     # 1. 구글 지도 등록 (Q1: MAP_SEARCHABLE)
-    q1 = survey.get('q1_map_searchable')
+    q1 = survey.get('q1MapSearchable')
     if q1 in ['NOT_FOUND', 'NOT_SURE']:
         # 접근성 높이기가 목표라면 가중치 부여
         score = 100 if goal == 'INCREASE_ACCESSIBILITY' else 90
@@ -19,7 +16,7 @@ def get_priority_rules(survey):
         })
 
     # 2. 정보 수정 (Q2: MAP_INFO_ACCURATE)
-    q2 = survey.get('q2_map_info_accurate')
+    q2 = survey.get('q2MapInfoAccurate')
     if q2 in ['PARTIAL_OR_WRONG', 'NONE_OR_UNKNOWN']:
         priorities.append({
             "target": "MAP_INFO",
@@ -28,7 +25,7 @@ def get_priority_rules(survey):
         })
 
     # 3. 메뉴 및 사진 최적화 (Q3: MENU_VISIBLE)
-    q3 = survey.get('q3_menu_visible')
+    q3 = survey.get('q3MenuVisible')
     if q3 in ['SOME', 'BARELY']:
         # 가게를 좋아 보이게 하는 것이 목표라면 가중치 부여
         score = 80 if goal == 'LOOK_BETTER' else 70
@@ -39,7 +36,7 @@ def get_priority_rules(survey):
         })
 
     # 4. 연락 채널 및 시스템 (Q4: CONTACT_CHANNEL)
-    q4 = survey.get('q4_contact_channel')
+    q4 = survey.get('q4ContactChannel')
     if q4 in ['NO_CHANNEL', 'NOT_SURE']:
         # 연락이 잘 오게 하는 것이 목표라면 가중치 부여
         score = 75 if goal == 'GET_MORE_CONTACTS' else 60
@@ -49,7 +46,6 @@ def get_priority_rules(survey):
             "score": score
         })
 
-    # 점수 기준 내림차순 정렬
     sorted_priorities = sorted(priorities, key=lambda x: x['score'], reverse=True)
 
     return [p['rule'] for p in sorted_priorities]
