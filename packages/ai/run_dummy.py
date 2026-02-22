@@ -4,8 +4,8 @@ import re
 import os
 import uuid
 from datetime import datetime, timedelta
-from rule_base import get_priority_rules
-from prompt import get_action_prompt
+from rules.rule_base import get_priority_rules
+from prompts.prompt import get_action_prompt
 import time
 import random
 
