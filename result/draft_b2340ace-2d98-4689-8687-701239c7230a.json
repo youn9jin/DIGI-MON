@@ -1,0 +1,63 @@
+{
+  "success": true,
+  "data": {
+    "guestKey": "b2340ace-2d98-4689-8687-701239c7230a",
+    "draftId": 101,
+    "attachToken": "3f5ea098-63e0-49bd-8471-0aad3bf1884b",
+    "attachTokenExpiresAt": "2026-02-22T17:05:32.029702Z",
+    "digitalLevel": "LEVEL0",
+    "initialPlan": {
+      "primaryAction": {
+        "actionCode": "GOOGLE_MAP_REGISTER",
+        "title": "햇살 베이커리, 구글 지도에 문 열어볼까요?",
+        "summary": "이제 손님들이 구글 지도에서 '햇살 베이커리'를 쉽게 찾아 오실 수 있게 돼요! 갓 구운 빵 냄새처럼 향기로운 첫 시작이 될 거예요.",
+        "estimatedMinutes": 30
+      },
+      "subActions": [
+        {
+          "title": "갓 구운 빵처럼 따끈따끈! '햇살 베이커리' 프로필 완성하기",
+          "steps": [
+            {
+              "step_title": "가게 찾기",
+              "description": "구글에서 '내 비즈니스'를 검색하신 후, 사장님 구글 계정으로 로그인해 주세요. 만약 등록이 처음이라면, '비즈니스 추가' 버튼을 눌러주시면 됩니다! '햇살 베이커리'를 구글에 등록하고 관리하는 방법은 여기를 참고해 주세요. ➡️ [https://support.google.com/business/answer/2911778](https://support.google.com/business/answer/2911778)"
+            },
+            {
+              "step_title": "핵심 정보 채우기",
+              "description": "손님들이 가장 궁금해하는 '햇살 베이커리'의 정확한 영업시간, 연락처, 그리고 주소를 꼼꼼하게 입력해 볼까요? 이 정보가 최신 상태여야 손님들이 헛걸음하지 않으실 거예요. ➡️ [https://support.google.com/business/answer/3039617](https://support.google.com/business/answer/3039617)"
+            },
+            {
+              "step_title": "예쁜 사진 올리기",
+              "description": "따뜻한 햇살 아래 노릇하게 구워진 빵 사진, 아늑한 가게 내부 사진을 올려주세요! 사진이 많을수록 '햇살 베이커리'의 매력을 듬뿍 보여줄 수 있답니다. ➡️ [https://support.google.com/business/answer/6103862](https://support.google.com/business/answer/6103862)"
+            },
+            {
+              "step_title": "메뉴판 상세 설명",
+              "description": "'햇살 베이커리'만의 시그니처 빵이나 인기 메뉴의 사진과 함께 가격, 특징을 상세하게 적어볼까요? 어떤 재료로 만들었는지, 어떤 맛인지 설명해두면 손님들이 참 좋아하실 거예요. ➡️ [https://support.google.com/business/answer/9310237](https://support.google.com/business/answer/9310237)"
+            }
+          ]
+        },
+        {
+          "title": "반짝이는 '햇살 베이커리' 인스타그램으로 손님 마음 사로잡기",
+          "steps": [
+            {
+              "step_title": "비즈니스 전환",
+              "description": "먼저 사장님의 인스타그램 계정을 '프로페셔널 계정'으로 전환해볼까요? 그래야 '햇살 베이커리' 전용 연락처 버튼도 달고, 손님들이 어떤 빵에 관심 많은지 분석도 할 수 있답니다. ➡️ [https://help.instagram.com/502981923235522](https://help.instagram.com/502981923235522)"
+            },
+            {
+              "step_title": "프로필 꾸미기",
+              "description": "'햇살 베이커리'의 이름, 업종(제과점), 위치와 함께 \"매일 아침 갓 구운 빵이 나오는 곳!\"처럼 매력적인 소개글을 적어주세요. 손님들이 프로필만 봐도 가게가 확 와닿을 거예요. ➡️ [https://help.instagram.com/362547690518331](https://help.instagram.com/362547690518331)"
+            },
+            {
+              "step_title": "연락처 활성화",
+              "description": "프로필에 '전화'나 'DM 보내기' 버튼을 추가해서 손님들이 궁금한 점을 바로바로 물어볼 수 있게 해두면 편리하겠죠? '프로필 편집'에서 쉽게 설정할 수 있어요. ➡️ [https://help.instagram.com/362547690518331](https://help.instagram.com/362547690518331)"
+            },
+            {
+              "step_title": "첫 게시물 올리기",
+              "description": "'햇살 베이커리'의 대표 빵 사진이나, 빵 만드는 과정을 짧은 영상으로 올려볼까요? 게시물 올릴 때 가게 위치를 꼭 태그해두면 주변 손님들에게도 잘 보인답니다! ➡️ [https://help.instagram.com/488619951338752](https://help.instagram.com/488619951338752)"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "error": null
+}

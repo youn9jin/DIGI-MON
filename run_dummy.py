@@ -15,27 +15,6 @@ API_KEY = "AIzaSyADubVvQcQPJWCAotaJ5uwOEIu8eNhCcDU"
 genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('gemini-2.5-flash')
 
-def calculate_digital_level(survey):
-    "설문 답변에 따른 단계별 레벨 판정"
-    
-    # 1단계 조건: Q1(지도 검색)이 'EASY_FOUND'이고 Q2(정보 정확)가 'ALL_CORRECT'인가?
-    is_level1_pass = (survey.get('q1_map_searchable') == 'EASY_FOUND' and 
-                      survey.get('q2_map_info_accurate') == 'ALL_CORRECT')
-    if not is_level1_pass:
-        return "LEVEL0" 
-
-    # 2단계 조건: Q3(품목/서비스 설명)가 'ENOUGH'인가?
-    is_level2_pass = (survey.get('q3_menu_visible') == 'ENOUGH')
-    if not is_level2_pass:
-        return "LEVEL1" 
-
-    # 3단계 조건: Q4(연락 채널)가 'HAS_CHANNEL'인가?
-    is_level3_pass = (survey.get('q4_contact_channel') == 'HAS_CHANNEL')
-    if not is_level3_pass:
-        return "LEVEL2" 
-
-    return "LEVEL3" 
-
 def load_official_context(survey, digital_level):
     context = ""
     
@@ -102,8 +81,8 @@ def process_draft_request(request_data):
     if not guest_key:
         guest_key = str(uuid.uuid4())
     
-    # 2. digitalLevel 계산
-    digital_level = calculate_digital_level(survey) ## 근데 이부분 백엔드에서 레벨 계산하면 다르게 불러와야함
+    # 2. digitalLevel 받아오기
+    digital_level = request_data["digitalLevel"]
     
     # 3. AI용 오너 데이터 구성 (계산된 레벨 포함)
     owner_context = {
@@ -136,12 +115,16 @@ def process_draft_request(request_data):
 if __name__ == "__main__":
     # 명세서의 '최초 방문' Request Body 시뮬레이션
     dummy_request = {
+      "requestId": str(uuid.uuid4()),
+      "stage": "PRE_LOGIN",
+      "locale": "ko-KR",
+      "digitalLevel": "LEVEL0",  # <- 백엔드에서 주입해주는 값
       "survey": {
-        "q1_map_searchable": "NOT_FOUND",
-        "q2_map_info_accurate": "NONE_OR_UNKNOWN",
-        "q3_menu_visible": "BARELY",
-        "q4_contact_channel": "NO_CHANNEL",
-        "q5_primary_goal": "INCREASE_ACCESSIBILITY"
+        "q1MapSearchable": "NOT_FOUND",
+        "q2MapInfoAccurate": "NONE_OR_UNKNOWN",
+        "q3MenuVisible": "BARELY",
+        "q4ContactChannel": "NO_CHANNEL",
+        "q5PrimaryGoal": "INCREASE_ACCESSIBILITY"
       }
     }
     
