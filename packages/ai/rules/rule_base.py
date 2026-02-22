@@ -3,7 +3,7 @@ def get_priority_rules(survey):
     서버 명세 Enum 값을 기반으로 우선순위 규칙과 점수를 결정합니다.
     """
     priorities = []
-    
+
     # Q5: 사장님의 핵심 목표
     goal = survey.get('q5_primary_goal', 'NOT_SURE')
 
@@ -51,5 +51,5 @@ def get_priority_rules(survey):
 
     # 점수 기준 내림차순 정렬
     sorted_priorities = sorted(priorities, key=lambda x: x['score'], reverse=True)
-    
+
     return [p['rule'] for p in sorted_priorities]
