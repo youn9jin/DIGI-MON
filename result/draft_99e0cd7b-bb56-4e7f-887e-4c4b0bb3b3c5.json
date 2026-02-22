@@ -1,0 +1,63 @@
+{
+  "success": true,
+  "data": {
+    "guestKey": "99e0cd7b-bb56-4e7f-887e-4c4b0bb3b3c5",
+    "draftId": 101,
+    "attachToken": "3313f39a-977b-43f2-b5ea-ec617478860e",
+    "attachTokenExpiresAt": "2026-02-22T17:07:19.518464Z",
+    "digitalLevel": "LEVEL0",
+    "initialPlan": {
+      "primaryAction": {
+        "actionCode": "INSTAGRAM_BIZ_START",
+        "title": "햇살 베이커리 인스타그램 비즈니스 계정 시작하기!",
+        "summary": "햇살 베이커리가 손님들과 더 가까이 소통하고, 갓 구운 빵 소식을 더 많은 분께 알릴 수 있게 될 거예요! 우리 가게의 매력을 인스타그램에서 마음껏 뽐내볼까요?",
+        "estimatedMinutes": 30
+      },
+      "subActions": [
+        {
+          "title": "햇살 베이커리 인스타그램 프로필 단장하기!",
+          "steps": [
+            {
+              "step_title": "계정 전환",
+              "description": "사장님, 먼저 개인 계정을 햇살 베이커리만의 '비즈니스 계정'으로 바꿔볼까요? 그래야 손님들이 편하게 연락하고, 우리 가게 소식도 더 많이 퍼뜨릴 수 있는 특별한 기능들을 쓸 수 있답니다. ➡️  https://help.instagram.com/502981923235522"
+            },
+            {
+              "step_title": "정보 입력",
+              "description": "이제 햇살 베이커리의 가게 이름, 업종(제과점), 연락처 같은 기본 정보를 꼼꼼하게 채워주세요. 손님들이 햇살 베이커리를 바로 알아볼 수 있도록 중요한 정보들이에요! ➡️  https://help.instagram.com/362547690518331"
+            },
+            {
+              "step_title": "소개글 작성",
+              "description": "햇살 베이커리만의 매력을 담은 짧은 소개글을 남겨주세요. '매일 아침 갓 구운 빵 나오는 곳!'처럼 손님들이 혹할 만한 정보를 넣어두면 참 좋아하실 거예요! ➡️  https://help.instagram.com/362547690518331"
+            },
+            {
+              "step_title": "외부 링크",
+              "description": "햇살 베이커리 구글 지도 링크를 프로필에 연결해두면, 손님들이 인스타그램을 보고 바로 길을 찾아오실 수 있을 거예요! 편리함에 감동할지도 몰라요! ➡️  https://help.instagram.com/362547690518331"
+            }
+          ]
+        },
+        {
+          "title": "햇살 베이커리 인스타그램, 손님과 친해지고 맛 자랑하기!",
+          "steps": [
+            {
+              "step_title": "첫 게시물",
+              "description": "갓 구운 식빵, 먹음직스러운 케이크, 반짝이는 쿠키 사진을 올려 햇살 베이커리의 맛있는 메뉴를 자랑해볼까요? 가게 위치 태그도 잊지 마세요! 손님들이 군침 흘릴 거예요! ➡️  https://help.instagram.com/488619951338752"
+            },
+            {
+              "step_title": "DM 소통",
+              "description": "손님들이 궁금해하는 점이나 칭찬 댓글, DM(메시지)에 다정하게 답변해 주세요. 친절한 소통은 햇살 베이커리의 단골손님을 만드는 아주 좋은 방법이랍니다! ➡️  https://help.instagram.com/488619951338752"
+            },
+            {
+              "step_title": "보안 강화",
+              "description": "혹시 모를 상황에 대비해 2단계 인증으로 햇살 베이커리 계정을 튼튼하게 지켜두는 것도 잊지 마세요! 안전한 디지털 환경에서 사장님은 베이커리에만 집중할 수 있어요. ➡️  https://help.instagram.com/566810106808645"
+            },
+            {
+              "step_title": "계정 점검",
+              "description": "가끔씩 계정 정보를 확인하고 필요한 부분을 업데이트하면, 손님들이 햇살 베이커리를 더욱 신뢰할 거예요. 최신 정보는 언제나 중요하죠! ➡️  https://help.instagram.com/362547690518331"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "error": null
+}
