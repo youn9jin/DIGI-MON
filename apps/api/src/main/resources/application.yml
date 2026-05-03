@@ -33,3 +33,10 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
+
+# AI 마이크로서비스 연동 (내부 전용). application-local.yml에서 오버라이드 가능
+digimon:
+  ai:
+    base-url: http://localhost:8000
+    timeout-ms: 3000
+    enabled: false

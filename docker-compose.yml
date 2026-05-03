@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: digimon-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: digi-mon
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespw
+      TZ: Asia/Seoul
+    volumes:
+      - digimon-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  digimon-postgres-data:

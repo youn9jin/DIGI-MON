@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>DIGI-MON Firebase Login Test</title>
+</head>
+<body>
+  <h2>🔥 DIGI-MON Firebase Login Test Page</h2>
+
+  <h3>Google Login</h3>
+  <button id="googleLoginBtn">Google Login (Popup)</button>
+
+  <hr />
+
+  <h3>Email/Password (Local)</h3>
+  <div>
+    <input id="email" type="email" placeholder="email@example.com" style="width: 320px;" />
+  </div>
+  <div style="margin-top: 8px;">
+    <input id="password" type="password" placeholder="password (6+ chars)" style="width: 320px;" />
+  </div>
+
+  <div style="margin-top: 10px;">
+    <button id="signupBtn">Sign Up (Create User)</button>
+    <button id="loginBtn">Login</button>
+  </div>
+
+  <div style="margin-top: 10px;">
+    <button id="logoutBtn">Logout</button>
+  </div>
+
+  <hr />
+  <pre id="output"></pre>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      signInWithPopup,
+      GoogleAuthProvider,
+      signOut,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAx86S3M4VJ68kGtGb7BamCjV1hiSydWyo",
+      authDomain: "digi-mon-server.firebaseapp.com",
+      projectId: "digi-mon-server",
+      storageBucket: "digi-mon-server.firebasestorage.app",
+      messagingSenderId: "1043404218738",
+      appId: "1:1043404218738:web:eada51aa18f368f1187deb"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    const output = document.getElementById("output");
+
+    function setOutput(msg) {
+      output.textContent = msg;
+    }
+
+    async function printToken(user, label) {
+      const token = await user.getIdToken();
+      setOutput(
+        `✅ ${label}\n\n` +
+        `UID: ${user.uid}\n` +
+        `Email: ${user.email}\n\n` +
+        `ID TOKEN:\n${token}\n`
+      );
+      console.log("ID TOKEN:", token);
+    }
+
+    // Google 로그인
+    document.getElementById("googleLoginBtn").onclick = async () => {
+      try {
+        const result = await signInWithPopup(auth, googleProvider);
+        await printToken(result.user, "GOOGLE LOGIN SUCCESS");
+      } catch (e) {
+        setOutput("❌ GOOGLE LOGIN ERROR\n" + e);
+      }
+    };
+
+    // Email/Password 회원가입
+    document.getElementById("signupBtn").onclick = async () => {
+      try {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        if (!email || !password) {
+          setOutput("❗ email/password를 입력해줘");
+          return;
+        }
+
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        await printToken(cred.user, "SIGNUP SUCCESS");
+      } catch (e) {
+        setOutput("❌ SIGNUP ERROR\n" + e);
+      }
+    };
+
+    // Email/Password 로그인
+    document.getElementById("loginBtn").onclick = async () => {
+      try {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        if (!email || !password) {
+          setOutput("❗ email/password를 입력해줘");
+          return;
+        }
+
+        const cred = await signInWithEmailAndPassword(auth, email, password);
+        await printToken(cred.user, "LOGIN SUCCESS");
+      } catch (e) {
+        setOutput("❌ LOGIN ERROR\n" + e);
+      }
+    };
+
+    // 로그아웃
+    document.getElementById("logoutBtn").onclick = async () => {
+      await signOut(auth);
+      setOutput("Logged out");
+    };
+  </script>
+</body>
+</html>

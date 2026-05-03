@@ -36,5 +36,17 @@ out/
 ### VS Code ###
 .vscode/
 
+### Python ###
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.env/
+
 ### Local config (DB 등 민감정보) ###
 **/application-local.yml
+**/.env.local
+**/.env*.local
+apps/web/lib/firebase.ts

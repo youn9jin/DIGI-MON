@@ -1,0 +1,33 @@
+[주제: Google 비즈니스 프로필(구 구글 지도) 등록 및 관리 공식 가이드]
+
+1. 기본 개념 및 접속처
+- 서비스 명칭: Google 비즈니스 프로필
+- 핵심 기능: 구글 검색 및 지도에 내 가게 위치, 사진, 연락처 노출
+- 공식 관리 페이지 주소: https://www.google.com/business/
+- 공식 고객센터: https://support.google.com/business/
+
+2. 단계별 등록 절차 (Action Steps)
+
+단계 1: 비즈니스 검색 및 추가
+- 설명: 이미 등록된 정보가 있는지 확인하거나 새 비즈니스를 생성합니다.
+- 바로가기 링크: https://www.google.com/business/go
+
+단계 2: 비즈니스 소유권 인증 (Verification)
+- 설명: 실제 운영자임을 증명하기 위해 우편, 전화 또는 이메일로 인증 코드를 수신합니다.
+- 공식 매뉴얼: ()
+
+단계 3: 핵심 정보(영업시간/연락처) 업데이트
+- 설명: 고객이 헛걸음하지 않도록 요일별 영업시간과 연락처를 정확히 입력합니다.
+- 공식 매뉴얼: https://support.google.com/business/answer/3039617
+
+단계 4: 사진 및 메뉴 등록
+- 설명: 가게 입구, 간판, 대표 메뉴 사진을 최소 3장 이상 업로드하여 신뢰도를 높입니다.
+- 사진 관리 가이드: https://support.google.com/business/answer/6103637
+
+단계 5: 고객 소통 및 리뷰 관리
+- 설명: 고객의 리뷰에 답글을 달고 새로운 소식을 게시물로 공유합니다.
+- 리뷰 관리 가이드: https://support.google.com/business/answer/3474050
+
+3. 문제 해결 가이드
+- 프로필 정지 또는 문제 발생 시 지원 요청: https://support.google.com/business/gethelp
+- 중복 프로필 삭제 및 병합 방법: https://support.google.com/business/answer/12755431
