@@ -64,6 +64,7 @@ public class UserService {
             u.setFirebaseUid(uid);
             u.setEmail(email != null ? email : "");
             u.setName(name);
+            u.setRole(Role.ASSOCIATION);
             return userRepository.save(u);
         } catch (DataIntegrityViolationException e) {
             return userRepository.findByFirebaseUid(uid)

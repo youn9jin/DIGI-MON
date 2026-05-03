@@ -93,4 +93,21 @@ class UserServiceTest {
 
         verify(userRepository, never()).save(any());
     }
+
+    @Test
+    @DisplayName("uid/email 모두 없음 → 신규 생성 시 role=ASSOCIATION 기본값")
+    void getOrCreateFromFirebase_newUser_defaultsRoleToAssociation() {
+        FirebaseToken token = token("uid-fresh", "fresh@b.com", "Fresh");
+        when(userRepository.findByFirebaseUid("uid-fresh")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("fresh@b.com")).thenReturn(Optional.empty());
+        when(userRepository.save(any(User.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        User result = userService.getOrCreateFromFirebase(token);
+
+        assertThat(result.getFirebaseUid()).isEqualTo("uid-fresh");
+        assertThat(result.getEmail()).isEqualTo("fresh@b.com");
+        assertThat(result.getProvider()).isEqualTo(AuthProvider.GOOGLE);
+        assertThat(result.getRole()).isEqualTo(Role.ASSOCIATION);
+        verify(userRepository).save(any(User.class));
+    }
 }
