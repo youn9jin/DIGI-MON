@@ -2,8 +2,8 @@ package com.digimon.api.user;
 
 import com.digimon.api.auth.AuthAccountConflictException;
 import com.digimon.api.auth.FirebaseTokenService;
-import com.digimon.api.helper.HelperProfileRepository;
-import com.digimon.api.owner.OwnerProfileRepository;
+import com.digimon.api.market.Market;
+import com.digimon.api.market.MarketRepository;
 import com.google.firebase.auth.FirebaseToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +17,14 @@ public class MeController {
 
     private final FirebaseTokenService firebaseTokenService;
     private final UserService userService;
-    private final OwnerProfileRepository ownerProfileRepository;
-    private final HelperProfileRepository helperProfileRepository;
+    private final MarketRepository marketRepository;
 
-    public MeController(FirebaseTokenService firebaseTokenService, UserService userService,
-                        OwnerProfileRepository ownerProfileRepository,
-                        HelperProfileRepository helperProfileRepository) {
+    public MeController(FirebaseTokenService firebaseTokenService,
+                        UserService userService,
+                        MarketRepository marketRepository) {
         this.firebaseTokenService = firebaseTokenService;
         this.userService = userService;
-        this.ownerProfileRepository = ownerProfileRepository;
-        this.helperProfileRepository = helperProfileRepository;
+        this.marketRepository = marketRepository;
     }
 
     @GetMapping("/me")
@@ -44,23 +42,24 @@ public class MeController {
 
             User user = userService.getOrCreateFromFirebase(decoded);
 
-            Map<String, Object> res = new HashMap<>();
+            Map<String, Object> res = new LinkedHashMap<>();
+            res.put("id", user.getId());
             res.put("uid", user.getFirebaseUid());
             res.put("email", user.getEmail());
             res.put("name", user.getName());
-            res.put("role", user.getRole());         // null 가능
-            res.put("onboarded", user.isOnboarded());
+            res.put("role", user.getRole());
 
             List<String> missing = new ArrayList<>();
             if (user.getRole() == null) {
                 missing.add("role");
-            } else if (user.getRole() == Role.OWNER) {
-                if (!ownerProfileRepository.existsById(user.getId())) {
-                    missing.add("ownerProfile");
-                }
-            } else if (user.getRole() == Role.HELPER) {
-                if (!helperProfileRepository.existsById(user.getId())) {
-                    missing.add("helperProfile");
+            } else if (user.getRole() == Role.ASSOCIATION) {
+                Optional<Market> marketOpt = marketRepository.findByUserId(user.getId());
+                if (marketOpt.isPresent()) {
+                    Market market = marketOpt.get();
+                    res.put("marketId", market.getId());
+                    res.put("marketName", market.getName());
+                } else {
+                    missing.add("market");
                 }
             }
             if (!missing.isEmpty()) {
