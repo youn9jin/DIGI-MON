@@ -1,6 +1,5 @@
 package com.digimon.api.user;
 
-import com.digimon.api.auth.AuthAccountConflictException;
 import com.digimon.api.auth.FirebaseTokenService;
 import com.digimon.api.market.Market;
 import com.digimon.api.market.MarketRepository;
@@ -45,7 +44,8 @@ public class MeController {
 
     /**
      * Authorization Bearer 토큰을 검증하고 User 를 로드한 뒤 핸들러를 실행한다.
-     * 검증 실패 시 401 응답을 반환하며 응답 포맷은 기존 GET /api/me 의 것을 유지한다.
+     * try 범위는 토큰 검증으로만 한정한다. 그 외 예외(DB 오류, AuthAccountConflictException 등)는
+     * 그대로 propagate 되어 GlobalExceptionHandler 가 적절한 status(409/500 등)로 처리한다.
      */
     private ResponseEntity<?> withAuthenticatedUser(String authorization,
                                                     java.util.function.Function<User, ResponseEntity<?>> handler) {
@@ -57,18 +57,18 @@ public class MeController {
 
         String idToken = authorization.substring("Bearer ".length()).trim();
 
+        FirebaseToken decoded;
         try {
-            FirebaseToken decoded = firebaseTokenService.verify(idToken);
-            User user = userService.getOrCreateFromFirebase(decoded);
-            return handler.apply(user);
-        } catch (AuthAccountConflictException e) {
-            throw e;
+            decoded = firebaseTokenService.verify(idToken);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
                     "message", "Invalid ID token",
                     "error", e.getMessage()
             ));
         }
+
+        User user = userService.getOrCreateFromFirebase(decoded);
+        return handler.apply(user);
     }
 
     /**

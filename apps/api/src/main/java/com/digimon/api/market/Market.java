@@ -39,8 +39,8 @@ public class Market {
     @Column(name = "market_type", length = 50)
     private String marketType;
 
-    @Column(name = "main_categories", length = 255)
-    private String mainCategories;
+    @Column(name = "main_categories", columnDefinition = "text[]")
+    private String[] mainCategories;
 
     @Column(name = "total_stores")
     private Integer totalStores;

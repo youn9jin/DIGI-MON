@@ -1,6 +1,5 @@
 package com.digimon.api.user;
 
-import com.digimon.api.auth.AuthAccountConflictException;
 import com.digimon.api.auth.FirebaseTokenService;
 import com.digimon.api.auth.ForbiddenException;
 import com.digimon.api.content.ContentRepository;
@@ -70,24 +69,25 @@ public class MyPageController {
 
         String idToken = authorization.substring("Bearer ".length()).trim();
 
+        // try 범위는 토큰 검증으로만 한정. DB 오류/Forbidden/AuthAccountConflict 등은
+        // 그대로 propagate 되어 GlobalExceptionHandler 가 403/409/500 으로 처리한다.
+        FirebaseToken decoded;
         try {
-            FirebaseToken decoded = firebaseTokenService.verify(idToken);
-            User user = userService.getOrCreateFromFirebase(decoded);
-
-            if (user.getRole() != Role.ASSOCIATION) {
-                throw new ForbiddenException("MyPage is available for ASSOCIATION users only");
-            }
-
-            return ResponseEntity.ok(buildMyPageResponse(user));
-
-        } catch (AuthAccountConflictException | ForbiddenException e) {
-            throw e;
+            decoded = firebaseTokenService.verify(idToken);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
                     "message", "Invalid ID token",
                     "error", e.getMessage()
             ));
         }
+
+        User user = userService.getOrCreateFromFirebase(decoded);
+
+        if (user.getRole() != Role.ASSOCIATION) {
+            throw new ForbiddenException("MyPage is available for ASSOCIATION users only");
+        }
+
+        return ResponseEntity.ok(buildMyPageResponse(user));
     }
 
     private Map<String, Object> buildMyPageResponse(User user) {
