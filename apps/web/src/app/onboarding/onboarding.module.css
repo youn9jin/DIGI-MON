@@ -449,6 +449,44 @@
   left: clamp(303px, 29.583vw, 568px);
 }
 
+.customerCard {
+  height: clamp(357px, 62.037svh, 670px);
+}
+
+.customerQuestion {
+  top: clamp(52px, 9.074svh, 98px);
+  left: clamp(41px, 4.01vw, 77px);
+}
+
+.textareaAnswer {
+  position: absolute;
+  top: clamp(124px, 21.667svh, 234px);
+  left: clamp(48px, 4.74vw, 91px);
+  width: clamp(616px, 60.156vw, 1155px);
+  height: clamp(130px, 22.685svh, 245px);
+  border: 1.5px solid #a1a1a1;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: transparent;
+  color: #000;
+  font-family: inherit;
+  font-size: clamp(14px, 1.25vw, 24px);
+  outline: none;
+  padding: clamp(14px, 1.354vw, 26px) clamp(16px, 1.667vw, 32px);
+  resize: none;
+}
+
+.textareaAnswer:focus {
+  border-color: #3b3b3b;
+}
+
+.textareaAnswer::placeholder {
+  color: #9a9a9a;
+}
+
+.customerNextButton {
+  top: clamp(289px, 50.093svh, 541px);
+}
+
 .stepIndicator {
   position: absolute;
   top: clamp(551px, 95.648svh, 1033px);
@@ -572,6 +610,23 @@
 
   .hoursNextButton {
     top: 52.870vw;
+  }
+
+  .customerCard {
+    height: 62.037vw;
+  }
+
+  .customerQuestion {
+    top: 9.074vw;
+  }
+
+  .textareaAnswer {
+    top: 21.667vw;
+    height: 22.685vw;
+  }
+
+  .customerNextButton {
+    top: 50.093vw;
   }
 
   .stepIndicator {
