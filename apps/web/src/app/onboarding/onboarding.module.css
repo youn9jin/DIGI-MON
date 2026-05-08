@@ -131,6 +131,12 @@
   height: clamp(373px, 64.722svh, 699px);
 }
 
+.businessCard {
+  top: clamp(93px, 16.204svh, 175px);
+  left: clamp(154px, 15.052vw, 289px);
+  height: clamp(410px, 71.204svh, 769px);
+}
+
 .questionText {
   position: absolute;
   top: clamp(63px, 11.019svh, 119px);
@@ -156,6 +162,11 @@
 
 .selectionQuestion {
   top: clamp(43px, 7.407svh, 80px);
+  left: clamp(39px, 3.802vw, 73px);
+}
+
+.businessQuestion {
+  top: clamp(30px, 5.185svh, 56px);
   left: clamp(39px, 3.802vw, 73px);
 }
 
@@ -298,6 +309,25 @@
   left: clamp(303px, 29.583vw, 568px);
 }
 
+.businessOptionList {
+  position: absolute;
+  top: clamp(94px, 16.204svh, 175px);
+  left: clamp(39px, 3.802vw, 73px);
+  display: flex;
+  width: clamp(636px, 62.135vw, 1193px);
+  flex-direction: column;
+  gap: clamp(9px, 0.833vw, 16px);
+}
+
+.businessOptionList .marketTypeOption {
+  height: clamp(39px, 3.823vw, 73px);
+}
+
+.businessNextButton {
+  top: clamp(341px, 59.259svh, 640px);
+  left: clamp(302px, 29.479vw, 566px);
+}
+
 .stepIndicator {
   position: absolute;
   top: clamp(551px, 95.648svh, 1033px);
@@ -362,6 +392,23 @@
 
   .selectionNextButton {
     top: 50.741vw;
+  }
+
+  .businessCard {
+    top: 16.204vw;
+    height: 71.204vw;
+  }
+
+  .businessQuestion {
+    top: 5.185vw;
+  }
+
+  .businessOptionList {
+    top: 16.204vw;
+  }
+
+  .businessNextButton {
+    top: 59.259vw;
   }
 
   .stepIndicator {
