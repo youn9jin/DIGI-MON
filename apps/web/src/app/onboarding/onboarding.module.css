@@ -506,6 +506,36 @@
   top: clamp(216px, 37.778svh, 408px);
 }
 
+.splitInputWrapper {
+  position: absolute;
+  top: clamp(124px, 21.574svh, 233px);
+  left: clamp(49px, 4.844vw, 93px);
+  width: clamp(616px, 60.156vw, 1155px);
+  display: flex;
+  gap: clamp(12px, 1.25vw, 24px);
+}
+
+.splitInput {
+  flex: 1;
+  height: clamp(57px, 5.521vw, 106px);
+  border: 1.5px solid #a1a1a1;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: transparent;
+  color: #000;
+  font-size: clamp(14px, 1.25vw, 24px);
+  font-family: inherit;
+  outline: none;
+  padding: 0 clamp(16px, 1.667vw, 32px);
+}
+
+.splitInput:focus {
+  border-color: #3b3b3b;
+}
+
+.splitInput::placeholder {
+  color: #9a9a9a;
+}
+
 .stepIndicator {
   position: absolute;
   top: clamp(551px, 95.648svh, 1033px);
