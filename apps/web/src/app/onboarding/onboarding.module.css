@@ -125,6 +125,12 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
 }
 
+.selectionCard {
+  top: clamp(115px, 20svh, 216px);
+  left: clamp(155px, 15.156vw, 291px);
+  height: clamp(373px, 64.722svh, 699px);
+}
+
 .questionText {
   position: absolute;
   top: clamp(63px, 11.019svh, 119px);
@@ -146,6 +152,16 @@
   font-size: clamp(16px, 1.563vw, 30px);
   font-weight: 500;
   line-height: clamp(24px, 2.344vw, 45px);
+}
+
+.selectionQuestion {
+  top: clamp(43px, 7.407svh, 80px);
+  left: clamp(39px, 3.802vw, 73px);
+}
+
+.selectionQuestion label {
+  font-size: clamp(14px, 1.354vw, 26px);
+  font-weight: 600;
 }
 
 .shortAnswer {
@@ -225,6 +241,63 @@
   top: clamp(245px, 42.593svh, 460px);
 }
 
+.optionList {
+  position: absolute;
+  top: clamp(105px, 18.148svh, 196px);
+  left: clamp(39px, 3.802vw, 73px);
+  display: flex;
+  width: clamp(636px, 62.135vw, 1193px);
+  flex-direction: column;
+  gap: clamp(9px, 0.833vw, 16px);
+}
+
+.marketTypeOption {
+  display: flex;
+  width: 100%;
+  height: clamp(51px, 4.948vw, 95px);
+  align-items: center;
+  gap: clamp(12px, 1.146vw, 22px);
+  padding: 0 clamp(22px, 2.188vw, 42px);
+  border: 0.6px solid #000;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: rgba(255, 255, 255, 0.18);
+  color: #000;
+  cursor: pointer;
+  font-size: clamp(12px, 1.146vw, 22px);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.marketTypeOption input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+}
+
+.optionBullet {
+  width: clamp(9px, 0.833vw, 16px);
+  height: clamp(9px, 0.833vw, 16px);
+  border-radius: 999px;
+  background: #e4e4e4;
+}
+
+.marketTypeOptionSelected {
+  border-color: #b93b2f;
+  background: rgba(255, 242, 197, 0.24);
+}
+
+.marketTypeOptionSelected .optionBullet {
+  background: #c43d31;
+}
+
+.selectionNextButton {
+  top: clamp(292px, 50.741svh, 548px);
+  left: clamp(303px, 29.583vw, 568px);
+}
+
 .stepIndicator {
   position: absolute;
   top: clamp(551px, 95.648svh, 1033px);
@@ -272,6 +345,23 @@
 
   .addressNextButton {
     top: 42.593vw;
+  }
+
+  .selectionCard {
+    top: 20vw;
+    height: 64.722vw;
+  }
+
+  .selectionQuestion {
+    top: 7.407vw;
+  }
+
+  .optionList {
+    top: 18.148vw;
+  }
+
+  .selectionNextButton {
+    top: 50.741vw;
   }
 
   .stepIndicator {
