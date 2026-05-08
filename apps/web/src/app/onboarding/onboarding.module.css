@@ -487,6 +487,25 @@
   top: clamp(289px, 50.093svh, 541px);
 }
 
+.contactCard {
+  top: clamp(162px, 28.241svh, 305px);
+  height: clamp(296px, 51.667svh, 558px);
+}
+
+.contactQuestion {
+  top: clamp(49px, 8.611svh, 93px);
+  left: clamp(41px, 4.01vw, 77px);
+}
+
+.contactInput {
+  top: clamp(124px, 21.574svh, 233px);
+  left: clamp(49px, 4.844vw, 93px);
+}
+
+.contactNextButton {
+  top: clamp(216px, 37.778svh, 408px);
+}
+
 .stepIndicator {
   position: absolute;
   top: clamp(551px, 95.648svh, 1033px);
@@ -627,6 +646,23 @@
 
   .customerNextButton {
     top: 50.093vw;
+  }
+
+  .contactCard {
+    top: 28.241vw;
+    height: 51.667vw;
+  }
+
+  .contactQuestion {
+    top: 8.611vw;
+  }
+
+  .contactInput {
+    top: 21.574vw;
+  }
+
+  .contactNextButton {
+    top: 37.778vw;
   }
 
   .stepIndicator {
