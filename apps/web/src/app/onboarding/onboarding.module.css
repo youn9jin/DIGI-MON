@@ -1,0 +1,719 @@
+.viewport {
+  width: 100vw;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #fff;
+}
+
+.canvas {
+  position: relative;
+  width: 100vw;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #fff;
+  font-family: Pretendard, "Noto Sans KR", Inter, Arial, sans-serif;
+}
+
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  width: 100%;
+  height: clamp(47px, 8.148svh, 88px);
+  align-items: center;
+  background: #fce6d5;
+  box-shadow: 0 2px 10px rgba(9, 128, 68, 0.2);
+}
+
+.headerInner {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(45px, 8.333vw, 160px);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: clamp(68px, 6.771vw, 130px);
+}
+
+.logoSlot {
+  width: 55px;
+}
+
+.logoMark {
+  position: relative;
+  width: clamp(29px, 2.865vw, 55px);
+  height: clamp(21px, 2.031vw, 39px);
+  overflow: hidden;
+}
+
+.logoImage {
+  position: absolute;
+  top: -206.43%;
+  left: -26.64%;
+  width: 513.93%;
+  height: 733.33%;
+  max-width: none;
+}
+
+.primaryNav {
+  display: flex;
+  width: clamp(120px, 11.771vw, 226px);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.primaryNav,
+.authNav {
+  color: #000;
+  font-size: clamp(11px, 1.042vw, 20px);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.primaryNav a,
+.authNav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.authNav {
+  display: flex;
+  align-items: center;
+  gap: clamp(7px, 0.677vw, 13px);
+}
+
+.headerDivider {
+  width: 1px;
+  height: clamp(10px, 0.964vw, 19px);
+}
+
+.illustration {
+  position: absolute;
+  top: clamp(91px, 15.741svh, 170px);
+  left: clamp(99px, 9.635vw, 185px);
+  width: clamp(827px, 80.729vw, 1550px);
+  height: clamp(422px, 73.241svh, 791px);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.illustrationImage {
+  position: absolute;
+  top: -47.01%;
+  left: 0;
+  width: 100%;
+  height: 196.01%;
+  max-width: none;
+}
+
+.card {
+  position: absolute;
+  top: clamp(155px, 26.944svh, 291px);
+  left: clamp(154px, 15.052vw, 289px);
+  width: clamp(716px, 69.948vw, 1343px);
+  height: clamp(293px, 50.833svh, 549px);
+  border: 0;
+  border-radius: clamp(53px, 5.208vw, 100px);
+  background: rgba(253, 253, 253, 0.98);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+}
+
+.selectionCard {
+  top: clamp(115px, 20svh, 216px);
+  left: clamp(155px, 15.156vw, 291px);
+  height: clamp(373px, 64.722svh, 699px);
+}
+
+.businessCard {
+  top: clamp(93px, 16.204svh, 175px);
+  left: clamp(154px, 15.052vw, 289px);
+  height: clamp(410px, 71.204svh, 769px);
+}
+
+.storeCountCard {
+  top: clamp(102px, 17.778svh, 192px);
+  left: clamp(154px, 15vw, 288px);
+  height: clamp(410px, 71.204svh, 769px);
+}
+
+.hoursCard {
+  top: clamp(155px, 26.944svh, 291px);
+  left: clamp(154px, 15.052vw, 289px);
+  height: clamp(387px, 64.815svh, 700px);
+}
+
+.questionText {
+  position: absolute;
+  top: clamp(63px, 11.019svh, 119px);
+  left: clamp(39px, 3.802vw, 73px);
+  color: #000;
+  line-height: 0;
+  white-space: nowrap;
+}
+
+.questionText p {
+  margin: 0;
+  font-size: clamp(14px, 1.354vw, 26px);
+  font-weight: 600;
+  line-height: clamp(24px, 2.344vw, 45px);
+}
+
+.questionText label {
+  display: block;
+  font-size: clamp(16px, 1.563vw, 30px);
+  font-weight: 500;
+  line-height: clamp(24px, 2.344vw, 45px);
+}
+
+.selectionQuestion {
+  top: clamp(43px, 7.407svh, 80px);
+  left: clamp(39px, 3.802vw, 73px);
+}
+
+.businessQuestion {
+  top: clamp(30px, 5.185svh, 56px);
+  left: clamp(39px, 3.802vw, 73px);
+}
+
+.storeCountQuestion {
+  top: clamp(30px, 5.185svh, 56px);
+  left: clamp(39px, 3.802vw, 73px);
+}
+
+.hoursQuestion {
+  top: clamp(44px, 7.685svh, 83px);
+  left: clamp(41px, 4.01vw, 77px);
+}
+
+.selectionQuestion label {
+  font-size: clamp(14px, 1.354vw, 26px);
+  font-weight: 600;
+}
+
+.shortAnswer {
+  position: absolute;
+  top: clamp(133px, 23.056svh, 249px);
+  left: clamp(50px, 4.896vw, 94px);
+  width: clamp(616px, 60.156vw, 1155px);
+  height: clamp(57px, 5.521vw, 106px);
+  border: 1.5px solid #a1a1a1;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: transparent;
+  color: #000;
+  font-size: clamp(16px, 1.354vw, 26px);
+  outline: none;
+  padding: 0 clamp(16px, 1.667vw, 32px);
+}
+
+.shortAnswer:focus {
+  border-color: #3b3b3b;
+}
+
+.addressFields {
+  position: absolute;
+  top: clamp(133px, 23.056svh, 249px);
+  left: clamp(50px, 4.896vw, 94px);
+  display: flex;
+  width: clamp(616px, 60.156vw, 1155px);
+  flex-direction: column;
+  gap: clamp(10px, 1.042vw, 20px);
+}
+
+.addressField {
+  width: 100%;
+  height: clamp(43px, 4.167vw, 80px);
+  padding: 0 clamp(16px, 1.667vw, 32px);
+  border: 1.5px solid #a1a1a1;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: transparent;
+  color: #000;
+  font-size: clamp(14px, 1.25vw, 24px);
+  outline: none;
+}
+
+.addressField:focus {
+  border-color: #3b3b3b;
+}
+
+.addressField::placeholder {
+  color: #9a9a9a;
+}
+
+.addressSearchInput {
+  cursor: pointer;
+}
+
+.nextButton {
+  position: absolute;
+  top: clamp(227px, 39.352svh, 425px);
+  left: clamp(303px, 29.583vw, 568px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: clamp(112px, 10.938vw, 210px);
+  height: clamp(50px, 4.844vw, 93px);
+  padding: 0 clamp(43px, 4.167vw, 80px);
+  border: 0;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: #fff2c5;
+  color: #3b3b3b;
+  cursor: pointer;
+  font-size: clamp(13px, 1.302vw, 25px);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.addressNextButton {
+  top: clamp(245px, 42.593svh, 460px);
+}
+
+.optionList {
+  position: absolute;
+  top: clamp(105px, 18.148svh, 196px);
+  left: clamp(39px, 3.802vw, 73px);
+  display: flex;
+  width: clamp(636px, 62.135vw, 1193px);
+  flex-direction: column;
+  gap: clamp(9px, 0.833vw, 16px);
+}
+
+.marketTypeOption {
+  display: flex;
+  width: 100%;
+  height: clamp(51px, 4.948vw, 95px);
+  align-items: center;
+  gap: clamp(12px, 1.146vw, 22px);
+  padding: 0 clamp(22px, 2.188vw, 42px);
+  border: 0.6px solid #000;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: rgba(255, 255, 255, 0.18);
+  color: #000;
+  cursor: pointer;
+  font-size: clamp(12px, 1.146vw, 22px);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.marketTypeOption input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+}
+
+.optionBullet {
+  width: clamp(9px, 0.833vw, 16px);
+  height: clamp(9px, 0.833vw, 16px);
+  border-radius: 999px;
+  background: #e4e4e4;
+}
+
+.marketTypeOptionSelected {
+  border-color: #b93b2f;
+  background: rgba(255, 242, 197, 0.24);
+}
+
+.marketTypeOptionSelected .optionBullet {
+  background: #c43d31;
+}
+
+.selectionNextButton {
+  top: clamp(292px, 50.741svh, 548px);
+  left: clamp(303px, 29.583vw, 568px);
+}
+
+.businessOptionList {
+  position: absolute;
+  top: clamp(94px, 16.204svh, 175px);
+  left: clamp(39px, 3.802vw, 73px);
+  display: flex;
+  width: clamp(636px, 62.135vw, 1193px);
+  flex-direction: column;
+  gap: clamp(9px, 0.833vw, 16px);
+}
+
+.businessOptionList .marketTypeOption {
+  height: clamp(39px, 3.823vw, 73px);
+}
+
+.businessNextButton {
+  top: clamp(341px, 59.259svh, 640px);
+  left: clamp(302px, 29.479vw, 566px);
+}
+
+.storeCountOptionList {
+  position: absolute;
+  top: clamp(93px, 16.204svh, 175px);
+  left: clamp(39px, 3.802vw, 73px);
+  display: flex;
+  width: clamp(636px, 62.135vw, 1193px);
+  flex-direction: column;
+  gap: clamp(9px, 0.833vw, 16px);
+}
+
+.storeCountOptionList .marketTypeOption {
+  height: clamp(39px, 3.823vw, 73px);
+}
+
+.storeCountNextButton {
+  top: clamp(341px, 59.259svh, 640px);
+  left: clamp(302px, 29.479vw, 566px);
+}
+
+.hoursFieldset {
+  position: absolute;
+  left: clamp(50px, 4.896vw, 94px);
+  width: clamp(616px, 60.156vw, 1155px);
+  padding: 0;
+  border: 0;
+  margin: 0;
+}
+
+.hoursFieldset legend {
+  margin-bottom: clamp(5px, 0.521vw, 10px);
+  color: #000;
+  font-size: clamp(11px, 1.042vw, 20px);
+  font-weight: 500;
+  line-height: clamp(24px, 2.344vw, 45px);
+}
+
+.weekdayHours {
+  top: clamp(105px, 18.333svh, 198px);
+}
+
+.weekendHours {
+  top: clamp(203px, 33.333svh, 360px);
+}
+
+.timeRangeInput {
+  display: flex;
+  width: 100%;
+  height: clamp(46px, 4.479vw, 86px);
+  align-items: center;
+  gap: clamp(12px, 1.146vw, 22px);
+  padding: 0 clamp(24px, 2.344vw, 45px);
+  border: 1.5px solid #a1a1a1;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: transparent;
+}
+
+.timeRangeInput select {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+  font-size: clamp(15px, 1.354vw, 26px);
+  outline: none;
+}
+
+.timeRangeInput span {
+  color: #3b3b3b;
+  font-size: clamp(15px, 1.354vw, 26px);
+  font-weight: 500;
+}
+
+.sundayClosedLabel {
+  position: absolute;
+  top: clamp(285px, 48.241svh, 521px);
+  left: clamp(53px, 5.156vw, 99px);
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 0.833vw, 16px);
+  color: #000;
+  cursor: pointer;
+  font-size: clamp(10px, 0.938vw, 18px);
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.sundayClosedLabel input {
+  width: clamp(11px, 1.094vw, 21px);
+  height: clamp(11px, 1.094vw, 21px);
+  margin: 0;
+  accent-color: #c43d31;
+}
+
+.hoursNextButton {
+  top: clamp(319px, 52.870svh, 571px);
+  left: clamp(303px, 29.583vw, 568px);
+}
+
+.customerCard {
+  height: clamp(357px, 62.037svh, 670px);
+}
+
+.customerQuestion {
+  top: clamp(52px, 9.074svh, 98px);
+  left: clamp(41px, 4.01vw, 77px);
+}
+
+.textareaAnswer {
+  position: absolute;
+  top: clamp(124px, 21.667svh, 234px);
+  left: clamp(48px, 4.74vw, 91px);
+  width: clamp(616px, 60.156vw, 1155px);
+  height: clamp(130px, 22.685svh, 245px);
+  border: 1.5px solid #a1a1a1;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: transparent;
+  color: #000;
+  font-family: inherit;
+  font-size: clamp(14px, 1.25vw, 24px);
+  outline: none;
+  padding: clamp(14px, 1.354vw, 26px) clamp(16px, 1.667vw, 32px);
+  resize: none;
+}
+
+.textareaAnswer:focus {
+  border-color: #3b3b3b;
+}
+
+.textareaAnswer::placeholder {
+  color: #9a9a9a;
+}
+
+.customerNextButton {
+  top: clamp(289px, 50.093svh, 541px);
+}
+
+.contactCard {
+  top: clamp(162px, 28.241svh, 305px);
+  height: clamp(296px, 51.667svh, 558px);
+}
+
+.contactQuestion {
+  top: clamp(49px, 8.611svh, 93px);
+  left: clamp(41px, 4.01vw, 77px);
+}
+
+.contactInput {
+  top: clamp(124px, 21.574svh, 233px);
+  left: clamp(49px, 4.844vw, 93px);
+}
+
+.contactNextButton {
+  top: clamp(216px, 37.778svh, 408px);
+}
+
+.splitInputWrapper {
+  position: absolute;
+  top: clamp(124px, 21.574svh, 233px);
+  left: clamp(49px, 4.844vw, 93px);
+  width: clamp(616px, 60.156vw, 1155px);
+  display: flex;
+  gap: clamp(12px, 1.25vw, 24px);
+}
+
+.splitInput {
+  flex: 1;
+  height: clamp(57px, 5.521vw, 106px);
+  border: 1.5px solid #a1a1a1;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: transparent;
+  color: #000;
+  font-size: clamp(14px, 1.25vw, 24px);
+  font-family: inherit;
+  outline: none;
+  padding: 0 clamp(16px, 1.667vw, 32px);
+}
+
+.splitInput:focus {
+  border-color: #3b3b3b;
+}
+
+.splitInput::placeholder {
+  color: #9a9a9a;
+}
+
+.stepIndicator {
+  position: absolute;
+  top: clamp(551px, 95.648svh, 1033px);
+  left: clamp(453px, 44.219vw, 849px);
+  display: flex;
+  align-items: center;
+}
+
+.stepActive {
+  width: clamp(13px, 1.302vw, 25px);
+  height: clamp(13px, 1.302vw, 25px);
+}
+
+.stepInactive {
+  width: clamp(12px, 1.146vw, 22px);
+  height: clamp(12px, 1.146vw, 22px);
+}
+
+@media (max-aspect-ratio: 16 / 9) {
+  .header {
+    height: 8.148vw;
+  }
+
+  .illustration {
+    top: 15.741vw;
+    height: 73.241vw;
+  }
+
+  .card {
+    top: 26.944vw;
+    height: 50.833vw;
+  }
+
+  .questionText {
+    top: 11.019vw;
+  }
+
+  .shortAnswer {
+    top: 23.056vw;
+  }
+
+  .nextButton {
+    top: 39.352vw;
+  }
+
+  .addressNextButton {
+    top: 42.593vw;
+  }
+
+  .selectionCard {
+    top: 20vw;
+    height: 64.722vw;
+  }
+
+  .selectionQuestion {
+    top: 7.407vw;
+  }
+
+  .optionList {
+    top: 18.148vw;
+  }
+
+  .selectionNextButton {
+    top: 50.741vw;
+  }
+
+  .businessCard {
+    top: 16.204vw;
+    height: 71.204vw;
+  }
+
+  .businessQuestion {
+    top: 5.185vw;
+  }
+
+  .businessOptionList {
+    top: 16.204vw;
+  }
+
+  .businessNextButton {
+    top: 59.259vw;
+  }
+
+  .storeCountCard {
+    top: 17.778vw;
+    height: 71.204vw;
+  }
+
+  .storeCountQuestion {
+    top: 5.185vw;
+  }
+
+  .storeCountOptionList {
+    top: 16.204vw;
+  }
+
+  .storeCountNextButton {
+    top: 59.259vw;
+  }
+
+  .hoursCard {
+    top: 26.944vw;
+    height: 64.815vw;
+  }
+
+  .hoursQuestion {
+    top: 7.685vw;
+  }
+
+  .weekdayHours {
+    top: 18.333vw;
+  }
+
+  .weekendHours {
+    top: 33.333vw;
+  }
+
+  .sundayClosedLabel {
+    top: 48.241vw;
+  }
+
+  .hoursNextButton {
+    top: 52.870vw;
+  }
+
+  .customerCard {
+    height: 62.037vw;
+  }
+
+  .customerQuestion {
+    top: 9.074vw;
+  }
+
+  .textareaAnswer {
+    top: 21.667vw;
+    height: 22.685vw;
+  }
+
+  .customerNextButton {
+    top: 50.093vw;
+  }
+
+  .contactCard {
+    top: 28.241vw;
+    height: 51.667vw;
+  }
+
+  .contactQuestion {
+    top: 8.611vw;
+  }
+
+  .contactInput {
+    top: 21.574vw;
+  }
+
+  .contactNextButton {
+    top: 37.778vw;
+  }
+
+  .stepIndicator {
+    top: 95.648vw;
+  }
+}
+
+@media (max-width: 767px) {
+  .headerInner {
+    padding: 0 20px;
+  }
+
+  .headerLeft {
+    gap: 0;
+  }
+
+  .primaryNav {
+    display: none;
+  }
+
+  .authNav {
+    font-size: 14px;
+  }
+}
