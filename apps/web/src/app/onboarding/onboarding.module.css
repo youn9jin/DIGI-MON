@@ -143,6 +143,12 @@
   height: clamp(410px, 71.204svh, 769px);
 }
 
+.hoursCard {
+  top: clamp(155px, 26.944svh, 291px);
+  left: clamp(154px, 15.052vw, 289px);
+  height: clamp(387px, 64.815svh, 700px);
+}
+
 .questionText {
   position: absolute;
   top: clamp(63px, 11.019svh, 119px);
@@ -179,6 +185,11 @@
 .storeCountQuestion {
   top: clamp(30px, 5.185svh, 56px);
   left: clamp(39px, 3.802vw, 73px);
+}
+
+.hoursQuestion {
+  top: clamp(44px, 7.685svh, 83px);
+  left: clamp(41px, 4.01vw, 77px);
 }
 
 .selectionQuestion label {
@@ -358,6 +369,86 @@
   left: clamp(302px, 29.479vw, 566px);
 }
 
+.hoursFieldset {
+  position: absolute;
+  left: clamp(50px, 4.896vw, 94px);
+  width: clamp(616px, 60.156vw, 1155px);
+  padding: 0;
+  border: 0;
+  margin: 0;
+}
+
+.hoursFieldset legend {
+  margin-bottom: clamp(5px, 0.521vw, 10px);
+  color: #000;
+  font-size: clamp(11px, 1.042vw, 20px);
+  font-weight: 500;
+  line-height: clamp(24px, 2.344vw, 45px);
+}
+
+.weekdayHours {
+  top: clamp(105px, 18.333svh, 198px);
+}
+
+.weekendHours {
+  top: clamp(203px, 33.333svh, 360px);
+}
+
+.timeRangeInput {
+  display: flex;
+  width: 100%;
+  height: clamp(46px, 4.479vw, 86px);
+  align-items: center;
+  gap: clamp(12px, 1.146vw, 22px);
+  padding: 0 clamp(24px, 2.344vw, 45px);
+  border: 1.5px solid #a1a1a1;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: transparent;
+}
+
+.timeRangeInput select {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+  font-size: clamp(15px, 1.354vw, 26px);
+  outline: none;
+}
+
+.timeRangeInput span {
+  color: #3b3b3b;
+  font-size: clamp(15px, 1.354vw, 26px);
+  font-weight: 500;
+}
+
+.sundayClosedLabel {
+  position: absolute;
+  top: clamp(285px, 48.241svh, 521px);
+  left: clamp(53px, 5.156vw, 99px);
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 0.833vw, 16px);
+  color: #000;
+  cursor: pointer;
+  font-size: clamp(10px, 0.938vw, 18px);
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.sundayClosedLabel input {
+  width: clamp(11px, 1.094vw, 21px);
+  height: clamp(11px, 1.094vw, 21px);
+  margin: 0;
+  accent-color: #c43d31;
+}
+
+.hoursNextButton {
+  top: clamp(319px, 52.870svh, 571px);
+  left: clamp(303px, 29.583vw, 568px);
+}
+
 .stepIndicator {
   position: absolute;
   top: clamp(551px, 95.648svh, 1033px);
@@ -456,6 +547,31 @@
 
   .storeCountNextButton {
     top: 59.259vw;
+  }
+
+  .hoursCard {
+    top: 26.944vw;
+    height: 64.815vw;
+  }
+
+  .hoursQuestion {
+    top: 7.685vw;
+  }
+
+  .weekdayHours {
+    top: 18.333vw;
+  }
+
+  .weekendHours {
+    top: 33.333vw;
+  }
+
+  .sundayClosedLabel {
+    top: 48.241vw;
+  }
+
+  .hoursNextButton {
+    top: 52.870vw;
   }
 
   .stepIndicator {
