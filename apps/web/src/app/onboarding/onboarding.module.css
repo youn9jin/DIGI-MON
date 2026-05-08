@@ -167,6 +167,40 @@
   border-color: #3b3b3b;
 }
 
+.addressFields {
+  position: absolute;
+  top: clamp(133px, 23.056svh, 249px);
+  left: clamp(50px, 4.896vw, 94px);
+  display: flex;
+  width: clamp(616px, 60.156vw, 1155px);
+  flex-direction: column;
+  gap: clamp(10px, 1.042vw, 20px);
+}
+
+.addressField {
+  width: 100%;
+  height: clamp(43px, 4.167vw, 80px);
+  padding: 0 clamp(16px, 1.667vw, 32px);
+  border: 1.5px solid #a1a1a1;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: transparent;
+  color: #000;
+  font-size: clamp(14px, 1.25vw, 24px);
+  outline: none;
+}
+
+.addressField:focus {
+  border-color: #3b3b3b;
+}
+
+.addressField::placeholder {
+  color: #9a9a9a;
+}
+
+.addressSearchInput {
+  cursor: pointer;
+}
+
 .nextButton {
   position: absolute;
   top: clamp(227px, 39.352svh, 425px);
@@ -185,6 +219,10 @@
   font-size: clamp(13px, 1.302vw, 25px);
   font-weight: 500;
   line-height: 1;
+}
+
+.addressNextButton {
+  top: clamp(245px, 42.593svh, 460px);
 }
 
 .stepIndicator {
@@ -230,6 +268,10 @@
 
   .nextButton {
     top: 39.352vw;
+  }
+
+  .addressNextButton {
+    top: 42.593vw;
   }
 
   .stepIndicator {

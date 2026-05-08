@@ -1,4 +1,8 @@
+"use client";
+
 import Image from "next/image";
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import Header from "@/components/layout/Header";
 import styles from "./onboarding.module.css";
 
@@ -26,6 +30,19 @@ function StepIndicator() {
 }
 
 export default function OnboardingPage() {
+  const router = useRouter();
+  const [marketName, setMarketName] = useState("");
+
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!marketName.trim()) {
+      return;
+    }
+
+    router.push("/onboarding/step-2");
+  }
+
   return (
     <main className={styles.viewport}>
       <div className={styles.canvas} data-node-id="148:1795">
@@ -42,7 +59,12 @@ export default function OnboardingPage() {
           />
         </div>
 
-        <section className={styles.card} aria-labelledby="onboarding-question" data-node-id="148:1810">
+        <form
+          className={styles.card}
+          aria-labelledby="onboarding-question"
+          data-node-id="148:1810"
+          onSubmit={handleSubmit}
+        >
           <div className={styles.questionText} data-node-id="148:1811">
             <p>질문 1.</p>
             <label id="onboarding-question" htmlFor="market-name">
@@ -58,12 +80,15 @@ export default function OnboardingPage() {
             className={styles.shortAnswer}
             aria-label="소속된 시장 이름"
             data-node-id="148:1711"
+            required
+            value={marketName}
+            onChange={(event) => setMarketName(event.target.value)}
           />
 
-          <button type="button" className={styles.nextButton} data-node-id="148:1834">
+          <button type="submit" className={styles.nextButton} data-node-id="148:1834">
             다음
           </button>
-        </section>
+        </form>
 
         <StepIndicator />
       </div>
