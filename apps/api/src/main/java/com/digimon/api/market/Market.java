@@ -42,13 +42,13 @@ public class Market {
     @Column(name = "main_categories", columnDefinition = "text[]")
     private String[] mainCategories;
 
-    @Column(name = "total_stores")
-    private Integer totalStores;
+    @Column(name = "total_stores", length = 20)
+    private String totalStores;
 
     @Column(name = "operating_hours", length = 255)
     private String operatingHours;
 
-    @Column(name = "target_customers", length = 255)
+    @Column(name = "target_customers", length = 500)
     private String targetCustomers;
 
     @Column(name = "contact", length = 50)
@@ -56,6 +56,12 @@ public class Market {
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
+
+    @Column(name = "manager_name", length = 50)
+    private String managerName;
+
+    @Column(name = "manager_title", length = 50)
+    private String managerTitle;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

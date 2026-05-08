@@ -1,5 +1,6 @@
 package com.digimon.api.global;
 
+import com.digimon.api.associations.AlreadyOnboardedException;
 import com.digimon.api.auth.AuthAccountConflictException;
 import com.digimon.api.auth.ForbiddenException;
 import com.digimon.api.auth.UnauthorizedException;
@@ -21,6 +22,15 @@ public class GlobalExceptionHandler {
         ResponseWrapper<Void> body = ResponseWrapper.error(
                 "AUTH_ACCOUNT_CONFLICT",
                 ex.getMessage() != null ? ex.getMessage() : "Email already linked to another account",
+                null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    @ExceptionHandler(AlreadyOnboardedException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleAlreadyOnboarded(AlreadyOnboardedException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "ALREADY_ONBOARDED",
+                ex.getMessage() != null ? ex.getMessage() : "이미 온보딩이 완료된 계정입니다.",
                 null);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
