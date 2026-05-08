@@ -137,6 +137,12 @@
   height: clamp(410px, 71.204svh, 769px);
 }
 
+.storeCountCard {
+  top: clamp(102px, 17.778svh, 192px);
+  left: clamp(154px, 15vw, 288px);
+  height: clamp(410px, 71.204svh, 769px);
+}
+
 .questionText {
   position: absolute;
   top: clamp(63px, 11.019svh, 119px);
@@ -166,6 +172,11 @@
 }
 
 .businessQuestion {
+  top: clamp(30px, 5.185svh, 56px);
+  left: clamp(39px, 3.802vw, 73px);
+}
+
+.storeCountQuestion {
   top: clamp(30px, 5.185svh, 56px);
   left: clamp(39px, 3.802vw, 73px);
 }
@@ -328,6 +339,25 @@
   left: clamp(302px, 29.479vw, 566px);
 }
 
+.storeCountOptionList {
+  position: absolute;
+  top: clamp(93px, 16.204svh, 175px);
+  left: clamp(39px, 3.802vw, 73px);
+  display: flex;
+  width: clamp(636px, 62.135vw, 1193px);
+  flex-direction: column;
+  gap: clamp(9px, 0.833vw, 16px);
+}
+
+.storeCountOptionList .marketTypeOption {
+  height: clamp(39px, 3.823vw, 73px);
+}
+
+.storeCountNextButton {
+  top: clamp(341px, 59.259svh, 640px);
+  left: clamp(302px, 29.479vw, 566px);
+}
+
 .stepIndicator {
   position: absolute;
   top: clamp(551px, 95.648svh, 1033px);
@@ -408,6 +438,23 @@
   }
 
   .businessNextButton {
+    top: 59.259vw;
+  }
+
+  .storeCountCard {
+    top: 17.778vw;
+    height: 71.204vw;
+  }
+
+  .storeCountQuestion {
+    top: 5.185vw;
+  }
+
+  .storeCountOptionList {
+    top: 16.204vw;
+  }
+
+  .storeCountNextButton {
     top: 59.259vw;
   }
 
