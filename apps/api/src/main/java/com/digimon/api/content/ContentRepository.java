@@ -9,4 +9,10 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
     List<Content> findByMarketIdOrderByCreatedAtDesc(Long marketId);
 
     long countByMarketId(Long marketId);
+
+    /**
+     * 점포 삭제(DELETE /api/stores/{storeId}) 시 cascade 처리용.
+     * 호출자(StoresService.deleteStore) 의 @Transactional 안에서 실행된다.
+     */
+    long deleteByStoreId(Long storeId);
 }

@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseToken;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,10 +29,11 @@ import java.util.function.Function;
  * 인증/응답 패턴은 MeController, AssociationsController 와 동일하게 유지한다.
  *
  * 엔드포인트:
- * - POST  /api/stores             : 일괄 등록 (부분 성공 정책)
- * - GET   /api/stores             : 내 시장의 점포 목록 (market 없으면 빈 리스트)
- * - GET   /api/stores/{storeId}   : 점포 상세 (404 STORE_NOT_FOUND / 403 FORBIDDEN)
- * - PATCH /api/stores/{storeId}   : 점포 부분 수정 (400/403/404, 응답은 GET 상세와 동일 구조)
+ * - POST   /api/stores             : 일괄 등록 (부분 성공 정책)
+ * - GET    /api/stores             : 내 시장의 점포 목록 (market 없으면 빈 리스트)
+ * - GET    /api/stores/{storeId}   : 점포 상세 (404 STORE_NOT_FOUND / 403 FORBIDDEN)
+ * - PATCH  /api/stores/{storeId}   : 점포 부분 수정 (400/403/404, 응답은 GET 상세와 동일 구조)
+ * - DELETE /api/stores/{storeId}   : 점포 삭제 (cascade 로 연결된 contents 도 삭제, 403/404)
  *
  * POST 부분 성공 정책:
  * - 한 점포의 검증 실패가 다른 점포 INSERT 를 막지 않는다.
@@ -91,6 +93,14 @@ public class StoresController {
             @RequestBody(required = false) UpdateStoreRequest request) {
         return withAuthenticatedUser(authorization, user ->
                 ResponseEntity.ok(storesService.updateStore(user, storeId, request)));
+    }
+
+    @DeleteMapping("/stores/{storeId}")
+    public ResponseEntity<?> deleteStore(
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @PathVariable Long storeId) {
+        return withAuthenticatedUser(authorization, user ->
+                ResponseEntity.ok(storesService.deleteStore(user, storeId)));
     }
 
     /**

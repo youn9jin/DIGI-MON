@@ -1,6 +1,7 @@
 package com.digimon.api.store;
 
 import com.digimon.api.auth.ForbiddenException;
+import com.digimon.api.content.ContentRepository;
 import com.digimon.api.global.ValidationErrorDetail;
 import com.digimon.api.global.ValidationErrorException;
 import com.digimon.api.market.Market;
@@ -24,14 +25,14 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * 점포(Store) 도메인 서비스. POST 일괄 등록, GET 목록/상세, PATCH 부분 수정을 담당한다.
+ * 점포(Store) 도메인 서비스. POST 일괄 등록, GET 목록/상세, PATCH 부분 수정, DELETE 삭제를 담당한다.
  *
  * POST /api/stores 정책:
  * - 점포 수 한도(150) 초과 → TooManyStoresException (전체 차단, 400)
  * - market 미존재 → MarketNotFoundException (전체 차단, 409)
  * - 그 외 점포별 검증 실패 / DB 예외 → 해당 한 건만 failedItems 에 기록, 나머지는 정상 INSERT
  *
- * GET /api/stores/{storeId} & PATCH /api/stores/{storeId}:
+ * GET /api/stores/{storeId} & PATCH /api/stores/{storeId} & DELETE /api/stores/{storeId}:
  * - 점포 존재/소유권 검증은 requireOwnedStore() 헬퍼로 통일. 404 → 403 우선순위 유지.
  *
  * PATCH 정책:
@@ -39,11 +40,15 @@ import java.util.regex.Pattern;
  * - 검증은 누적하여 ValidationErrorException 으로 한 번에 반환(POST 의 "첫 실패만" 정책과 다름).
  * - name/category 가 trim 후 빈 → 검증 실패. 그 외 선택 필드는 trim 후 빈 → null 로 정규화하여 "값 지우기".
  *
+ * DELETE 정책:
+ * - Store 엔티티에 cascade 매핑이 없으므로 ContentRepository.deleteByStoreId 로 명시 cascade.
+ * - contents 삭제 → store 삭제를 단일 @Transactional 안에서 처리하여 일관성 보장.
+ *
  * 트랜잭션:
  * - createStores 자체에는 트랜잭션을 두지 않는다.
  * - 점포 INSERT 는 self.saveOne(...) (REQUIRES_NEW) 으로 점포별 독립 트랜잭션을 가져
  *   한 건의 DB 예외(컬럼 길이 초과 등)가 다른 건을 롤백시키지 않도록 한다.
- * - updateStore 는 단건이므로 일반 @Transactional(REQUIRED).
+ * - updateStore / deleteStore 는 단건이므로 일반 @Transactional(REQUIRED).
  */
 @Service
 public class StoresService {
@@ -59,13 +64,16 @@ public class StoresService {
 
     private final MarketRepository marketRepository;
     private final StoreRepository storeRepository;
+    private final ContentRepository contentRepository;
     private final StoresService self;
 
     public StoresService(MarketRepository marketRepository,
                          StoreRepository storeRepository,
+                         ContentRepository contentRepository,
                          @Lazy StoresService self) {
         this.marketRepository = marketRepository;
         this.storeRepository = storeRepository;
+        this.contentRepository = contentRepository;
         this.self = self;
     }
 
@@ -170,6 +178,23 @@ public class StoresService {
 
         Store saved = storeRepository.save(store);
         return toDetailMap(saved);
+    }
+
+    /**
+     * DELETE /api/stores/{storeId} — 점포 삭제.
+     * Store 엔티티에 cascade 매핑이 없으므로 contents 를 명시적으로 먼저 삭제한 뒤 store 를 삭제한다.
+     * 두 작업은 단일 트랜잭션 안에서 진행되어 중간 실패 시 전체 롤백된다.
+     */
+    @Transactional
+    public Map<String, Object> deleteStore(User user, Long storeId) {
+        Store store = requireOwnedStore(user, storeId);
+        contentRepository.deleteByStoreId(storeId);
+        storeRepository.delete(store);
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("storeId", storeId);
+        body.put("message", "점포가 삭제되었습니다.");
+        return body;
     }
 
     /**
