@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { saveOnboardingData } from "@/lib/onboarding-store";
 import Header from "@/components/layout/Header";
 import styles from "../onboarding.module.css";
 
@@ -43,6 +44,7 @@ export default function OnboardingStepEightPage() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    saveOnboardingData({ contactNumber });
     router.push("/onboarding/step-9");
   }
 

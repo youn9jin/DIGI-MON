@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { saveOnboardingData } from "@/lib/onboarding-store";
 import Header from "@/components/layout/Header";
 import styles from "../onboarding.module.css";
 
@@ -41,6 +42,7 @@ export default function OnboardingStepSevenPage() {
       return;
     }
 
+    saveOnboardingData({ targetCustomers: customerCharacteristics });
     router.push("/onboarding/step-8");
   }
 

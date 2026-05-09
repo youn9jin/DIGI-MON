@@ -5,6 +5,8 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/layout/Header";
 import styles from "../onboarding.module.css";
+import { saveOnboardingData } from "@/lib/onboarding-store";
+import { submitOnboarding, type OnboardingError } from "@/lib/api/onboarding";
 
 const TOTAL_STEPS = 10;
 const ACTIVE_STEP = 9;
@@ -34,10 +36,34 @@ export default function OnboardingStepTenPage() {
   const router = useRouter();
   const [managerName, setManagerName] = useState("");
   const [managerRole, setManagerRole] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    router.push("/dashboard");
+    if (isSubmitting) return;
+
+    saveOnboardingData({ managerName, managerRole });
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      await submitOnboarding();
+      router.push("/dashboard");
+    } catch (err) {
+      const error = err as OnboardingError;
+      if (error.status === 409) {
+        setErrorMessage("이미 온보딩이 완료된 계정입니다.");
+      } else if (error.status === 400) {
+        setErrorMessage("입력 정보를 다시 확인해주세요.");
+      } else if (error.status === 401) {
+        setErrorMessage("로그인이 필요합니다.");
+      } else {
+        setErrorMessage("오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -91,12 +117,26 @@ export default function OnboardingStepTenPage() {
             />
           </div>
 
+          {errorMessage && (
+            <p style={{
+              position: "absolute",
+              top: "clamp(165px, 28.7svh, 310px)",
+              left: "clamp(49px, 4.844vw, 93px)",
+              color: "#c43d31",
+              fontSize: "clamp(12px, 1.042vw, 20px)",
+              margin: 0,
+            }}>
+              {errorMessage}
+            </p>
+          )}
+
           <button
             type="submit"
+            disabled={isSubmitting}
             className={`${styles.nextButton} ${styles.contactNextButton}`}
             data-node-id="148:2415"
           >
-            완료
+            {isSubmitting ? "처리 중..." : "완료"}
           </button>
         </form>
 

@@ -1,0 +1,418 @@
+/* ════════════════════════════════════════════════════
+   로그인 / 회원가입 공통 레이아웃
+   ════════════════════════════════════════════════════ */
+
+.viewport {
+  width: 100vw;
+  min-height: 100svh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.canvas {
+  position: relative;
+  width: 100vw;
+  min-height: 100svh;
+  overflow-x: hidden;
+  background: #fff;
+  font-family: Pretendard, "Noto Sans KR", Inter, Arial, sans-serif;
+}
+
+/* ── 배경 일러스트 ── */
+.illustration {
+  position: absolute;
+  top: clamp(91px, 15.741svh, 170px);
+  left: clamp(99px, 9.635vw, 185px);
+  width: clamp(827px, 80.729vw, 1550px);
+  height: clamp(422px, 73.241svh, 791px);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.illustrationImage {
+  position: absolute;
+  top: -47.01%;
+  left: 0;
+  width: 100%;
+  height: 196.01%;
+  max-width: none;
+  opacity: 0.18;
+}
+
+/* ── 카드 공통 ── */
+.card {
+  position: absolute;
+  top: clamp(88px, 17.315svh, 187px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: clamp(300px, 32.708vw, 628px);
+  padding: clamp(28px, 3.125vw, 60px);
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: rgba(253, 253, 253, 0.98);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 카드 제목 ── */
+.cardTitle {
+  margin: 0 0 clamp(24px, 2.5vw, 48px);
+  color: #000;
+  font-size: clamp(16px, 1.458vw, 28px);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+/* ── 입력 필드 그룹 ── */
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 0.833vw, 16px);
+  margin-bottom: clamp(6px, 0.625vw, 12px);
+}
+
+.input {
+  width: 100%;
+  height: clamp(44px, 6.759svh, 73px);
+  padding: 0 clamp(14px, 1.458vw, 28px);
+  border: 1.5px solid #d0d0d0;
+  border-radius: clamp(10px, 1.042vw, 20px);
+  background: transparent;
+  color: #000;
+  font-family: inherit;
+  font-size: clamp(13px, 1.042vw, 20px);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.input:focus {
+  border-color: #3b3b3b;
+}
+
+.input::placeholder {
+  color: #a0a0a0;
+}
+
+/* ── 아이디/비밀번호 찾기 ── */
+.findLinks {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: clamp(6px, 0.625vw, 12px);
+  margin-bottom: clamp(20px, 2.083vw, 40px);
+  color: #6b6b6b;
+  font-size: clamp(11px, 0.938vw, 18px);
+}
+
+.findLinks a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.findLinks a:hover {
+  color: #3b3b3b;
+}
+
+.findDivider {
+  width: 1px;
+  height: clamp(10px, 0.938vw, 18px);
+  background: #c0c0c0;
+}
+
+/* ── 버튼 공통 ── */
+.button {
+  width: 100%;
+  height: clamp(44px, 6.759svh, 73px);
+  border: 0;
+  border-radius: clamp(10px, 1.042vw, 20px);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: clamp(14px, 1.25vw, 24px);
+  font-weight: 600;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(8px, 0.833vw, 16px);
+  box-sizing: border-box;
+}
+
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 로그인/제출 버튼 */
+.primaryButton {
+  background: #ffe480;
+  color: #3b3b3b;
+  margin-bottom: clamp(8px, 0.833vw, 16px);
+}
+
+.primaryButton:hover:not(:disabled) {
+  background: #f5d96a;
+}
+
+/* 구글 버튼 */
+.googleButton {
+  background: #fff;
+  color: #3b3b3b;
+  border: 1.5px solid #d0d0d0;
+  margin-bottom: clamp(14px, 1.458vw, 28px);
+}
+
+.googleButton:hover {
+  background: #f8f8f8;
+}
+
+/* ── 하단 링크 텍스트 ── */
+.bottomText {
+  text-align: center;
+  color: #6b6b6b;
+  font-size: clamp(11px, 0.938vw, 18px);
+  margin: 0;
+}
+
+.bottomText a {
+  color: #e9b906;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.bottomText a:hover {
+  text-decoration: underline;
+}
+
+/* ── 에러 메시지 ── */
+.errorMessage {
+  color: #c43d31;
+  font-size: clamp(11px, 0.938vw, 18px);
+  margin: 0 0 clamp(8px, 0.833vw, 16px);
+}
+
+/* ════════════════════════════════════════════════════
+   회원가입 전용
+   ════════════════════════════════════════════════════ */
+
+/* 더 넓은 카드 */
+.signupCard {
+  top: clamp(70px, 13.981svh, 151px);
+  width: clamp(320px, 44.219vw, 849px);
+  padding: clamp(28px, 3.906vw, 75px) clamp(24px, 4.063vw, 78px);
+}
+
+/* 제목 가운데 정렬 */
+.cardTitleCenter {
+  text-align: center;
+  margin-bottom: clamp(20px, 3.073vw, 59px);
+}
+
+/* 언더라인 입력 필드 */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 0.521vw, 10px);
+  margin-bottom: clamp(16px, 1.719vw, 33px);
+}
+
+.fieldLabel {
+  color: #6b6b6b;
+  font-size: clamp(12px, 0.938vw, 18px);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.underlineInput {
+  width: 100%;
+  height: clamp(36px, 2.917vw, 56px);
+  padding: 0 0 clamp(6px, 0.521vw, 10px);
+  border: 0;
+  border-bottom: 1px solid #c0c0c0;
+  background: transparent;
+  color: #000;
+  font-family: inherit;
+  font-size: clamp(13px, 1.042vw, 20px);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.underlineInput:focus {
+  border-bottom-color: #3b3b3b;
+}
+
+/* 이전 화면으로 버튼 */
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: clamp(12px, 1.25vw, 24px);
+  color: #6b6b6b;
+  font-size: clamp(11px, 0.938vw, 18px);
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+.backButton:hover {
+  color: #3b3b3b;
+}
+
+/* 확인 버튼 — 카드 중앙 정렬 */
+.confirmButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(180px, 16.042vw, 308px);
+  height: clamp(44px, 6.852svh, 74px);
+  margin: 0 auto;
+  border: 0;
+  border-radius: clamp(10px, 1.042vw, 20px);
+  background: #ffe480;
+  color: #3b3b3b;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: clamp(14px, 1.25vw, 24px);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.confirmButton:hover:not(:disabled) {
+  background: #f5d96a;
+}
+
+.confirmButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── 이메일 도메인 드롭다운 ── */
+.domainDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 2px 0 0;
+  padding: 4px 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #d0d0d0;
+  border-radius: clamp(8px, 0.833vw, 16px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.domainOption {
+  display: flex;
+  align-items: center;
+  padding: clamp(8px, 0.625vw, 12px) clamp(12px, 1.042vw, 20px);
+  font-size: clamp(12px, 0.938vw, 18px);
+  color: #3b3b3b;
+  cursor: pointer;
+  gap: 0;
+}
+
+.domainOption:hover,
+.domainOptionActive {
+  background: #fffbec;
+}
+
+.domainLocal {
+  color: #a0a0a0;
+}
+
+.domainAt {
+  color: #a0a0a0;
+}
+
+.domainSuffix {
+  color: #3b3b3b;
+  font-weight: 500;
+}
+
+/* ════════════════════════════════════════════════════
+   모바일 반응형 (≤ 900px)
+   ════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  .viewport {
+    overflow-y: auto;
+  }
+
+  .canvas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100svh;
+    padding: 88px 20px 48px;
+  }
+
+  .illustration {
+    display: none;
+  }
+
+  .card {
+    position: static;
+    width: 100%;
+    max-width: 480px;
+    transform: none;
+    padding: 28px 20px 24px;
+    border-radius: 20px;
+  }
+
+  .input {
+    height: 50px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  .button {
+    height: 50px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  .cardTitle {
+    font-size: 17px;
+    margin-bottom: 20px;
+  }
+
+  .findLinks {
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  .bottomText {
+    font-size: 13px;
+  }
+
+  /* 회원가입 카드 모바일 */
+  .signupCard {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 20px 24px;
+    top: auto;
+  }
+
+  .fieldLabel {
+    font-size: 13px;
+  }
+
+  .underlineInput {
+    font-size: 15px;
+    height: 44px;
+  }
+
+  .confirmButton {
+    width: 100%;
+    max-width: none;
+    height: 50px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+}
