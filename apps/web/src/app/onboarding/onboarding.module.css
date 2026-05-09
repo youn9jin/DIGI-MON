@@ -223,7 +223,7 @@
   left: clamp(50px, 4.896vw, 94px);
   display: flex;
   width: clamp(616px, 60.156vw, 1155px);
-  flex-direction: column;
+  flex-direction: row;
   gap: clamp(10px, 1.042vw, 20px);
 }
 
@@ -272,7 +272,7 @@
 }
 
 .addressNextButton {
-  top: clamp(245px, 42.593svh, 460px);
+  top: clamp(250px, 38svh, 411px);
 }
 
 .optionList {
@@ -642,6 +642,7 @@
   .addressFields {
     position: static;
     width: 100%;
+    flex-direction: column;
   }
 
   .addressField {
