@@ -41,7 +41,7 @@ export default function SignupPage() {
 
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      router.push("/onboarding");
+      router.push("/signup/complete");
     } catch (err: unknown) {
       const code = (err as { code?: string }).code;
       if (code === "auth/email-already-in-use") {

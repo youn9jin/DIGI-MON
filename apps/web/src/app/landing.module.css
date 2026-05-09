@@ -72,8 +72,8 @@
   width: clamp(200px, 23.906vw, 459px);
   height: clamp(50px, 10.185svh, 110px);
   border: 0;
-  border-radius: clamp(25px, 2.865vw, 55px);
-  background: #fff2c5;
+  border-radius: clamp(16px, 1.563vw, 30px);
+  background: #ffefb4;
   color: #3b3b3b;
   cursor: pointer;
   font-family: inherit;
@@ -84,7 +84,23 @@
 }
 
 .ctaButton:hover {
-  background: #ffe99e;
+  background: #ffe08a;
+}
+
+/* ── 회원가입 완료 페이지 위치 오버라이드 ── */
+/* 랜딩 대비: 타이틀↓, 부제↑, 버튼↑ (더 압축된 레이아웃) */
+.heroTitleComplete {
+  top: clamp(185px, 37.037svh, 400px);
+}
+
+.heroSubComplete {
+  top: clamp(220px, 43.519svh, 470px);
+}
+
+.ctaButtonComplete {
+  top: clamp(260px, 52.407svh, 566px);
+  left: clamp(170px, 38.177vw, 733px);
+  width: clamp(200px, 24.271vw, 466px);
 }
 
 /* ════════════════════════════════════════════════════
