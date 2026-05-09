@@ -192,6 +192,150 @@
 }
 
 /* ════════════════════════════════════════════════════
+   회원가입 전용
+   ════════════════════════════════════════════════════ */
+
+/* 더 넓은 카드 */
+.signupCard {
+  top: clamp(70px, 13.981svh, 151px);
+  width: clamp(320px, 44.219vw, 849px);
+  padding: clamp(28px, 3.906vw, 75px) clamp(24px, 4.063vw, 78px);
+}
+
+/* 제목 가운데 정렬 */
+.cardTitleCenter {
+  text-align: center;
+  margin-bottom: clamp(20px, 3.073vw, 59px);
+}
+
+/* 언더라인 입력 필드 */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 0.521vw, 10px);
+  margin-bottom: clamp(16px, 1.719vw, 33px);
+}
+
+.fieldLabel {
+  color: #6b6b6b;
+  font-size: clamp(12px, 0.938vw, 18px);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.underlineInput {
+  width: 100%;
+  height: clamp(36px, 2.917vw, 56px);
+  padding: 0 0 clamp(6px, 0.521vw, 10px);
+  border: 0;
+  border-bottom: 1px solid #c0c0c0;
+  background: transparent;
+  color: #000;
+  font-family: inherit;
+  font-size: clamp(13px, 1.042vw, 20px);
+  outline: none;
+  box-sizing: border-box;
+}
+
+.underlineInput:focus {
+  border-bottom-color: #3b3b3b;
+}
+
+/* 이전 화면으로 버튼 */
+.backButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: clamp(12px, 1.25vw, 24px);
+  color: #6b6b6b;
+  font-size: clamp(11px, 0.938vw, 18px);
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+.backButton:hover {
+  color: #3b3b3b;
+}
+
+/* 확인 버튼 — 카드 중앙 정렬 */
+.confirmButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(180px, 16.042vw, 308px);
+  height: clamp(44px, 6.852svh, 74px);
+  margin: 0 auto;
+  border: 0;
+  border-radius: clamp(10px, 1.042vw, 20px);
+  background: #ffe480;
+  color: #3b3b3b;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: clamp(14px, 1.25vw, 24px);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.confirmButton:hover:not(:disabled) {
+  background: #f5d96a;
+}
+
+.confirmButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── 이메일 도메인 드롭다운 ── */
+.domainDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 2px 0 0;
+  padding: 4px 0;
+  list-style: none;
+  background: #fff;
+  border: 1px solid #d0d0d0;
+  border-radius: clamp(8px, 0.833vw, 16px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.domainOption {
+  display: flex;
+  align-items: center;
+  padding: clamp(8px, 0.625vw, 12px) clamp(12px, 1.042vw, 20px);
+  font-size: clamp(12px, 0.938vw, 18px);
+  color: #3b3b3b;
+  cursor: pointer;
+  gap: 0;
+}
+
+.domainOption:hover,
+.domainOptionActive {
+  background: #fffbec;
+}
+
+.domainLocal {
+  color: #a0a0a0;
+}
+
+.domainAt {
+  color: #a0a0a0;
+}
+
+.domainSuffix {
+  color: #3b3b3b;
+  font-weight: 500;
+}
+
+/* ════════════════════════════════════════════════════
    모바일 반응형 (≤ 900px)
    ════════════════════════════════════════════════════ */
 @media (max-width: 900px) {
@@ -245,5 +389,30 @@
 
   .bottomText {
     font-size: 13px;
+  }
+
+  /* 회원가입 카드 모바일 */
+  .signupCard {
+    width: 100%;
+    max-width: 480px;
+    padding: 28px 20px 24px;
+    top: auto;
+  }
+
+  .fieldLabel {
+    font-size: 13px;
+  }
+
+  .underlineInput {
+    font-size: 15px;
+    height: 44px;
+  }
+
+  .confirmButton {
+    width: 100%;
+    max-width: none;
+    height: 50px;
+    font-size: 15px;
+    border-radius: 12px;
   }
 }
