@@ -1,10 +1,13 @@
 package com.digimon.api.store;
 
 import com.digimon.api.auth.ForbiddenException;
+import com.digimon.api.global.ValidationErrorDetail;
+import com.digimon.api.global.ValidationErrorException;
 import com.digimon.api.market.Market;
 import com.digimon.api.market.MarketRepository;
 import com.digimon.api.store.dto.CreateStoresRequest;
 import com.digimon.api.store.dto.StoreItemRequest;
+import com.digimon.api.store.dto.UpdateStoreRequest;
 import com.digimon.api.user.User;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -21,17 +24,26 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * POST /api/stores 부분 성공 등록 서비스.
+ * 점포(Store) 도메인 서비스. POST 일괄 등록, GET 목록/상세, PATCH 부분 수정을 담당한다.
  *
- * 정책:
+ * POST /api/stores 정책:
  * - 점포 수 한도(150) 초과 → TooManyStoresException (전체 차단, 400)
  * - market 미존재 → MarketNotFoundException (전체 차단, 409)
  * - 그 외 점포별 검증 실패 / DB 예외 → 해당 한 건만 failedItems 에 기록, 나머지는 정상 INSERT
+ *
+ * GET /api/stores/{storeId} & PATCH /api/stores/{storeId}:
+ * - 점포 존재/소유권 검증은 requireOwnedStore() 헬퍼로 통일. 404 → 403 우선순위 유지.
+ *
+ * PATCH 정책:
+ * - 모든 필드 optional. null 인 필드는 미변경.
+ * - 검증은 누적하여 ValidationErrorException 으로 한 번에 반환(POST 의 "첫 실패만" 정책과 다름).
+ * - name/category 가 trim 후 빈 → 검증 실패. 그 외 선택 필드는 trim 후 빈 → null 로 정규화하여 "값 지우기".
  *
  * 트랜잭션:
  * - createStores 자체에는 트랜잭션을 두지 않는다.
  * - 점포 INSERT 는 self.saveOne(...) (REQUIRES_NEW) 으로 점포별 독립 트랜잭션을 가져
  *   한 건의 DB 예외(컬럼 길이 초과 등)가 다른 건을 롤백시키지 않도록 한다.
+ * - updateStore 는 단건이므로 일반 @Transactional(REQUIRED).
  */
 @Service
 public class StoresService {
@@ -112,9 +124,60 @@ public class StoresService {
      * GET /api/stores/{storeId} — 점포 상세.
      * - storeId 미존재 → StoreNotFoundException(404)
      * - 본인 market 소속이 아니면 → ForbiddenException(403)
-     * (본인 market 자체가 없는 경우도 자동으로 403 으로 떨어진다.)
      */
     public Map<String, Object> getStoreDetail(User user, Long storeId) {
+        Store store = requireOwnedStore(user, storeId);
+        return toDetailMap(store);
+    }
+
+    /**
+     * PATCH /api/stores/{storeId} — 점포 부분 수정.
+     * - 권한/존재 검증 → 누적 검증(400) → null 이 아닌 필드만 반영 → 저장 → 상세 응답 반환.
+     * - @UpdateTimestamp 가 updatedAt 을 자동 갱신한다.
+     */
+    @Transactional
+    public Map<String, Object> updateStore(User user, Long storeId, UpdateStoreRequest request) {
+        Store store = requireOwnedStore(user, storeId);
+
+        UpdateStoreRequest req = request != null ? request : new UpdateStoreRequest();
+
+        List<ValidationErrorDetail> errors = validateForUpdate(req);
+        if (!errors.isEmpty()) {
+            throw new ValidationErrorException(errors);
+        }
+
+        if (req.getName() != null) {
+            store.setName(req.getName().trim());
+        }
+        if (req.getCategory() != null) {
+            store.setCategory(req.getCategory());
+        }
+        if (req.getItems() != null) {
+            store.setItems(trimToNull(req.getItems()));
+        }
+        if (req.getOperatingHours() != null) {
+            store.setOperatingHours(trimToNull(req.getOperatingHours()));
+        }
+        if (req.getYearsOfOperation() != null) {
+            store.setYearsOfOperation(trimToNull(req.getYearsOfOperation()));
+        }
+        if (req.getContact() != null) {
+            store.setContact(trimToNull(req.getContact()));
+        }
+        if (req.getDescription() != null) {
+            store.setDescription(trimToNull(req.getDescription()));
+        }
+
+        Store saved = storeRepository.save(store);
+        return toDetailMap(saved);
+    }
+
+    /**
+     * 점포 단건 조회 + 본인 market 소속 검증.
+     * 404 → 403 우선순위 유지(점포가 없으면 소유권 체크 전에 NOT_FOUND 반환).
+     * 본인 market 이 아예 없는 유저도 동일하게 403 으로 떨어진다.
+     */
+    private Store requireOwnedStore(User user, Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new StoreNotFoundException("해당 점포를 찾을 수 없습니다."));
 
@@ -125,8 +188,7 @@ public class StoresService {
         if (ownerMarketId == null || !ownerMarketId.equals(store.getMarket().getId())) {
             throw new ForbiddenException("해당 점포에 접근할 권한이 없습니다.");
         }
-
-        return toDetailMap(store);
+        return store;
     }
 
     /** 목록용. createdAt/updatedAt 미포함. 명세 키 순서 유지를 위해 LinkedHashMap 사용. */
@@ -171,55 +233,109 @@ public class StoresService {
     }
 
     /**
-     * 점포 1건 검증. 첫 실패 사유를 한국어 메시지로 반환하며, 통과 시 null 을 반환한다.
-     * 빈 문자열은 null 과 동일하게 취급(선택 필드는 미입력으로 간주).
+     * POST 점포 1건 검증. 첫 실패 사유를 한국어 메시지로 반환하며, 통과 시 null 을 반환한다.
+     * name/category 는 필수, 그 외는 선택. 빈 문자열은 null 과 동일하게 취급(선택 필드는 미입력으로 간주).
      */
     private String validate(StoreItemRequest dto) {
         if (dto == null) {
             return "점포 정보가 비어있습니다.";
         }
 
-        String name = trimToNull(dto.getName());
-        if (name == null) {
-            return "name은 필수 입력 항목입니다.";
+        String err;
+        if ((err = validateName(dto.getName(), true)) != null) return err;
+        if ((err = validateCategory(dto.getCategory(), true)) != null) return err;
+        if ((err = validateItems(dto.getItems())) != null) return err;
+        if ((err = validateOperatingHours(dto.getOperatingHours())) != null) return err;
+        if ((err = validateYearsOfOperation(dto.getYearsOfOperation())) != null) return err;
+        if ((err = validateContact(dto.getContact())) != null) return err;
+        if ((err = validateDescription(dto.getDescription())) != null) return err;
+        return null;
+    }
+
+    /**
+     * PATCH 검증. null 인 필드는 미변경 의도로 간주하여 검증을 건너뛴다.
+     * name/category 는 "값이 들어왔을 때만" 필수 규칙 적용(trim 후 빈이면 에러).
+     * 모든 위반을 누적하여 반환한다(클라이언트가 한 번에 모든 에러를 받을 수 있도록).
+     */
+    private List<ValidationErrorDetail> validateForUpdate(UpdateStoreRequest dto) {
+        List<ValidationErrorDetail> errors = new ArrayList<>();
+        addIfPresent(errors, "name", dto.getName() != null ? validateName(dto.getName(), true) : null);
+        addIfPresent(errors, "category", dto.getCategory() != null ? validateCategory(dto.getCategory(), true) : null);
+        addIfPresent(errors, "items", validateItems(dto.getItems()));
+        addIfPresent(errors, "operatingHours", validateOperatingHours(dto.getOperatingHours()));
+        addIfPresent(errors, "yearsOfOperation", validateYearsOfOperation(dto.getYearsOfOperation()));
+        addIfPresent(errors, "contact", validateContact(dto.getContact()));
+        addIfPresent(errors, "description", validateDescription(dto.getDescription()));
+        return errors;
+    }
+
+    private static void addIfPresent(List<ValidationErrorDetail> errors, String field, String reason) {
+        if (reason != null) {
+            errors.add(new ValidationErrorDetail(field, reason));
         }
-        if (name.length() > 100) {
+    }
+
+    // --- 필드별 검증 (POST/PATCH 공유) ---
+    // 각 메서드는 위반 시 한국어 메시지를 반환하고, 통과 시 null 을 반환한다.
+
+    private static String validateName(String name, boolean required) {
+        String trimmed = trimToNull(name);
+        if (trimmed == null) {
+            return required ? "name은 필수 입력 항목입니다." : null;
+        }
+        if (trimmed.length() > 100) {
             return "name은 1~100자여야 합니다.";
         }
+        return null;
+    }
 
-        String category = dto.getCategory();
+    private static String validateCategory(String category, boolean required) {
         if (category == null || category.isBlank()) {
-            return "category는 필수 입력 항목입니다.";
+            return required ? "category는 필수 입력 항목입니다." : null;
         }
         if (!ALLOWED_CATEGORIES.contains(category)) {
             return "category는 농수산물/먹거리/의류/생활용품/기타 중 하나여야 합니다.";
         }
+        return null;
+    }
 
-        String items = trimToNull(dto.getItems());
-        if (items != null && items.length() > 255) {
+    private static String validateItems(String value) {
+        String trimmed = trimToNull(value);
+        if (trimmed != null && trimmed.length() > 255) {
             return "items는 1~255자여야 합니다.";
         }
+        return null;
+    }
 
-        String operatingHours = trimToNull(dto.getOperatingHours());
-        if (operatingHours != null && operatingHours.length() > 50) {
+    private static String validateOperatingHours(String value) {
+        String trimmed = trimToNull(value);
+        if (trimmed != null && trimmed.length() > 50) {
             return "operatingHours는 1~50자여야 합니다.";
         }
+        return null;
+    }
 
-        String yearsOfOperation = trimToNull(dto.getYearsOfOperation());
-        if (yearsOfOperation != null && yearsOfOperation.length() > 20) {
+    private static String validateYearsOfOperation(String value) {
+        String trimmed = trimToNull(value);
+        if (trimmed != null && trimmed.length() > 20) {
             return "yearsOfOperation은 1~20자여야 합니다.";
         }
+        return null;
+    }
 
-        String contact = trimToNull(dto.getContact());
-        if (contact != null && !CONTACT_PATTERN.matcher(contact).matches()) {
+    private static String validateContact(String value) {
+        String trimmed = trimToNull(value);
+        if (trimmed != null && !CONTACT_PATTERN.matcher(trimmed).matches()) {
             return "contact는 숫자/+/-/()/공백으로 구성된 5~20자여야 합니다.";
         }
+        return null;
+    }
 
-        String description = trimToNull(dto.getDescription());
-        if (description != null && description.length() > 500) {
+    private static String validateDescription(String value) {
+        String trimmed = trimToNull(value);
+        if (trimmed != null && trimmed.length() > 500) {
             return "description은 1~500자여야 합니다.";
         }
-
         return null;
     }
 
