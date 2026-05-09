@@ -1,7 +1,8 @@
 .viewport {
   width: 100vw;
   min-height: 100svh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background: #fff;
 }
 
@@ -9,7 +10,7 @@
   position: relative;
   width: 100vw;
   min-height: 100svh;
-  overflow: hidden;
+  overflow-x: hidden;
   background: #fff;
   font-family: Pretendard, "Noto Sans KR", Inter, Arial, sans-serif;
 }
@@ -554,149 +555,223 @@
   height: clamp(12px, 1.146vw, 22px);
 }
 
-@media (max-aspect-ratio: 16 / 9) {
-  .header {
-    height: 8.148vw;
+/* ════════════════════════════════════════════════════
+   모바일 / 태블릿 반응형 (≤ 900px)
+   절대 위치 레이아웃 → flex 세로 흐름으로 전환
+   ════════════════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* 스크롤 허용 */
+  .viewport {
+    overflow-y: auto;
   }
 
+  .canvas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100svh;
+    padding-top: 72px;
+    padding-bottom: 72px;
+    overflow: visible;
+  }
+
+  /* 배경 일러스트 숨김 */
   .illustration {
-    top: 15.741vw;
-    height: 73.241vw;
+    display: none;
   }
 
+  /* ── 카드 공통: flow 레이아웃 ── */
   .card {
-    top: 26.944vw;
-    height: 50.833vw;
+    position: static;
+    width: calc(100% - 32px);
+    max-width: 480px;
+    height: auto;
+    margin: 0 auto;
+    padding: 28px 20px 24px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 
-  .questionText {
-    top: 11.019vw;
+  /* 카드 변형: position 영향 없는 top/height만 재정의 */
+  .selectionCard,
+  .businessCard,
+  .storeCountCard,
+  .hoursCard,
+  .customerCard,
+  .contactCard {
+    height: auto;
   }
 
+  /* ── 질문 텍스트 ── */
+  .questionText,
+  .selectionQuestion,
+  .businessQuestion,
+  .storeCountQuestion,
+  .hoursQuestion,
+  .customerQuestion,
+  .contactQuestion {
+    position: static;
+    white-space: normal;
+    line-height: normal;
+  }
+
+  .questionText p {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .questionText label,
+  .selectionQuestion label {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* ── 텍스트 입력 ── */
   .shortAnswer {
-    top: 23.056vw;
+    position: static;
+    width: 100%;
+    height: 52px;
+    font-size: 15px;
+    border-radius: 14px;
   }
 
-  .nextButton {
-    top: 39.352vw;
+  /* ── 주소 입력 ── */
+  .addressFields {
+    position: static;
+    width: 100%;
   }
 
-  .addressNextButton {
-    top: 42.593vw;
+  .addressField {
+    height: 48px;
+    font-size: 14px;
+    border-radius: 14px;
   }
 
-  .selectionCard {
-    top: 20vw;
-    height: 64.722vw;
+  /* ── 텍스트에어리어 ── */
+  .textareaAnswer {
+    position: static;
+    width: 100%;
+    height: 140px;
+    font-size: 14px;
+    border-radius: 14px;
   }
 
-  .selectionQuestion {
-    top: 7.407vw;
-  }
-
-  .optionList {
-    top: 18.148vw;
-  }
-
-  .selectionNextButton {
-    top: 50.741vw;
-  }
-
-  .businessCard {
-    top: 16.204vw;
-    height: 71.204vw;
-  }
-
-  .businessQuestion {
-    top: 5.185vw;
-  }
-
-  .businessOptionList {
-    top: 16.204vw;
-  }
-
-  .businessNextButton {
-    top: 59.259vw;
-  }
-
-  .storeCountCard {
-    top: 17.778vw;
-    height: 71.204vw;
-  }
-
-  .storeCountQuestion {
-    top: 5.185vw;
-  }
-
+  /* ── 선택지 목록 ── */
+  .optionList,
+  .businessOptionList,
   .storeCountOptionList {
-    top: 16.204vw;
+    position: static;
+    width: 100%;
   }
 
-  .storeCountNextButton {
-    top: 59.259vw;
+  .marketTypeOption {
+    height: 48px;
+    font-size: 14px;
+    border-radius: 14px;
+    padding: 0 16px;
+    gap: 10px;
   }
 
-  .hoursCard {
-    top: 26.944vw;
-    height: 64.815vw;
+  .businessOptionList .marketTypeOption,
+  .storeCountOptionList .marketTypeOption {
+    height: 44px;
   }
 
-  .hoursQuestion {
-    top: 7.685vw;
+  .optionBullet {
+    width: 10px;
+    height: 10px;
+    flex-shrink: 0;
   }
 
-  .weekdayHours {
-    top: 18.333vw;
+  /* ── 운영시간 fieldset ── */
+  .hoursFieldset {
+    position: static;
+    width: 100%;
   }
 
-  .weekendHours {
-    top: 33.333vw;
+  .hoursFieldset legend {
+    font-size: 13px;
+  }
+
+  .timeRangeInput {
+    height: 48px;
+    padding: 0 14px;
+    gap: 6px;
+    border-radius: 14px;
+  }
+
+  .timeRangeInput select {
+    font-size: 13px;
+  }
+
+  .timeRangeInput span {
+    font-size: 13px;
   }
 
   .sundayClosedLabel {
-    top: 48.241vw;
+    position: static;
+    font-size: 13px;
+    gap: 8px;
   }
 
-  .hoursNextButton {
-    top: 52.870vw;
+  /* ── 이름/직책 분리 입력 ── */
+  .splitInputWrapper {
+    position: static;
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
   }
 
-  .customerCard {
-    height: 62.037vw;
+  .splitInput {
+    height: 52px;
+    font-size: 14px;
+    border-radius: 14px;
   }
 
-  .customerQuestion {
-    top: 9.074vw;
-  }
-
-  .textareaAnswer {
-    top: 21.667vw;
-    height: 22.685vw;
-  }
-
-  .customerNextButton {
-    top: 50.093vw;
-  }
-
-  .contactCard {
-    top: 28.241vw;
-    height: 51.667vw;
-  }
-
-  .contactQuestion {
-    top: 8.611vw;
-  }
-
-  .contactInput {
-    top: 21.574vw;
-  }
-
+  /* ── 다음/완료 버튼 ── */
+  .nextButton,
+  .addressNextButton,
+  .selectionNextButton,
+  .businessNextButton,
+  .storeCountNextButton,
+  .hoursNextButton,
+  .customerNextButton,
   .contactNextButton {
-    top: 37.778vw;
+    position: static;
+    width: 100%;
+    max-width: none;
+    height: 52px;
+    font-size: 16px;
+    border-radius: 14px;
+    padding: 0;
+    margin-top: 4px;
   }
 
+  /* ── 스텝 인디케이터: 하단 고정 ── */
   .stepIndicator {
-    top: 95.648vw;
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    top: auto;
+    transform: translateX(-50%);
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 4px 10px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+  }
+
+  .stepActive {
+    width: 14px;
+    height: 14px;
+  }
+
+  .stepInactive {
+    width: 12px;
+    height: 12px;
   }
 }
 

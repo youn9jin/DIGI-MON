@@ -4,6 +4,7 @@ import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/layout/Header";
+import { saveOnboardingData } from "@/lib/onboarding-store";
 import styles from "../onboarding.module.css";
 
 const TOTAL_STEPS = 10;
@@ -102,6 +103,7 @@ export default function OnboardingStepSixPage() {
       return;
     }
 
+    saveOnboardingData({ weekdayOpen, weekdayClose, weekendOpen, weekendClose, closedSunday });
     router.push("/onboarding/step-7");
   }
 
@@ -186,7 +188,7 @@ export default function OnboardingStepSixPage() {
           <button
             type="submit"
             className={`${styles.nextButton} ${styles.hoursNextButton}`}
-            data-node-id="148:1713"
+            data-node-id="148:2248"
           >
             다음
           </button>
