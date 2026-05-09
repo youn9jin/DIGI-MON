@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import ExitModal from "@/components/ui/ExitModal";
+import styles from "./layout.module.css";
 
 export default function OnboardingLayout({
   children,
@@ -10,8 +11,19 @@ export default function OnboardingLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [showModal, setShowModal] = useState(false);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  // 현재 스텝 번호 파싱 (step-2 ~ step-10)
+  const stepMatch = pathname.match(/\/onboarding\/step-(\d+)/);
+  const currentStep = stepMatch ? parseInt(stepMatch[1], 10) : 1;
+  const prevHref =
+    currentStep > 1
+      ? currentStep === 2
+        ? "/onboarding"
+        : `/onboarding/step-${currentStep - 1}`
+      : null;
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -78,6 +90,17 @@ export default function OnboardingLayout({
   return (
     <>
       {children}
+      {prevHref && (
+        <button
+          className={styles.backButton}
+          onClick={() => {
+            setPendingHref(prevHref);
+            setShowModal(true);
+          }}
+        >
+          이전 질문으로 돌아가기
+        </button>
+      )}
       {showModal && (
         <ExitModal onLeave={handleLeave} onClose={handleClose} />
       )}
