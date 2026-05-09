@@ -1,5 +1,6 @@
 package com.digimon.api.store;
 
+import com.digimon.api.auth.ForbiddenException;
 import com.digimon.api.market.Market;
 import com.digimon.api.market.MarketRepository;
 import com.digimon.api.store.dto.CreateStoresRequest;
@@ -11,9 +12,11 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -86,6 +89,66 @@ public class StoresService {
         }
 
         return new Result(items.size(), successStoreIds, failedItems);
+    }
+
+    /**
+     * GET /api/stores — 내 시장의 점포 목록.
+     * market 이 없으면 빈 리스트를 반환한다(예외 X). 명세상 200 + total=0 + stores=[] 처리.
+     */
+    public List<Map<String, Object>> getStoreSummaries(User user) {
+        Optional<Market> marketOpt = marketRepository.findByUserId(user.getId());
+        if (marketOpt.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Store> stores = storeRepository.findByMarketId(marketOpt.get().getId());
+        List<Map<String, Object>> result = new ArrayList<>(stores.size());
+        for (Store store : stores) {
+            result.add(toSummaryMap(store));
+        }
+        return result;
+    }
+
+    /**
+     * GET /api/stores/{storeId} — 점포 상세.
+     * - storeId 미존재 → StoreNotFoundException(404)
+     * - 본인 market 소속이 아니면 → ForbiddenException(403)
+     * (본인 market 자체가 없는 경우도 자동으로 403 으로 떨어진다.)
+     */
+    public Map<String, Object> getStoreDetail(User user, Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new StoreNotFoundException("해당 점포를 찾을 수 없습니다."));
+
+        Long ownerMarketId = marketRepository.findByUserId(user.getId())
+                .map(Market::getId)
+                .orElse(null);
+
+        if (ownerMarketId == null || !ownerMarketId.equals(store.getMarket().getId())) {
+            throw new ForbiddenException("해당 점포에 접근할 권한이 없습니다.");
+        }
+
+        return toDetailMap(store);
+    }
+
+    /** 목록용. createdAt/updatedAt 미포함. 명세 키 순서 유지를 위해 LinkedHashMap 사용. */
+    private Map<String, Object> toSummaryMap(Store store) {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("storeId", store.getId());
+        m.put("name", store.getName());
+        m.put("category", store.getCategory());
+        m.put("items", store.getItems());
+        m.put("operatingHours", store.getOperatingHours());
+        m.put("yearsOfOperation", store.getYearsOfOperation());
+        m.put("contact", store.getContact());
+        m.put("description", store.getDescription());
+        return m;
+    }
+
+    /** 상세용. summary 키에 createdAt/updatedAt 추가. */
+    private Map<String, Object> toDetailMap(Store store) {
+        Map<String, Object> m = toSummaryMap(store);
+        m.put("createdAt", store.getCreatedAt());
+        m.put("updatedAt", store.getUpdatedAt());
+        return m;
     }
 
     /**

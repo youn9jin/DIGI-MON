@@ -5,6 +5,7 @@ import com.digimon.api.auth.AuthAccountConflictException;
 import com.digimon.api.auth.ForbiddenException;
 import com.digimon.api.auth.UnauthorizedException;
 import com.digimon.api.store.MarketNotFoundException;
+import com.digimon.api.store.StoreNotFoundException;
 import com.digimon.api.store.TooManyStoresException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +45,15 @@ public class GlobalExceptionHandler {
                 ex.getMessage() != null ? ex.getMessage() : "등록된 시장이 없습니다.",
                 null);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    @ExceptionHandler(StoreNotFoundException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleStoreNotFound(StoreNotFoundException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "STORE_NOT_FOUND",
+                ex.getMessage() != null ? ex.getMessage() : "해당 점포를 찾을 수 없습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
     }
 
     @ExceptionHandler(TooManyStoresException.class)
