@@ -2,112 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FormEvent, KeyboardEvent, useRef, useState } from "react";
+import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import Header from "@/components/layout/Header";
+import EmailInput from "@/components/ui/EmailInput";
 import styles from "../auth.module.css";
-
-const EMAIL_DOMAINS = [
-  "naver.com",
-  "gmail.com",
-  "kakao.com",
-  "daum.net",
-  "hanmail.net",
-  "nate.com",
-  "icloud.com",
-  "outlook.com",
-  "hotmail.com",
-];
-
-interface EmailInputProps {
-  value: string;
-  onChange: (value: string) => void;
-}
-
-function EmailInput({ value, onChange }: EmailInputProps) {
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [activeIndex, setActiveIndex] = useState(-1);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-
-  function handleChange(raw: string) {
-    onChange(raw);
-    const atIdx = raw.indexOf("@");
-    if (atIdx === -1) {
-      setSuggestions([]);
-      return;
-    }
-    const typed = raw.slice(atIdx + 1).toLowerCase();
-    const filtered = typed
-      ? EMAIL_DOMAINS.filter((d) => d.startsWith(typed))
-      : EMAIL_DOMAINS;
-    setSuggestions(filtered);
-    setActiveIndex(-1);
-  }
-
-  function selectDomain(domain: string) {
-    const local = value.split("@")[0];
-    onChange(`${local}@${domain}`);
-    setSuggestions([]);
-    setActiveIndex(-1);
-  }
-
-  function handleKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (!suggestions.length) return;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setActiveIndex((i) => Math.min(i + 1, suggestions.length - 1));
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setActiveIndex((i) => Math.max(i - 1, -1));
-    } else if (e.key === "Enter" && activeIndex >= 0) {
-      e.preventDefault();
-      selectDomain(suggestions[activeIndex]);
-    } else if (e.key === "Escape") {
-      setSuggestions([]);
-    }
-  }
-
-  function handleBlur() {
-    // 드롭다운 클릭 시 blur가 먼저 일어나므로 짧은 딜레이 후 닫기
-    setTimeout(() => setSuggestions([]), 150);
-  }
-
-  return (
-    <div ref={wrapperRef} style={{ position: "relative" }}>
-      <input
-        id="signup-email"
-        type="email"
-        className={styles.underlineInput}
-        value={value}
-        onChange={(e) => handleChange(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onBlur={handleBlur}
-        autoComplete="off"
-        required
-      />
-      {suggestions.length > 0 && (
-        <ul className={styles.domainDropdown}>
-          {suggestions.map((domain, i) => {
-            const local = value.split("@")[0];
-            return (
-              <li
-                key={domain}
-                className={`${styles.domainOption} ${i === activeIndex ? styles.domainOptionActive : ""}`}
-                onMouseDown={() => selectDomain(domain)}
-              >
-                <span className={styles.domainLocal}>{local}</span>
-                <span className={styles.domainAt}>@</span>
-                <span className={styles.domainSuffix}>{domain}</span>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </div>
-  );
-}
 
 export default function SignupPage() {
   const router = useRouter();
@@ -202,7 +103,12 @@ export default function SignupPage() {
             <label className={styles.fieldLabel} htmlFor="signup-email" data-node-id="148:1962">
               이메일(ID)
             </label>
-            <EmailInput value={email} onChange={setEmail} />
+            <EmailInput
+              id="signup-email"
+              value={email}
+              onChange={setEmail}
+              variant="underline"
+            />
           </div>
 
           <div className={styles.field}>

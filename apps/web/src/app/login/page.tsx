@@ -11,6 +11,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import Header from "@/components/layout/Header";
+import EmailInput from "@/components/ui/EmailInput";
 import styles from "../auth.module.css";
 
 export default function LoginPage() {
@@ -89,15 +90,12 @@ export default function LoginPage() {
           </h1>
 
           <div className={styles.inputGroup}>
-            <input
-              type="email"
-              className={styles.input}
-              placeholder="아이디(이메일)를 입력해 주세요"
+            <EmailInput
+              id="login-email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoComplete="email"
-              required
-              data-node-id="148:1928"
+              onChange={setEmail}
+              variant="box"
+              placeholder="아이디(이메일)를 입력해 주세요"
             />
             <input
               type="password"
