@@ -1,0 +1,29 @@
+[
+    {
+        "store_id": "ST_001",
+        "market_id": "MKT_001",
+        "name": "대박 수제 고로케",
+        "category": "분식/간식",
+        "main_menu": ["야채 고로케", "치즈 고로케", "꽈배기"],
+        "keywords": ["바삭함", "줄서서 먹는 집", "당일 생산"],
+        "description": "" 
+    },
+    {
+        "store_id": "ST_002",
+        "market_id": "MKT_001",
+        "name": "싱싱 수산",
+        "category": "수산물",
+        "main_menu": ["제철 활어회", "전복", "매운탕 거리"],
+        "keywords": ["산지 직송", "가성비", "친절한 사장님"],
+        "description": ""
+    },
+    {
+        "store_id": "ST_003",
+        "market_id": "MKT_001",
+        "name": "할머니 손칼국수",
+        "category": "식당",
+        "main_menu": ["손칼국수", "수제비", "겉절이"],
+        "keywords": ["30년 전통", "깊은 육수", "푸짐한 양"],
+        "description": ""
+    }
+]
