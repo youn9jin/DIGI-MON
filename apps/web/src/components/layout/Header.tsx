@@ -26,7 +26,7 @@ export default function Header() {
         </div>
 
         <nav className={styles.authNav} aria-label="인증 메뉴" data-node-id="148:1805">
-          <a href="#">로그인</a>
+          <a href="/login">로그인</a>
           <Image
             src="/images/onboarding/header-divider.svg"
             alt=""
@@ -34,7 +34,7 @@ export default function Header() {
             height={19}
             className={styles.headerDivider}
           />
-          <a href="#">회원가입</a>
+          <a href="/signup">회원가입</a>
         </nav>
       </div>
     </header>
