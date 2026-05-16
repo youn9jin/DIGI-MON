@@ -70,7 +70,7 @@ export default function OnboardingPage() {
           <div className={styles.questionText} data-node-id="148:1811">
             <p>질문 1.</p>
             <label id="onboarding-question" htmlFor="market-name">
-              소속된 시장 이름을 입력해주세요.
+              시장 이름을 입력해주세요.
             </label>
           </div>
 

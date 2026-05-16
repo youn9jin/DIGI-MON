@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import Header from "@/components/layout/Header";
 import EmailInput from "@/components/ui/EmailInput";
@@ -40,7 +40,8 @@ export default function SignupPage() {
     setErrorMessage("");
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(userCredential.user, { displayName: name.trim() });
       router.push("/signup/complete");
     } catch (err: unknown) {
       const code = (err as { code?: string }).code;
