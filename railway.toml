@@ -1,0 +1,22 @@
+# Railway 배포 설정
+#
+# 전제: Railway 서비스 Settings → "Root Directory" 를 비워둘 것 (레포 루트 사용).
+#       Dockerfile 및 빌드 컨텍스트가 모두 레포 루트 기준으로 해석됨.
+
+[build]
+builder = "dockerfile"
+dockerfilePath = "apps/api/Dockerfile"
+
+[deploy]
+# Dockerfile ENTRYPOINT 와 동일한 명령. Railway 가 ENTRYPOINT 를 덮어쓰는
+# 케이스를 방지하기 위해 명시.
+startCommand = "sh -c 'exec java $JAVA_OPTS -jar /app/app.jar'"
+
+# Spring Boot Actuator health endpoint
+# (application.yml 의 management.endpoints.web.exposure.include 에 health 포함되어 있음)
+healthcheckPath = "/actuator/health"
+healthcheckTimeout = 30
+
+# 비정상 종료 시 재시작 정책
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
