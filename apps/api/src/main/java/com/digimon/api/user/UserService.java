@@ -1,6 +1,7 @@
 package com.digimon.api.user;
 
 import com.digimon.api.auth.AuthAccountConflictException;
+import com.digimon.api.user.dto.UpdateMeRequest;
 import com.google.firebase.auth.FirebaseToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,7 @@ public class UserService {
             u.setFirebaseUid(uid);
             u.setEmail(email != null ? email : "");
             u.setName(name);
+            u.setRole(Role.ASSOCIATION);
             return userRepository.save(u);
         } catch (DataIntegrityViolationException e) {
             return userRepository.findByFirebaseUid(uid)
@@ -73,6 +75,24 @@ public class UserService {
                                 .orElseThrow(() -> e);
                     });
         }
+    }
+
+    /**
+     * 내 프로필 부분 수정. 요청에서 null이 아닌 필드만 반영(partial update).
+     * 새 필드 확장 시 UpdateMeRequest 에 추가 후 여기 null-check 한 줄 추가.
+     */
+    @Transactional
+    public User updateProfile(Long userId, UpdateMeRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
+
+        if (request.getName() != null) {
+            user.setName(request.getName().trim());
+        }
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone().trim());
+        }
+        return userRepository.save(user);
     }
 
     private static boolean isBlank(String s) {

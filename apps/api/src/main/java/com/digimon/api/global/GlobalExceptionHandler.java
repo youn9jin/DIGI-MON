@@ -1,13 +1,12 @@
 package com.digimon.api.global;
 
+import com.digimon.api.associations.AlreadyOnboardedException;
 import com.digimon.api.auth.AuthAccountConflictException;
-import com.digimon.api.auth.EmailAlreadyExistsException;
 import com.digimon.api.auth.ForbiddenException;
 import com.digimon.api.auth.UnauthorizedException;
-import com.digimon.api.owner.OnboardingNotCompletedException;
-import com.digimon.api.plandraft.AttachTokenInvalidOrExpiredException;
-import com.digimon.api.plandraft.DraftAlreadyAttachedException;
-import com.digimon.api.plandraft.DraftNotFoundException;
+import com.digimon.api.store.MarketNotFoundException;
+import com.digimon.api.store.StoreNotFoundException;
+import com.digimon.api.store.TooManyStoresException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
@@ -31,10 +29,40 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handleEmailAlreadyExists() {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("message", "EMAIL_ALREADY_EXISTS"));
+    @ExceptionHandler(AlreadyOnboardedException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleAlreadyOnboarded(AlreadyOnboardedException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "ALREADY_ONBOARDED",
+                ex.getMessage() != null ? ex.getMessage() : "이미 온보딩이 완료된 계정입니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    @ExceptionHandler(MarketNotFoundException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleMarketNotFound(MarketNotFoundException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "MARKET_NOT_FOUND",
+                ex.getMessage() != null ? ex.getMessage() : "등록된 시장이 없습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    @ExceptionHandler(StoreNotFoundException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleStoreNotFound(StoreNotFoundException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "STORE_NOT_FOUND",
+                ex.getMessage() != null ? ex.getMessage() : "해당 점포를 찾을 수 없습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(TooManyStoresException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleTooManyStores(TooManyStoresException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "TOO_MANY_STORES",
+                ex.getMessage() != null ? ex.getMessage() : "점포 수가 한도를 초과했습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(UnauthorizedException.class)
@@ -50,45 +78,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ResponseWrapper<Void>> handleForbidden(ForbiddenException ex) {
         ResponseWrapper<Void> body = ResponseWrapper.error(
                 "FORBIDDEN",
-                ex.getMessage() != null ? ex.getMessage() : "No permission to finalize this draft",
+                ex.getMessage() != null ? ex.getMessage() : "Forbidden",
                 null);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
-    }
-
-    @ExceptionHandler(OnboardingNotCompletedException.class)
-    public ResponseEntity<ResponseWrapper<Void>> handleOnboardingNotCompleted() {
-        ResponseWrapper<Void> body = ResponseWrapper.error(
-                "ONBOARDING_NOT_COMPLETED",
-                "Owner onboarding must be completed before finalize",
-                null);
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
-    }
-
-    @ExceptionHandler(DraftNotFoundException.class)
-    public ResponseEntity<ResponseWrapper<Void>> handleDraftNotFound() {
-        ResponseWrapper<Void> body = ResponseWrapper.error(
-                "DRAFT_NOT_FOUND",
-                "Plan draft not found",
-                null);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
-    }
-
-    @ExceptionHandler(AttachTokenInvalidOrExpiredException.class)
-    public ResponseEntity<ResponseWrapper<Void>> handleAttachTokenInvalid() {
-        ResponseWrapper<Void> body = ResponseWrapper.error(
-                "ATTACH_TOKEN_INVALID_OR_EXPIRED",
-                "Attach token is invalid, expired, or already used",
-                null);
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
-    }
-
-    @ExceptionHandler(DraftAlreadyAttachedException.class)
-    public ResponseEntity<ResponseWrapper<Void>> handleDraftAlreadyAttached() {
-        ResponseWrapper<Void> body = ResponseWrapper.error(
-                "DRAFT_ALREADY_ATTACHED",
-                "Draft is already attached to another user",
-                null);
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
     @ExceptionHandler(ValidationErrorException.class)

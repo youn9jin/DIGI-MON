@@ -1,74 +1,40 @@
-"use client";
-
 import Image from "next/image";
-import Link from "next/link";
+import styles from "@/app/onboarding/onboarding.module.css";
 
 export default function Header() {
   return (
-    <header
-      className="
-        sticky top-0 z-50
-        h-[70px] w-full
-        shadow-[0px_2px_2px_0px_rgba(169,169,169,0.25)]
-        bg-white/60 backdrop-blur
-      "
-    >
-      <div className="mx-auto flex h-full max-w-6xl items-center justify-between px-4 md:px-8">
-        {/* 왼쪽: 로고 + DIGI-MON */}
-        <div className="flex items-center gap-3">
-          <div className="relative h-[30px] w-[30px]">
-          <Image
-              src="/images/logo.svg"
-              alt="logo"
-              width={19}
-              height={30}
-            />
-          </div>
-
-          <span className="text-[20px] font-semibold text-[#353535] whitespace-nowrap">
-            DIGI-MON
-          </span>
-        </div>
-
-        {/* 오른쪽 네비게이션 */}
-        <nav className="flex items-center gap-4 md:gap-6 text-[17px]">
-          
-          {/* 사용방법 */}
-          <Link
-            href="/guide"
-            className="hidden md:inline-block text-[#535353] hover:opacity-80"
-          >
-            사용방법
-          </Link>
-
-          {/* 구분선 */}
-          <span className="hidden md:inline-block">
-            <div className="relative h-[17px] w-[1px]">
+    <header className={styles.header} data-node-id="148:1796">
+      <div className={styles.headerInner} data-node-id="148:1797">
+        <div className={styles.headerLeft} data-node-id="148:1798">
+          <div className={styles.logoSlot} data-node-id="148:1799">
+            <div className={styles.logoMark} data-node-id="148:1800">
               <Image
-                src="/images/divider.svg"
-                alt=""
-                fill
-                className="object-contain"
+                src="/images/onboarding/market-illustration.png"
+                alt="DIGI-MON"
+                width={283}
+                height={286}
+                priority
+                className={styles.logoImage}
               />
             </div>
-          </span>
+          </div>
 
-          {/* 로그인 이동 */}
-          <Link
-            href="/login"
-            className="text-black hover:text-[#b0c965] transition"
-          >
-            로그인
-          </Link>
+          <nav className={styles.primaryNav} aria-label="주요 메뉴" data-node-id="148:1802">
+            <a href="#">사용방법</a>
+            <a href="#">커뮤니티</a>
+          </nav>
+        </div>
 
-          {/* 회원가입 이동 */}
-          <Link
-            href="/signup"
-            className="text-black hover:text-[#b0c965] transition"
-          >
-            회원가입
-          </Link>
-
+        <nav className={styles.authNav} aria-label="인증 메뉴" data-node-id="148:1805">
+          <a href="#">로그인</a>
+          <Image
+            src="/images/onboarding/header-divider.svg"
+            alt=""
+            width={1}
+            height={19}
+            className={styles.headerDivider}
+          />
+          <a href="#">회원가입</a>
         </nav>
       </div>
     </header>
