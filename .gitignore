@@ -47,6 +47,7 @@ venv/
 
 ### Local config (DB 등 민감정보) ###
 **/application-local.yml
+**/.env
 **/.env.local
 **/.env*.local
 apps/web/lib/firebase.ts
