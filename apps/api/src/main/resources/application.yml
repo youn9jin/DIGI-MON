@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
 
 spring:
   application:
@@ -8,13 +8,13 @@ spring:
     active: ${SPRING_PROFILES_ACTIVE:local}
   # DB 설정은 application-local.yml (로컬 전용, 미커밋) 또는 환경 변수 사용
   datasource:
-    url: jdbc:postgresql://localhost:5432/digi-mon
+    url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
+    show-sql: ${JPA_SHOW_SQL:true}
 
 management:
   endpoints:
@@ -37,6 +37,11 @@ springdoc:
 # AI 마이크로서비스 연동 (내부 전용). application-local.yml에서 오버라이드 가능
 digimon:
   ai:
-    base-url: http://localhost:8000
-    timeout-ms: 3000
-    enabled: false
+    base-url: ${DIGIMON_AI_BASE_URL:http://localhost:8000}
+    timeout-ms: ${DIGIMON_AI_TIMEOUT_MS:3000}
+    enabled: ${DIGIMON_AI_ENABLED:false}
+
+# Web/CORS 설정. 운영 도메인은 환경변수 WEB_CORS_ALLOWED_ORIGINS 로 주입 (콤마 구분)
+web:
+  cors:
+    allowed-origins: ${WEB_CORS_ALLOWED_ORIGINS:http://localhost:3000}
