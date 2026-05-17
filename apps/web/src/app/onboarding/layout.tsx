@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import ExitModal from "@/components/ui/ExitModal";
 import styles from "./layout.module.css";
 
@@ -14,6 +16,35 @@ export default function OnboardingLayout({
   const pathname = usePathname();
   const [showModal, setShowModal] = useState(false);
   const [pendingHref, setPendingHref] = useState<string | null>(null);
+
+  // 온보딩 완료 여부 확인 — marketId가 있으면 이미 온보딩 완료 → dashboard로 리다이렉트
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        // 비로그인 상태 → 로그인 페이지로
+        router.replace("/login");
+        return;
+      }
+      try {
+        const idToken = await user.getIdToken();
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+        const res = await fetch(`${baseUrl}/api/me`, {
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.marketId) {
+            // 이미 온보딩 완료
+            router.replace("/dashboard");
+          }
+        }
+      } catch {
+        // 네트워크 오류는 무시하고 온보딩 계속 진행
+      }
+    });
+    return () => unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // 현재 스텝 번호 파싱 (step-2 ~ step-10)
   const stepMatch = pathname.match(/\/onboarding\/step-(\d+)/);
@@ -93,10 +124,7 @@ export default function OnboardingLayout({
       {prevHref && (
         <button
           className={styles.backButton}
-          onClick={() => {
-            setPendingHref(prevHref);
-            setShowModal(true);
-          }}
+          onClick={() => router.push(prevHref)}
         >
           이전 질문으로 돌아가기
         </button>

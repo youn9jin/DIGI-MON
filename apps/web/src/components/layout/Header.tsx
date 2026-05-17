@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import styles from "@/app/onboarding/onboarding.module.css";
+import styles from "./Header.module.css";
 
 export default function Header() {
   const [user, setUser] = useState<User | null>(null);

@@ -1,3 +1,5 @@
+"use client";
+
 import styles from "./ExitModal.module.css";
 
 interface ExitModalProps {

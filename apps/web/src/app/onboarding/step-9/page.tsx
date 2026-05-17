@@ -5,31 +5,8 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveOnboardingData } from "@/lib/onboarding-store";
 import Header from "@/components/layout/Header";
+import StepIndicator from "@/components/ui/StepIndicator";
 import styles from "../onboarding.module.css";
-
-const TOTAL_STEPS = 10;
-const ACTIVE_STEP = 8;
-
-function StepIndicator() {
-  return (
-    <div className={styles.stepIndicator} aria-label="9 / 10" data-node-id="148:2351">
-      {Array.from({ length: TOTAL_STEPS }, (_, index) => (
-        <Image
-          key={index}
-          src={
-            index === ACTIVE_STEP
-              ? "/images/onboarding/step-active.svg"
-              : "/images/onboarding/step-inactive.svg"
-          }
-          alt=""
-          width={index === ACTIVE_STEP ? 25 : 22}
-          height={index === ACTIVE_STEP ? 25 : 22}
-          className={index === ACTIVE_STEP ? styles.stepActive : styles.stepInactive}
-        />
-      ))}
-    </div>
-  );
-}
 
 export default function OnboardingStepNinePage() {
   const router = useRouter();
@@ -90,7 +67,7 @@ export default function OnboardingStepNinePage() {
           </button>
         </form>
 
-        <StepIndicator />
+        <StepIndicator step={9} />
       </div>
     </main>
   );
