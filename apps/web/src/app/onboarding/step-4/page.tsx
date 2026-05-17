@@ -5,33 +5,10 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveOnboardingData } from "@/lib/onboarding-store";
 import Header from "@/components/layout/Header";
+import StepIndicator from "@/components/ui/StepIndicator";
 import styles from "../onboarding.module.css";
 
-const TOTAL_STEPS = 10;
-const ACTIVE_STEP = 3;
-
 const BUSINESS_TYPES = ["농/수산물", "음식점", "의류", "생활용품", "기타"];
-
-function StepIndicator() {
-  return (
-    <div className={styles.stepIndicator} aria-label="4 / 10" data-node-id="148:2093">
-      {Array.from({ length: TOTAL_STEPS }, (_, index) => (
-        <Image
-          key={index}
-          src={
-            index === ACTIVE_STEP
-              ? "/images/onboarding/step-active.svg"
-              : "/images/onboarding/step-inactive.svg"
-          }
-          alt=""
-          width={index === ACTIVE_STEP ? 25 : 22}
-          height={index === ACTIVE_STEP ? 25 : 22}
-          className={index === ACTIVE_STEP ? styles.stepActive : styles.stepInactive}
-        />
-      ))}
-    </div>
-  );
-}
 
 export default function OnboardingStepFourPage() {
   const router = useRouter();
@@ -120,7 +97,7 @@ export default function OnboardingStepFourPage() {
           </button>
         </form>
 
-        <StepIndicator />
+        <StepIndicator step={4} />
       </div>
     </main>
   );

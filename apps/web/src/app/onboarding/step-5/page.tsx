@@ -5,10 +5,8 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveOnboardingData } from "@/lib/onboarding-store";
 import Header from "@/components/layout/Header";
+import StepIndicator from "@/components/ui/StepIndicator";
 import styles from "../onboarding.module.css";
-
-const TOTAL_STEPS = 10;
-const ACTIVE_STEP = 4;
 
 const STORE_COUNT_OPTIONS = [
   "10개 이상 20개 미만",
@@ -17,27 +15,6 @@ const STORE_COUNT_OPTIONS = [
   "40개 이상 50개 미만",
   "50개 이상",
 ];
-
-function StepIndicator() {
-  return (
-    <div className={styles.stepIndicator} aria-label="5 / 10" data-node-id="164:1871">
-      {Array.from({ length: TOTAL_STEPS }, (_, index) => (
-        <Image
-          key={index}
-          src={
-            index === ACTIVE_STEP
-              ? "/images/onboarding/step-active.svg"
-              : "/images/onboarding/step-inactive.svg"
-          }
-          alt=""
-          width={index === ACTIVE_STEP ? 25 : 22}
-          height={index === ACTIVE_STEP ? 25 : 22}
-          className={index === ACTIVE_STEP ? styles.stepActive : styles.stepInactive}
-        />
-      ))}
-    </div>
-  );
-}
 
 export default function OnboardingStepFivePage() {
   const router = useRouter();
@@ -114,7 +91,7 @@ export default function OnboardingStepFivePage() {
           </button>
         </form>
 
-        <StepIndicator />
+        <StepIndicator step={5} />
       </div>
     </main>
   );
