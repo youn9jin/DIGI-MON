@@ -27,7 +27,7 @@ export default function LandingPage() {
         });
         if (res.ok) {
           const data = await res.json();
-          setCtaHref(data.marketId ? "/dashboard" : "/onboarding");
+          setCtaHref(data.marketId ? "/templates" : "/onboarding");
         } else {
           setCtaHref("/onboarding");
         }

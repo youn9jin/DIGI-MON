@@ -26,7 +26,7 @@ export default function OnboardingStepTenPage() {
 
     try {
       await submitOnboarding();
-      router.push("/dashboard");
+      router.push("/templates");
     } catch (err) {
       const error = err as OnboardingError;
       if (error.status === 409) {
