@@ -4,6 +4,9 @@ import com.digimon.api.associations.AlreadyOnboardedException;
 import com.digimon.api.auth.AuthAccountConflictException;
 import com.digimon.api.auth.ForbiddenException;
 import com.digimon.api.auth.UnauthorizedException;
+import com.digimon.api.marketpage.AlreadyInProgressException;
+import com.digimon.api.marketpage.InvalidTemplateTypeException;
+import com.digimon.api.marketpage.MarketPageMarketNotFoundException;
 import com.digimon.api.store.MarketNotFoundException;
 import com.digimon.api.store.StoreNotFoundException;
 import com.digimon.api.store.TooManyStoresException;
@@ -45,6 +48,37 @@ public class GlobalExceptionHandler {
                 ex.getMessage() != null ? ex.getMessage() : "등록된 시장이 없습니다.",
                 null);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    /**
+     * POST /api/market/page 의 MARKET_NOT_FOUND. 같은 code 지만 status 가 다르므로
+     * 별도 예외 클래스로 분리되어 있다(Q1-B).
+     */
+    @ExceptionHandler(MarketPageMarketNotFoundException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleMarketPageMarketNotFound(MarketPageMarketNotFoundException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "MARKET_NOT_FOUND",
+                ex.getMessage() != null ? ex.getMessage() : "등록된 시장이 없습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(InvalidTemplateTypeException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleInvalidTemplateType(InvalidTemplateTypeException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "INVALID_TEMPLATE_TYPE",
+                ex.getMessage() != null ? ex.getMessage() : "templateType 은 TEMPLATE_1, TEMPLATE_2, TEMPLATE_3 중 하나여야 합니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(AlreadyInProgressException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleAlreadyInProgress(AlreadyInProgressException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "ALREADY_IN_PROGRESS",
+                ex.getMessage() != null ? ex.getMessage() : "이미 생성 중인 페이지가 있습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(StoreNotFoundException.class)
