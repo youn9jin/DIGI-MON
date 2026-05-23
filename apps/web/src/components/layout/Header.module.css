@@ -1,13 +1,14 @@
 .header {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  z-index: 5;
+  z-index: 50;
   display: flex;
   width: 100%;
   height: clamp(47px, 8.148svh, 88px);
   align-items: center;
-  background: #fce6d5;
+  background: rgba(252, 230, 213, 0.86);
+  backdrop-filter: blur(12px);
   box-shadow: 0 2px 10px rgba(9, 128, 68, 0.2);
 }
 

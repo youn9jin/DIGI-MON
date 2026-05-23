@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   createMarketPage,
   getMarketPageStatus,
@@ -16,6 +16,18 @@ interface TemplateGenerationActionsProps {
   previewHref: string;
 }
 
+function subscribeToEmbedState() {
+  return () => {};
+}
+
+function getEmbeddedSnapshot() {
+  return window.self !== window.top;
+}
+
+function getServerEmbeddedSnapshot() {
+  return false;
+}
+
 export default function TemplateGenerationActions({
   templateType,
   previewHref,
@@ -23,12 +35,19 @@ export default function TemplateGenerationActions({
   const router = useRouter();
   const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const isEmbeddedPreview = useSyncExternalStore(
+    subscribeToEmbedState,
+    getEmbeddedSnapshot,
+    getServerEmbeddedSnapshot,
+  );
 
   useEffect(() => {
     return () => {
       if (pollTimer.current) clearTimeout(pollTimer.current);
     };
   }, []);
+
+  if (isEmbeddedPreview) return null;
 
   async function pollUntilDone(jobId: string | number) {
     try {
