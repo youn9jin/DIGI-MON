@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{MARKET_NAME}} - 시장소개</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Black+Han+Sans&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --col-red:    #C8362A;
+      --col-yellow: #E8A020;
+      --col-green:  #2A6E38;
+      --col-blue:   #1A4FA0;
+      --col-navy:   #1A2E6E;
+      --bg:         #F5F3EE;
+      --white:      #FFFFFF;
+      --text:       #1A1A1A;
+      --text-muted: #888880;
+      --border:     #E0DDD6;
+      --shadow:     0 2px 16px rgba(0,0,0,0.07);
+    }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    /* ── Pennant Bar ── */
+    .pennant-bar {
+      display: flex;
+      height: 48px;
+      overflow: hidden;
+      background: var(--white);
+    }
+    .pennant {
+      flex: 1;
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transform-origin: top center;
+      animation: pennantSwing 0.5s ease-out both;
+    }
+    .pennant:nth-child(5n+1) { background: var(--col-red); }
+    .pennant:nth-child(5n+2) { background: var(--col-yellow); }
+    .pennant:nth-child(5n+3) { background: var(--col-green); }
+    .pennant:nth-child(5n+4) { background: var(--col-blue); }
+    .pennant:nth-child(5n+5) { background: var(--col-navy); }
+    .pennant:nth-child(1)  { animation-delay: 0.00s; }
+    .pennant:nth-child(2)  { animation-delay: 0.04s; }
+    .pennant:nth-child(3)  { animation-delay: 0.08s; }
+    .pennant:nth-child(4)  { animation-delay: 0.12s; }
+    .pennant:nth-child(5)  { animation-delay: 0.16s; }
+    .pennant:nth-child(6)  { animation-delay: 0.20s; }
+    .pennant:nth-child(7)  { animation-delay: 0.24s; }
+    .pennant:nth-child(8)  { animation-delay: 0.28s; }
+    .pennant:nth-child(9)  { animation-delay: 0.32s; }
+    .pennant:nth-child(10) { animation-delay: 0.36s; }
+    .pennant:nth-child(11) { animation-delay: 0.40s; }
+    .pennant:nth-child(12) { animation-delay: 0.44s; }
+    .pennant:nth-child(13) { animation-delay: 0.48s; }
+    .pennant:nth-child(14) { animation-delay: 0.52s; }
+    .pennant:nth-child(15) { animation-delay: 0.56s; }
+    .pennant:nth-child(16) { animation-delay: 0.60s; }
+    .pennant:nth-child(17) { animation-delay: 0.64s; }
+    .pennant:nth-child(18) { animation-delay: 0.68s; }
+    .pennant:nth-child(19) { animation-delay: 0.72s; }
+    .pennant:nth-child(20) { animation-delay: 0.76s; }
+    @keyframes pennantSwing {
+      from { transform: translateY(-100%) rotate(-5deg); opacity: 0; }
+      to   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    }
+
+    /* ── Navigation ── */
+    .main-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      height: 44px;
+    }
+    .nav-tabs {
+      display: flex;
+      gap: 0;
+      margin-right: auto;
+      margin-left: auto;
+    }
+    .nav-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px;
+      height: 44px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: color .2s, border-color .2s;
+      white-space: nowrap;
+    }
+    .nav-tab:hover,
+    .nav-tab.active {
+      color: var(--text);
+      border-bottom-color: var(--col-red);
+    }
+    .lang-switch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      line-height: 1.3;
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 3px;
+    }
+    .lang-switch .active { color: var(--col-red); }
+
+    /* ── Hero Section ── */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 32px 40px;
+    }
+    .hero-image-wrap {
+      width: 340px;
+      height: 200px;
+      background: #D8D5CE;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+    .hero-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .hero-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 480px;
+      line-height: 1.8;
+    }
+
+    /* ── Feature Block (Image + Text, alternating) ── */
+    .feature-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 280px;
+    }
+    .feature-block.reverse { direction: rtl; }
+    .feature-block.reverse > * { direction: ltr; }
+
+    .feature-image {
+      background: #D0CCC4;
+      overflow: hidden;
+    }
+    .feature-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .feature-text {
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--white);
+    }
+    .feature-text .f-title {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 22px;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .feature-text .f-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+    .feature-text .f-body {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.9;
+    }
+
+    /* ── Directions Block ── */
+    .directions-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 320px;
+      margin-top: 48px;
+    }
+    .directions-map {
+      background: #C8C4BC;
+      overflow: hidden;
+      position: relative;
+    }
+    .directions-map img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .directions-text {
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: var(--white);
+    }
+    .directions-text .d-title {
+      font-family: 'Black Han Sans', sans-serif;
+      font-size: 22px;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+    .directions-text .d-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+    .directions-text .d-body {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.9;
+    }
+
+    /* ── Footer ── */
+    .site-footer {
+      background: #ECEAE3;
+      padding: 32px 32px 40px;
+      margin-top: 80px;
+      border-top: 1px solid var(--border);
+    }
+    .footer-nav {
+      display: flex;
+      gap: 28px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .footer-nav a {
+      font-size: 12px;
+      color: var(--text-muted);
+      transition: color .2s;
+    }
+    .footer-nav a:hover { color: var(--text); }
+    .footer-cols {
+      display: flex;
+      gap: 64px;
+    }
+    .footer-col strong {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .footer-col p {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+
+    /* ── Scroll Fade-in ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ① 페넌트 바 (30개) -->
+  <div class="pennant-bar">
+    <div class="pennant"></div><div class="pennant"></div><div class="pennant"></div>
+    <div class="pennant"></div><div class="pennant"></div><div class="pennant"></div>
+    <div class="pennant"></div><div class="pennant"></div><div class="pennant"></div>
+    <div class="pennant"></div><div class="pennant"></div><div class="pennant"></div>
+    <div class="pennant"></div><div class="pennant"></div><div class="pennant"></div>
+    <div class="pennant"></div><div class="pennant"></div><div class="pennant"></div>
+    <div class="pennant"></div><div class="pennant"></div>
+  </div>
+
+  <!-- ② 내비게이션 -->
+  <nav class="main-nav">
+    <div class="nav-tabs">
+      <a class="nav-tab active" href="index.html">시장<br>소개</a>
+      <a class="nav-tab" href="stores.html">가게<br>정보</a>
+      <a class="nav-tab" href="tourism.html">관광<br>정보</a>
+    </div>
+    <div class="lang-switch">
+      <span>EN</span>
+      <span class="active">KR</span>
+    </div>
+  </nav>
+
+  <!-- ③ 히어로 -->
+  <section class="hero reveal">
+    <div class="hero-image-wrap">
+      <!-- {{MARKET_IMAGE}} -->
+      <img src="{{MARKET_IMAGE_SRC}}" alt="{{MARKET_NAME}}" onerror="this.style.display='none'" />
+    </div>
+    <p class="hero-desc">{{MARKET_HERO_DESC}}</p>
+  </section>
+
+  <!-- ④ 피처 블록 1 (이미지 오른쪽) -->
+  <section class="feature-block reveal">
+    <div class="feature-image">
+      <img src="{{FEATURE1_IMAGE_SRC}}" alt="" onerror="this.style.display='none'" />
+    </div>
+    <div class="feature-text">
+      <div class="f-title">{{FEATURE1_TITLE}}</div>
+      <div class="f-subtitle">{{FEATURE1_SUBTITLE}}</div>
+      <div class="f-body">{{FEATURE1_BODY}}</div>
+    </div>
+  </section>
+
+  <!-- ⑤ 피처 블록 2 (이미지 왼쪽 → reverse) -->
+  <section class="feature-block reverse reveal" style="margin-top:4px;">
+    <div class="feature-image">
+      <img src="{{FEATURE2_IMAGE_SRC}}" alt="" onerror="this.style.display='none'" />
+    </div>
+    <div class="feature-text">
+      <div class="f-title">{{FEATURE2_TITLE}}</div>
+      <div class="f-subtitle">{{FEATURE2_SUBTITLE}}</div>
+      <div class="f-body">{{FEATURE2_BODY}}</div>
+    </div>
+  </section>
+
+  <!-- ⑥ 찾아오시는 길 -->
+  <section class="directions-block reveal">
+    <div class="directions-map">
+      <img src="{{MAP_IMAGE_SRC}}" alt="지도" onerror="this.style.display='none'" />
+    </div>
+    <div class="directions-text">
+      <div class="d-title">찾아오시는 길</div>
+      <div class="d-subtitle">{{MARKET_ADDRESS}}</div>
+      <div class="d-body">{{DIRECTIONS_BODY}}</div>
+    </div>
+  </section>
+
+  <!-- ⑦ 푸터 -->
+  <footer class="site-footer">
+    <div class="footer-nav">
+      <a href="index.html">시장소개</a>
+      <a href="stores.html">가게안내</a>
+      <a href="tourism.html">관광정보</a>
+      <a href="#">찾아오는 길</a>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col">
+        <strong>주소</strong>
+        <p>{{MARKET_ADDRESS}}</p>
+      </div>
+      <div class="footer-col">
+        <strong>문의</strong>
+        <p>TEL : {{MARKET_PHONE}}</p>
+        <p>FAX : {{MARKET_FAX}}</p>
+      </div>
+      <div class="footer-col">
+        <strong>이메일</strong>
+        {{MARKET_EMAILS_HTML}}
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(el => io.observe(el));
+  </script>
+</body>
+</html>

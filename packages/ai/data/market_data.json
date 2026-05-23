@@ -1,0 +1,68 @@
+[
+    {
+        "market_id": "1",
+        "user_id": 101,
+        "name": "남대문 시장",
+        "address": "서울특별시 중구 남대문시장4길 21",
+        "market_type": "전통시장",
+        "main_categories": [
+            "의류",
+            "액세서리",
+            "주방용품",
+            "먹거리"
+        ],
+        "total_stores": "100",
+        "operating_hours": "00:00 - 23:00 (점포별 상이)",
+        "target_customers": "국내외 관광객 및 도소매업자",
+        "contact": "02-753-2805",
+        "description": "남대문 시장은 서울의 활기찬 심장부에 위치한 대한민국 대표 전통시장입니다. 의류, 액세서리, 주방용품부터 맛있는 먹거리까지, 없는 게 없는 만물 백화점이죠! 국내외 관광객은 물론 도소매업자들의 발길이 끊이지 않는 이곳에서 특별한 쇼핑 경험과 한국의 정을 느껴보세요.",
+        "manager_name": "김민수",
+        "manager_title": "관리소장",
+        "created_at": "2024-01-15T09:00:00Z",
+        "updated_at": "2026-05-16T15:27:03.369485"
+    },
+    {
+        "market_id": "2",
+        "user_id": 102,
+        "name": "광장시장",
+        "address": "서울특별시 종로구 창경궁로 88",
+        "market_type": "전통시장",
+        "main_categories": [
+            "먹거리",
+            "한복",
+            "직물",
+            "구제 의류"
+        ],
+        "total_stores": "80",
+        "operating_hours": "09:00 - 23:00 (먹거리 골목 기준)",
+        "target_customers": "2030 청년층 및 글로벌 관광객",
+        "contact": "02-2267-0291",
+        "description": "",
+        "manager_name": "이영희",
+        "manager_title": "상인회장",
+        "created_at": "2024-02-20T10:30:00Z",
+        "updated_at": "2024-05-12T14:45:00Z"
+    },
+    {
+        "market_id": "3",
+        "user_id": 103,
+        "name": "망원시장",
+        "address": "서울특별시 마포구 포은로8길 14",
+        "market_type": "골목형 전통시장",
+        "main_categories": [
+            "농수산물",
+            "반찬",
+            "디저트/간식",
+            "생활잡화"
+        ],
+        "total_stores": "50",
+        "operating_hours": "09:00 - 21:00",
+        "target_customers": "지역 주민 및 1인 가구, 망리단길 방문객",
+        "contact": "02-335-3591",
+        "description": "",
+        "manager_name": "박준서",
+        "manager_title": "기획팀장",
+        "created_at": "2024-03-05T11:15:00Z",
+        "updated_at": "2024-05-15T09:20:00Z"
+    }
+]
