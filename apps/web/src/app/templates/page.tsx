@@ -46,14 +46,22 @@ export default function TemplateSelectionPage() {
             </div>
           </Link>
 
-          <div className={`${styles.templateCard} ${styles.disabled}`} aria-disabled="true">
-            <div className={`${styles.preview} ${styles.warmPreview}`} />
-            <div className={styles.cardBody}>
-              <h2>따뜻한 홍보형</h2>
-              <p>행사, 먹거리, 대표 상점을 더 적극적으로 드러내는 템플릿입니다.</p>
-              <span className={styles.badge}>준비 중</span>
+          <Link className={styles.templateCard} href="/templates/modern">
+            <div className={`${styles.preview} ${styles.modernDarkPreview}`}>
+              <div className={styles.modernDarkNav} />
+              <div className={styles.modernDarkHero}>
+                <b />
+                <span />
+                <span />
+              </div>
+              <div className={styles.modernDarkPanel} />
             </div>
-          </div>
+            <div className={styles.cardBody}>
+              <h2>다크 모던형</h2>
+              <p>차분한 다크 톤과 큰 타이포그래피로 시장의 브랜드감을 선명하게 보여줍니다.</p>
+              <span className={styles.badge}>미리보기 가능</span>
+            </div>
+          </Link>
 
           <div className={`${styles.templateCard} ${styles.disabled}`} aria-disabled="true">
             <div className={`${styles.preview} ${styles.modernPreview}`} />
