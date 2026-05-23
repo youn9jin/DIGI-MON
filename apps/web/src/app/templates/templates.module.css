@@ -217,28 +217,34 @@
     #2b302d;
 }
 
-.modernPreview {
-  background: #f7faf8;
-}
-
-.modernPreview::before {
-  position: absolute;
-  inset: 22px;
-  content: "";
-  border: 1px solid rgba(9, 128, 68, 0.2);
+.editorialPreview {
   background:
-    linear-gradient(90deg, #111 0 34%, transparent 34%),
-    linear-gradient(180deg, rgba(9, 128, 68, 0.12) 0 46%, transparent 46%);
+    linear-gradient(180deg, rgba(0, 0, 0, 0.62) 0 52%, #fff 52%),
+    #f6d8d6;
 }
 
-.disabled {
-  cursor: default;
-  opacity: 0.68;
+.editorialNav {
+  height: 36px;
+  background: #581616;
 }
 
-.disabled:hover {
-  transform: none;
-  box-shadow: 0 12px 32px rgba(9, 128, 68, 0.08);
+.editorialHero {
+  height: 116px;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)),
+    linear-gradient(135deg, #6f302c, #f1c0bc 55%, #2f1717);
+}
+
+.editorialPreview b {
+  position: absolute;
+  left: 20px;
+  bottom: 62px;
+  color: #111;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1;
+  transform: rotate(-90deg);
+  transform-origin: left center;
 }
 
 .cardBody {

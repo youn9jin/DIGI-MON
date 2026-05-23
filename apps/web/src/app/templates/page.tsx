@@ -63,14 +63,18 @@ export default function TemplateSelectionPage() {
             </div>
           </Link>
 
-          <div className={`${styles.templateCard} ${styles.disabled}`} aria-disabled="true">
-            <div className={`${styles.preview} ${styles.modernPreview}`} />
-            <div className={styles.cardBody}>
-              <h2>모던 안내형</h2>
-              <p>지도, 운영시간, 카테고리 탐색을 빠르게 확인하는 정보형 템플릿입니다.</p>
-              <span className={styles.badge}>준비 중</span>
+          <Link className={styles.templateCard} href="/templates/editorial">
+            <div className={`${styles.preview} ${styles.editorialPreview}`}>
+              <div className={styles.editorialNav} />
+              <div className={styles.editorialHero} />
+              <b>FOOD</b>
             </div>
-          </div>
+            <div className={styles.cardBody}>
+              <h2>에디토리얼형</h2>
+              <p>큰 이미지와 잡지형 섹션 구성을 활용해 시장의 분위기와 먹거리, 관광 정보를 감각적으로 보여줍니다.</p>
+              <span className={styles.badge}>미리보기 가능</span>
+            </div>
+          </Link>
         </section>
       </main>
     </div>
