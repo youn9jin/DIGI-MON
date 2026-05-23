@@ -1,0 +1,22 @@
+# Docker 빌드 컨텍스트 제외 목록
+# (apps/api/Dockerfile 빌드 시 사용. 빌드 컨텍스트 = 레포 루트)
+#
+# Gradle 캐시 / 빌드 산출물
+.gradle
+build/
+
+# Node 모듈 (모노레포 내 어느 위치든)
+**/node_modules
+
+# IDE 메타
+.idea/
+
+# 다른 모듈 (API 빌드에 불필요)
+apps/web/
+packages/ai/
+
+# 환경변수 파일 (민감정보)
+.env*
+
+# 문서 (런타임 불필요)
+*.md

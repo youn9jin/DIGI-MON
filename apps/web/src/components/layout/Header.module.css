@@ -1,0 +1,118 @@
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  width: 100%;
+  height: clamp(47px, 8.148svh, 88px);
+  align-items: center;
+  background: #fce6d5;
+  box-shadow: 0 2px 10px rgba(9, 128, 68, 0.2);
+}
+
+.headerInner {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(45px, 8.333vw, 160px);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: clamp(32px, 3.646vw, 70px);
+}
+
+.logoSlot {
+  width: 55px;
+}
+
+.logoMark {
+  position: relative;
+  width: clamp(29px, 2.865vw, 55px);
+  height: clamp(21px, 2.031vw, 39px);
+  overflow: hidden;
+}
+
+.logoImage {
+  position: absolute;
+  top: -206.43%;
+  left: -26.64%;
+  width: 513.93%;
+  height: 733.33%;
+  max-width: none;
+}
+
+.primaryNav {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 3.125vw, 60px);
+}
+
+.primaryNav,
+.authNav {
+  color: #000;
+  font-size: clamp(11px, 1.042vw, 20px);
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.primaryNav a,
+.authNav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.authNav {
+  display: flex;
+  align-items: center;
+  gap: clamp(7px, 0.677vw, 13px);
+}
+
+.headerDivider {
+  width: 1px;
+  height: clamp(10px, 0.964vw, 19px);
+}
+
+.userName {
+  color: #000;
+  font-size: clamp(11px, 1.042vw, 20px);
+  font-weight: 600;
+}
+
+.logoutButton {
+  border: 0;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: clamp(11px, 1.042vw, 20px);
+  font-weight: 500;
+  line-height: 1;
+  padding: 0;
+}
+
+.logoutButton:hover {
+  opacity: 0.7;
+}
+
+@media (max-width: 767px) {
+  .headerInner {
+    padding: 0 20px;
+  }
+
+  .headerLeft {
+    gap: 0;
+  }
+
+  .primaryNav {
+    display: none;
+  }
+
+  .authNav {
+    font-size: 14px;
+  }
+}

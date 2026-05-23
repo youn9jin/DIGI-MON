@@ -5,30 +5,8 @@ import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveOnboardingData } from "@/lib/onboarding-store";
 import Header from "@/components/layout/Header";
+import StepIndicator from "@/components/ui/StepIndicator";
 import styles from "./onboarding.module.css";
-
-const TOTAL_STEPS = 10;
-
-function StepIndicator() {
-  return (
-    <div className={styles.stepIndicator} aria-label="1 / 10" data-node-id="148:1812">
-      {Array.from({ length: TOTAL_STEPS }, (_, index) => (
-        <Image
-          key={index}
-          src={
-            index === 0
-              ? "/images/onboarding/step-active.svg"
-              : "/images/onboarding/step-inactive.svg"
-          }
-          alt=""
-          width={index === 0 ? 25 : 22}
-          height={index === 0 ? 25 : 22}
-          className={index === 0 ? styles.stepActive : styles.stepInactive}
-        />
-      ))}
-    </div>
-  );
-}
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -70,7 +48,7 @@ export default function OnboardingPage() {
           <div className={styles.questionText} data-node-id="148:1811">
             <p>질문 1.</p>
             <label id="onboarding-question" htmlFor="market-name">
-              소속된 시장 이름을 입력해주세요.
+              시장 이름을 입력해주세요.
             </label>
           </div>
 
@@ -92,7 +70,7 @@ export default function OnboardingPage() {
           </button>
         </form>
 
-        <StepIndicator />
+        <StepIndicator step={1} />
       </div>
     </main>
   );
