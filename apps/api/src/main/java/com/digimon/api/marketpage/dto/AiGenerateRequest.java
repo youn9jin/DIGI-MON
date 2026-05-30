@@ -27,6 +27,12 @@ public class AiGenerateRequest {
     @JsonProperty("template_type")
     private String templateType;
 
+    @JsonProperty("selected_sections")
+    private List<String> selectedSections;
+
+    @JsonProperty("user_content")
+    private UserContentDto userContent;
+
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -46,7 +52,7 @@ public class AiGenerateRequest {
         private String totalStores;
 
         @JsonProperty("operating_hours")
-        private String operatingHours;
+        private OperatingHoursDto operatingHours;
 
         @JsonProperty("target_customers")
         private String targetCustomers;
@@ -59,6 +65,41 @@ public class AiGenerateRequest {
 
         @JsonProperty("manager_title")
         private String managerTitle;
+    }
+
+    /**
+     * operating_hours object. markets.operating_hours 에 저장된 JSON 문자열을 역직렬화해 채운다.
+     * weekend 가 null 이면 직렬화 시 생략됨(NON_NULL) → FastAPI 는 키 부재를 "주말 미운영"으로 해석.
+     */
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class OperatingHoursDto {
+        private String weekday;
+        private String weekend;
+    }
+
+    /**
+     * 사용자가 setup 에서 직접 입력한 섹션별 텍스트. market_page_configs 에서 가져온다.
+     * 세 필드가 모두 null 이면 상위에서 user_content 자체를 null 로 두어 통째로 생략한다.
+     */
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public static class UserContentDto {
+
+        @JsonProperty("intro_text")
+        private String introText;
+
+        @JsonProperty("history_text")
+        private String historyText;
+
+        @JsonProperty("directions_text")
+        private String directionsText;
     }
 
     @Getter

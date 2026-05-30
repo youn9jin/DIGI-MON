@@ -2,15 +2,12 @@ package com.digimon.api.marketpage;
 
 import com.digimon.api.auth.FirebaseTokenService;
 import com.digimon.api.global.ResponseWrapper;
-import com.digimon.api.marketpage.dto.CreateMarketPageRequest;
 import com.digimon.api.user.User;
 import com.digimon.api.user.UserService;
 import com.google.firebase.auth.FirebaseToken;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,10 +44,9 @@ public class MarketPageController {
 
     @PostMapping("/market/page")
     public ResponseEntity<?> createMarketPage(
-            @RequestHeader(value = "Authorization", required = false) String authorization,
-            @Valid @RequestBody CreateMarketPageRequest request) {
+            @RequestHeader(value = "Authorization", required = false) String authorization) {
         return withAuthenticatedUser(authorization, user -> {
-            Long pageId = marketPageService.startGeneration(user, request.getTemplateType());
+            Long pageId = marketPageService.startGeneration(user);
             Map<String, Object> data = new LinkedHashMap<>();
             data.put("pageId", pageId);
             data.put("status", "PENDING");
