@@ -5,6 +5,7 @@ import com.digimon.api.market.MarketRepository;
 import com.digimon.api.marketpage.dto.AiGenerateRequest;
 import com.digimon.api.store.Store;
 import com.digimon.api.store.StoreRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -47,6 +48,8 @@ public class MarketPageGenerationService {
     private final MarketRepository marketRepository;
     private final StoreRepository storeRepository;
     private final MarketPageRepository marketPageRepository;
+    private final MarketPageConfigRepository marketPageConfigRepository;
+    private final ObjectMapper objectMapper;
     private final SseEmitterManager sseEmitterManager;
     private final MarketPageGenerationService self;
 
@@ -54,12 +57,16 @@ public class MarketPageGenerationService {
                                        MarketRepository marketRepository,
                                        StoreRepository storeRepository,
                                        MarketPageRepository marketPageRepository,
+                                       MarketPageConfigRepository marketPageConfigRepository,
+                                       ObjectMapper objectMapper,
                                        SseEmitterManager sseEmitterManager,
                                        @Lazy MarketPageGenerationService self) {
         this.aiWebClient = aiWebClient;
         this.marketRepository = marketRepository;
         this.storeRepository = storeRepository;
         this.marketPageRepository = marketPageRepository;
+        this.marketPageConfigRepository = marketPageConfigRepository;
+        this.objectMapper = objectMapper;
         this.sseEmitterManager = sseEmitterManager;
         this.self = self;
     }
@@ -67,11 +74,12 @@ public class MarketPageGenerationService {
     /**
      * 비동기 진입점. MarketPageService.startGeneration() 직후 호출되며,
      * 호출 즉시 별도 스레드(marketPageAsyncExecutor) 로 넘어간다.
+     * template_type / selected_sections / user_content 는 buildRequest 내부에서 market_page_configs 로부터 읽는다.
      */
     @Async("marketPageAsyncExecutor")
-    public void generateAsync(Long pageId, Long marketId, String templateType) {
+    public void generateAsync(Long pageId, Long marketId) {
         try {
-            AiGenerateRequest body = self.buildRequest(marketId, templateType);
+            AiGenerateRequest body = self.buildRequest(marketId);
 
             String responseJson = aiWebClient.post()
                     .uri(GENERATE_PATH)
@@ -103,12 +111,19 @@ public class MarketPageGenerationService {
     /**
      * FastAPI /generate 요청 본문을 빌드한다.
      * 사양: null 인 필드는 미포함(NON_NULL 직렬화). 빈 배열은 그대로 직렬화.
+     *
+     * template_type / selected_sections / user_content 는 market_page_configs 에서 읽는다.
+     * (이 메서드 도달 시점에 setup 은 이미 완료되어 있음 — startGeneration 의 SETUP 체크가 선행)
      */
     @Transactional(readOnly = true)
-    public AiGenerateRequest buildRequest(Long marketId, String templateType) {
+    public AiGenerateRequest buildRequest(Long marketId) {
         Market market = marketRepository.findById(marketId)
                 // 이 시점에 market 이 사라졌다는 건 동시 삭제 등 이례적 상황. 일반 예외로 흐르게 둠.
                 .orElseThrow(() -> new IllegalStateException("market not found: " + marketId));
+
+        MarketPageConfig config = marketPageConfigRepository.findByMarketId(marketId)
+                // SETUP 체크를 통과했으므로 정상 흐름에선 존재. 동시 삭제 등 이례적 상황만 여기 도달.
+                .orElseThrow(() -> new IllegalStateException("market page config not found: " + marketId));
 
         List<Store> stores = storeRepository.findByMarketId(marketId);
 
@@ -118,7 +133,7 @@ public class MarketPageGenerationService {
                 .marketType(market.getMarketType())
                 .mainCategories(toList(market.getMainCategories()))
                 .totalStores(market.getTotalStores())
-                .operatingHours(market.getOperatingHours())
+                .operatingHours(parseOperatingHours(market.getOperatingHours()))
                 .targetCustomers(market.getTargetCustomers())
                 .contact(market.getContact())
                 .description(market.getDescription())
@@ -141,7 +156,42 @@ public class MarketPageGenerationService {
         return AiGenerateRequest.builder()
                 .market(marketDto)
                 .stores(storeDtos)
-                .templateType(templateType)
+                .templateType(config.getTemplateType())
+                .selectedSections(config.getSelectedSections())
+                .userContent(buildUserContent(config))
+                .build();
+    }
+
+    /**
+     * markets.operating_hours 는 {"weekday":...,"weekend":...} JSON 문자열로 저장되어 있다.
+     * 이를 OperatingHoursDto 로 역직렬화한다. null/blank/파싱 실패 시 null 반환(NPE 방지).
+     */
+    private AiGenerateRequest.OperatingHoursDto parseOperatingHours(String operatingHoursJson) {
+        if (operatingHoursJson == null || operatingHoursJson.isBlank()) {
+            return null;
+        }
+        try {
+            return objectMapper.readValue(operatingHoursJson, AiGenerateRequest.OperatingHoursDto.class);
+        } catch (Exception e) {
+            log.warn("operating_hours 파싱 실패, null 로 처리: {}", safeMessage(e.getMessage()));
+            return null;
+        }
+    }
+
+    /**
+     * user_content 빌드. 세 텍스트가 모두 null 이면 null 반환 → 상위에서 user_content 키 자체가 생략된다(Q6-B).
+     */
+    private AiGenerateRequest.UserContentDto buildUserContent(MarketPageConfig config) {
+        String intro = config.getIntroText();
+        String history = config.getHistoryText();
+        String directions = config.getDirectionsText();
+        if (intro == null && history == null && directions == null) {
+            return null;
+        }
+        return AiGenerateRequest.UserContentDto.builder()
+                .introText(intro)
+                .historyText(history)
+                .directionsText(directions)
                 .build();
     }
 
