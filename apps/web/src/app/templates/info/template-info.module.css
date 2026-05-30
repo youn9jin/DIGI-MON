@@ -1,0 +1,414 @@
+.page {
+  position: relative;
+  min-height: 100svh;
+  overflow-x: hidden;
+  background: #fff;
+  color: #131313;
+  font-family: Pretendard, "Noto Sans KR", Inter, Arial, sans-serif;
+  padding: 220px 24px 110px;
+}
+
+.backgroundMark {
+  position: absolute;
+  top: 150px;
+  left: 50%;
+  width: min(80.73vw, 1550px);
+  height: min(41.2vw, 791px);
+  opacity: 0.15;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.backgroundMark img {
+  object-fit: cover;
+  object-position: center top;
+  transform: scale(1.96) translateY(-7%);
+}
+
+.hero {
+  position: relative;
+  z-index: 1;
+  margin: 0 auto 70px;
+  text-align: center;
+}
+
+.hero h1 {
+  margin: 0;
+  color: #131313;
+  font-size: clamp(32px, 2.86vw, 55px);
+  font-weight: 800;
+  line-height: 60px;
+}
+
+.hero p,
+.hero span {
+  display: block;
+  margin: 0;
+  color: #131313;
+  font-size: clamp(17px, 1.56vw, 30px);
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.hero span {
+  font-size: clamp(16px, 1.46vw, 28px);
+  font-weight: 400;
+}
+
+.panel {
+  position: relative;
+  z-index: 1;
+  width: min(70vw, 1343px);
+  margin: 0 auto;
+  border-radius: clamp(34px, 5.21vw, 100px);
+  background: rgba(253, 253, 253, 0.95);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+  padding: 78px 66px 72px;
+}
+
+.stepHeader h2 {
+  margin: 0 0 22px;
+  color: #000;
+  font-size: clamp(26px, 1.93vw, 37px);
+  font-weight: 700;
+  line-height: 45px;
+}
+
+.stepHeader p {
+  margin: 0 0 56px;
+  color: #000;
+  font-size: clamp(15px, 0.94vw, 18px);
+  line-height: 20px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 33px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fieldTitleRow {
+  display: flex;
+  width: min(100%, 1155px);
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.fieldTitleRow h3 {
+  margin: 0;
+  color: #000;
+  font-size: clamp(18px, 1.3vw, 25px);
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.fieldTitleRow button {
+  border: 0;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 20px;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.fieldGroup textarea,
+.fileUpload {
+  box-sizing: border-box;
+  width: min(100%, 1155px);
+  border: 1px solid #a1a1a1;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #131313;
+  font-family: inherit;
+  font-size: 18px;
+}
+
+.fieldGroup textarea {
+  min-height: 173px;
+  resize: vertical;
+  padding: 25px;
+  line-height: 1.7;
+}
+
+.fieldGroup textarea::placeholder {
+  color: #9f9f9f;
+}
+
+.aiButton {
+  width: 238px;
+  height: 41px;
+  margin-top: 28px;
+  border: 0;
+  border-radius: 10px;
+  background: #fff5d2;
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.14);
+  color: #131313;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.uploadHint {
+  width: min(100%, 1155px);
+  margin: -4px 0 32px;
+  color: #000;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 20px;
+}
+
+.fileUpload {
+  display: flex;
+  height: 90px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.fileUpload input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.fileUpload span {
+  color: #9f9f9f;
+  font-size: 22px;
+  line-height: 45px;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 21px;
+  margin-top: 66px;
+}
+
+.secondaryAction,
+.primaryAction {
+  display: flex;
+  height: 56px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 22px;
+  color: #000;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.secondaryAction {
+  width: 164px;
+  background: rgba(235, 235, 235, 0.7);
+}
+
+.primaryAction {
+  width: 260px;
+  background: rgba(255, 242, 197, 0.77);
+}
+
+.primaryAction:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.previewOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-y: auto;
+  background: rgba(37, 37, 37, 0.65);
+  padding: 87px 24px;
+}
+
+.previewModal {
+  position: relative;
+  width: min(100%, 1343px);
+  height: 910px;
+  overflow: hidden;
+  border-radius: clamp(42px, 5.21vw, 100px);
+  background: rgba(253, 253, 253, 0.95);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+}
+
+.closePreview {
+  position: absolute;
+  top: 43px;
+  left: 68px;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.closePreview::before,
+.closePreview::after {
+  position: absolute;
+  top: 8px;
+  left: -1px;
+  width: 20px;
+  height: 1px;
+  background: #000;
+  content: "";
+}
+
+.closePreview::before {
+  transform: rotate(45deg);
+}
+
+.closePreview::after {
+  transform: rotate(-45deg);
+}
+
+.previewModal h2 {
+  position: absolute;
+  top: 38px;
+  left: 50%;
+  z-index: 2;
+  margin: 0;
+  color: #0f0f0f;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 24px;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.previewCanvas {
+  position: absolute;
+  top: 98px;
+  left: 50%;
+  width: min(80%, 1074px);
+  height: 812px;
+  overflow: hidden;
+  background: #5c5c5c;
+  transform: translateX(-50%);
+}
+
+.previewCanvas img {
+  object-fit: cover;
+  object-position: top center;
+}
+
+.highlightBox {
+  position: absolute;
+  left: 14.43%;
+  bottom: 82px;
+  width: 71.14%;
+  height: 175px;
+  border: 2px solid #fff;
+}
+
+.previewModal > p {
+  position: absolute;
+  bottom: 37px;
+  left: 50%;
+  z-index: 2;
+  margin: 0;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 300;
+  text-align: center;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .panel {
+    width: calc(100% - 28px);
+    border-radius: 42px;
+    padding: 52px 28px 56px;
+  }
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding: 112px 14px 64px;
+  }
+
+  .hero {
+    margin-bottom: 42px;
+  }
+
+  .hero h1 {
+    font-size: 30px;
+    line-height: 1.25;
+  }
+
+  .hero p,
+  .hero span {
+    font-size: 16px;
+  }
+
+  .panel {
+    padding: 34px 18px 44px;
+    border-radius: 28px;
+  }
+
+  .fieldTitleRow {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .fieldTitleRow h3 {
+    font-size: 18px;
+  }
+
+  .fieldTitleRow button {
+    flex: 0 0 auto;
+    font-size: 13px;
+  }
+
+  .fieldGroup textarea {
+    min-height: 140px;
+    font-size: 15px;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .previewOverlay {
+    padding: 24px 14px;
+  }
+
+  .previewModal {
+    height: 680px;
+    border-radius: 34px;
+  }
+
+  .previewCanvas {
+    top: 86px;
+    width: 86%;
+    height: 520px;
+  }
+
+  .highlightBox {
+    bottom: 58px;
+    height: 112px;
+  }
+}

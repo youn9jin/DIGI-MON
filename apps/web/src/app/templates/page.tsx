@@ -3,14 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "@/components/layout/Header";
-import {
-  createMarketPage,
-  getMarketPageStatus,
-  type MarketPageApiError,
-  type TemplateType,
-} from "@/lib/api/market-page";
+import { type TemplateType } from "@/lib/api/market-page";
 import styles from "./templates.module.css";
 
 const backgroundImage =
@@ -59,23 +54,13 @@ const featureGroups = [
 
 export default function TemplateSelectionPage() {
   const router = useRouter();
-  const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("TEMPLATE_3");
   const [previewTemplate, setPreviewTemplate] = useState<TemplateType | null>(null);
   const [openFeature, setOpenFeature] = useState("점포 안내");
-  const [isGenerating, setIsGenerating] = useState(false);
 
-  const selectedTemplateHref =
-    templates.find((template) => template.id === selectedTemplate)?.href ?? "/templates/editorial";
   const previewTemplateData = previewTemplate
     ? templates.find((template) => template.id === previewTemplate)
     : null;
-
-  useEffect(() => {
-    return () => {
-      if (pollTimer.current) clearTimeout(pollTimer.current);
-    };
-  }, []);
 
   useEffect(() => {
     if (!previewTemplate) return;
@@ -88,43 +73,8 @@ export default function TemplateSelectionPage() {
     };
   }, [previewTemplate]);
 
-  async function pollUntilDone(jobId: string | number) {
-    try {
-      const result = await getMarketPageStatus(jobId);
-
-      if (result.status === "DONE") {
-        setIsGenerating(false);
-        const pageId = result.pageId ?? jobId;
-        router.push(`${selectedTemplateHref}?pageId=${encodeURIComponent(String(pageId))}`);
-        return;
-      }
-
-      if (result.status === "FAILED") {
-        setIsGenerating(false);
-        window.alert(result.error ?? "AI 웹페이지 생성에 실패했습니다. 다시 시도해주세요.");
-        return;
-      }
-
-      pollTimer.current = setTimeout(() => pollUntilDone(jobId), 5000);
-    } catch (error) {
-      setIsGenerating(false);
-      const apiError = error as MarketPageApiError;
-      window.alert(apiError.message ?? "생성 상태 확인에 실패했습니다.");
-    }
-  }
-
-  async function handleComplete() {
-    if (isGenerating) return;
-
-    setIsGenerating(true);
-    try {
-      const result = await createMarketPage(selectedTemplate);
-      pollUntilDone(result.jobId ?? result.pageId);
-    } catch (error) {
-      setIsGenerating(false);
-      const apiError = error as MarketPageApiError;
-      window.alert(apiError.message ?? "웹페이지 생성 요청에 실패했습니다.");
-    }
+  function handleComplete() {
+    router.push(`/templates/info?template=${encodeURIComponent(selectedTemplate)}`);
   }
 
   return (
@@ -249,11 +199,10 @@ export default function TemplateSelectionPage() {
           </Link>
           <button
             className={styles.primaryAction}
-            disabled={isGenerating}
             type="button"
             onClick={handleComplete}
           >
-            {isGenerating ? "생성 중..." : "선택 완료"}
+            선택 완료
           </button>
         </div>
       </section>
