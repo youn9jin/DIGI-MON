@@ -119,7 +119,7 @@ export default function TemplateSelectionPage() {
     setIsGenerating(true);
     try {
       const result = await createMarketPage(selectedTemplate);
-      pollUntilDone(result.jobId);
+      pollUntilDone(result.jobId ?? result.pageId);
     } catch (error) {
       setIsGenerating(false);
       const apiError = error as MarketPageApiError;
@@ -129,7 +129,7 @@ export default function TemplateSelectionPage() {
 
   return (
     <main className={styles.page}>
-      <Header />
+      <Header variant="builder" />
 
       <div className={styles.backgroundMark} aria-hidden="true">
         <Image
@@ -282,6 +282,7 @@ export default function TemplateSelectionPage() {
             >
               이 디자인 사용하기
             </button>
+            <h2 className={styles.previewTitle}>Main Page</h2>
             <div className={styles.largePreview}>
               <iframe
                 title={`${previewTemplateData.label} 실제 템플릿 미리보기`}

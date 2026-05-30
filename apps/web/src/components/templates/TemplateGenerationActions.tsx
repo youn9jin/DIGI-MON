@@ -80,7 +80,7 @@ export default function TemplateGenerationActions({
     setIsGenerating(true);
     try {
       const result = await createMarketPage(templateType);
-      pollUntilDone(result.jobId);
+      pollUntilDone(result.pageId);
     } catch (error) {
       setIsGenerating(false);
       const apiError = error as MarketPageApiError;

@@ -13,21 +13,30 @@ interface ApiEnvelope<T> {
 }
 
 export interface CreateMarketPageResponse {
-  jobId: string | number;
+  pageId: string | number;
+  jobId?: string | number;
   status: MarketPageStatus;
   message?: string;
 }
 
 export interface MarketPageStatusResponse {
-  jobId: string | number;
+  pageId?: string | number;
+  jobId?: string | number;
   status: MarketPageStatus;
-  pageId?: number;
   error?: string;
 }
 
 export interface MarketPageApiError {
   status: number;
+  code?: string;
   message: string;
+}
+
+interface RawCreateMarketPageResponse {
+  pageId?: string | number;
+  jobId?: string | number;
+  status?: MarketPageStatus;
+  message?: string;
 }
 
 async function getAuthorizationHeader(): Promise<HeadersInit> {
@@ -46,6 +55,7 @@ async function parseEnvelope<T>(response: Response): Promise<T> {
   if (!response.ok || body.success === false || !body.data) {
     throw {
       status: response.status,
+      code: body.error?.code,
       message: body.error?.message ?? "웹페이지 생성 요청에 실패했습니다.",
     } as MarketPageApiError;
   }
@@ -67,7 +77,22 @@ export async function createMarketPage(
     body: JSON.stringify({ templateType }),
   });
 
-  return parseEnvelope<CreateMarketPageResponse>(response);
+  const data = await parseEnvelope<RawCreateMarketPageResponse>(response);
+  const pageId = data.pageId ?? data.jobId;
+
+  if (pageId == null) {
+    throw {
+      status: response.status,
+      message: "웹페이지 생성 응답에 pageId가 없습니다.",
+    } as MarketPageApiError;
+  }
+
+  return {
+    pageId,
+    jobId: data.jobId,
+    status: data.status ?? "PENDING",
+    message: data.message,
+  };
 }
 
 export async function getMarketPageStatus(

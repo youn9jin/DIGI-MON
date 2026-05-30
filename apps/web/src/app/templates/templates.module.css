@@ -5,12 +5,12 @@
   background: #fff;
   color: #131313;
   font-family: Pretendard, "Noto Sans KR", Inter, Arial, sans-serif;
-  padding: clamp(150px, 8.85vw, 170px) 24px 110px;
+  padding: 220px 24px 110px;
 }
 
 .backgroundMark {
   position: absolute;
-  top: clamp(114px, 8.85vw, 170px);
+  top: 150px;
   left: 50%;
   width: min(80.73vw, 1550px);
   height: min(41.2vw, 791px);
@@ -28,7 +28,7 @@
 .hero {
   position: relative;
   z-index: 1;
-  margin: 0 auto clamp(38px, 3.33vw, 64px);
+  margin: 0 auto 64px;
   text-align: center;
 }
 
@@ -56,8 +56,7 @@
   border-radius: clamp(34px, 5.21vw, 100px);
   background: rgba(253, 253, 253, 0.95);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
-  padding: clamp(48px, 4.06vw, 78px) clamp(28px, 4.95vw, 95px)
-    clamp(54px, 3.91vw, 75px);
+  padding: 78px 63px 75px;
 }
 
 .stepSection h2 {
@@ -79,7 +78,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(24px, 5.16vw, 99px);
-  margin: clamp(44px, 4.38vw, 84px) 0 clamp(58px, 4.84vw, 93px);
+  margin: 62px 0 93px;
 }
 
 .templateOption {
@@ -95,6 +94,7 @@
   position: absolute;
   top: 0;
   left: calc(50% - (var(--template-preview-width) / 2) - 56px);
+  box-sizing: border-box;
   width: 32px;
   height: 32px;
   border: 0;
@@ -188,54 +188,58 @@
 }
 
 .featureList {
+  --feature-border: 1px solid #b8b8b8;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 9px;
 }
 
 .featureGroup {
-  border: 1px solid #a1a1a1;
-  border-radius: 60px;
-  background: #fff;
+  position: relative;
+  background: transparent;
 }
 
-.openFeature {
-  border-bottom-right-radius: 60px;
-  border-bottom-left-radius: 60px;
+.openFeature::before {
+  content: none;
 }
 
 .featureSummary {
+  position: relative;
+  z-index: 2;
+  box-sizing: border-box;
   display: flex;
   width: 100%;
-  min-height: 82px;
+  min-height: 72px;
   align-items: center;
-  gap: 22px;
-  border: 0;
-  background: transparent;
+  gap: 25px;
+  border: var(--feature-border);
+  border-radius: 44px;
+  background: #fff;
   color: #131313;
   cursor: pointer;
   font-family: inherit;
   font-size: clamp(18px, 1.15vw, 22px);
-  line-height: 1.2;
+  font-weight: 400;
+  line-height: 20px;
   list-style: none;
-  padding: 0 clamp(24px, 4.38vw, 84px);
+  padding: 0 30px;
   text-align: left;
 }
 
 .featureDot {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   flex: 0 0 auto;
   border-radius: 50%;
-  background: #e9e9e9;
+  background: #ededed;
 }
 
 .featureSummary i {
-  width: 18px;
-  height: 12px;
+  width: 15px;
+  height: 10px;
   margin-left: auto;
   clip-path: polygon(50% 100%, 0 0, 100% 0);
-  background: #a1a1a1;
+  background: #a8a8a8;
   transition: transform 160ms ease;
 }
 
@@ -244,34 +248,46 @@
 }
 
 .featureOptions {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 4px clamp(28px, 5.63vw, 108px) 36px;
+  gap: 20px;
+  width: calc(100% - 36px);
+  min-height: 132px;
+  margin: -14px auto 0;
+  border: var(--feature-border);
+  border-radius: 0 0 44px 44px;
+  background: #fff;
+  padding: 36px 32px 22px;
 }
 
 .featureOptions label {
+  min-height: 28.6px;
   display: flex;
   align-items: center;
-  gap: 22px;
+  gap: 20px;
   width: fit-content;
   color: #131313;
   cursor: pointer;
   font-size: clamp(18px, 1.15vw, 22px);
-  line-height: 1;
+  font-weight: 400;
+  line-height: 20px;
 }
 
 .featureOptions input {
   appearance: none;
-  width: 20px;
-  height: 20px;
+  box-sizing: border-box;
+  width: 18px;
+  height: 18px;
   flex: 0 0 auto;
   border-radius: 50%;
-  background: #e9e9e9;
+  background: #ededed;
 }
 
 .featureOptions input:checked {
-  border: 5px solid #e9e9e9;
+  border: 4px solid #ededed;
   background: #ffc700;
 }
 
@@ -279,32 +295,32 @@
   display: flex;
   justify-content: center;
   gap: 21px;
-  margin-top: clamp(66px, 4.9vw, 94px);
+  margin-top: clamp(52px, 3.65vw, 70px);
 }
 
 .secondaryAction,
 .primaryAction {
   display: flex;
-  height: 77px;
+  height: 56px;
   align-items: center;
   justify-content: center;
   border: 0;
-  border-radius: 30px;
+  border-radius: 22px;
   color: #000;
   cursor: pointer;
   font-family: inherit;
-  font-size: 20px;
+  font-size: 16px;
   line-height: 1;
   text-decoration: none;
 }
 
 .secondaryAction {
-  width: 218px;
+  width: 164px;
   background: rgba(235, 235, 235, 0.7);
 }
 
 .primaryAction {
-  width: 379px;
+  width: 260px;
   background: rgba(255, 242, 197, 0.77);
 }
 
@@ -316,23 +332,23 @@
 .previewOverlay {
   position: fixed;
   inset: 0;
-  z-index: 20;
+  z-index: 100;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   overflow-y: auto;
   background: rgba(97, 97, 97, 0.85);
-  padding: clamp(46px, 4.53vw, 87px) 24px;
+  padding: 87px 24px;
 }
 
 .previewModal {
   position: relative;
-  width: min(70vw, 1343px);
-  min-height: min(84.26vw, 910px);
+  width: min(100%, 1343px);
+  min-height: 910px;
   border-radius: clamp(42px, 5.21vw, 100px);
   background: rgba(253, 253, 253, 0.95);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
-  padding: clamp(104px, 6.72vw, 129px) clamp(38px, 7.03vw, 135px) 0;
+  padding: 154px 80px 0;
 }
 
 .closePreview {
@@ -394,20 +410,36 @@
   background: #581616;
 }
 
+.previewTitle {
+  position: absolute;
+  top: 101px;
+  left: 50%;
+  width: 200px;
+  margin: 0;
+  color: #000;
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 42px;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
 .largePreview {
   position: relative;
   width: min(100%, 1074px);
-  height: min(70vw, 756px);
+  height: 756px;
   margin: 0 auto;
   overflow: hidden;
   background: #f4f4f4;
 }
 
 .largePreview iframe {
-  width: 100%;
-  height: 100%;
+  width: 1440px;
+  height: 1100px;
   border: 0;
   background: #fff;
+  transform: scale(0.745833);
+  transform-origin: top left;
 }
 
 @media (max-width: 900px) {
@@ -482,11 +514,36 @@
 
   .featureSummary {
     min-height: 72px;
+    gap: 20px;
+    border-radius: 36px;
     padding: 0 22px;
   }
 
+  .featureDot,
+  .featureOptions input {
+    width: 20px;
+    height: 20px;
+  }
+
+  .featureSummary i {
+    width: 18px;
+    height: 12px;
+  }
+
   .featureOptions {
-    padding: 0 28px 30px;
+    gap: 22px;
+    min-height: 180px;
+    margin-top: -22px;
+    border-radius: 0 0 32px 32px;
+    padding: 54px 28px 26px;
+  }
+
+  .featureOptions label {
+    gap: 20px;
+  }
+
+  .featureOptions input:checked {
+    border-width: 5px;
   }
 
   .actions {
