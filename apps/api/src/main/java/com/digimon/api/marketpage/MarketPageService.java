@@ -32,13 +32,16 @@ public class MarketPageService {
 
     private final MarketRepository marketRepository;
     private final MarketPageRepository marketPageRepository;
+    private final MarketPageConfigRepository marketPageConfigRepository;
     private final MarketPageGenerationService generationService;
 
     public MarketPageService(MarketRepository marketRepository,
                              MarketPageRepository marketPageRepository,
+                             MarketPageConfigRepository marketPageConfigRepository,
                              MarketPageGenerationService generationService) {
         this.marketRepository = marketRepository;
         this.marketPageRepository = marketPageRepository;
+        this.marketPageConfigRepository = marketPageConfigRepository;
         this.generationService = generationService;
     }
 
@@ -52,6 +55,12 @@ public class MarketPageService {
         Market market = marketRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new MarketPageMarketNotFoundException(
                         "등록된 시장이 없습니다. 먼저 온보딩을 완료해주세요."));
+
+        // 생성 트리거 전 setup(market_page_configs) 선행 필수.
+        if (!marketPageConfigRepository.findByMarketId(market.getId()).isPresent()) {
+            throw new SetupNotCompletedException(
+                    "페이지 생성 설정이 완료되지 않았습니다. 먼저 /api/market/page/setup 을 호출해주세요.");
+        }
 
         Optional<MarketPage> existing = marketPageRepository.findByMarketId(market.getId());
 
