@@ -3,26 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Header from "@/components/layout/Header";
-import {
-  createMarketPage,
-  getMarketPageStatus,
-  type MarketPageApiError,
-  type TemplateType,
-} from "@/lib/api/market-page";
 import styles from "./template-info.module.css";
 
 const backgroundImage =
   "https://www.figma.com/api/mcp/asset/3734902e-c1bf-4629-b5d5-f55aba4c23ce";
 const locationPreviewImage =
   "https://www.figma.com/api/mcp/asset/2319ccd1-19b2-4d12-b6a1-72d89b228c56";
-
-const templateRoutes: Record<TemplateType, string> = {
-  TEMPLATE_1: "/templates/classic",
-  TEMPLATE_2: "/templates/modern",
-  TEMPLATE_3: "/templates/editorial",
-};
 
 const textFields = [
   {
@@ -46,63 +34,9 @@ const textFields = [
   },
 ];
 
-function getTemplateType(value: string | null): TemplateType {
-  if (value === "TEMPLATE_1" || value === "TEMPLATE_2" || value === "TEMPLATE_3") {
-    return value;
-  }
-
-  return "TEMPLATE_3";
-}
-
 export default function TemplateInfoPage() {
   const router = useRouter();
-  const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [templateType] = useState<TemplateType>(() => {
-    if (typeof window === "undefined") return "TEMPLATE_3";
-
-    return getTemplateType(new URLSearchParams(window.location.search).get("template"));
-  });
-  const [isGenerating, setIsGenerating] = useState(false);
   const [previewTarget, setPreviewTarget] = useState<string | null>(null);
-
-  async function pollUntilDone(jobId: string | number) {
-    try {
-      const result = await getMarketPageStatus(jobId);
-
-      if (result.status === "DONE") {
-        setIsGenerating(false);
-        const pageId = result.pageId ?? jobId;
-        router.push(`${templateRoutes[templateType]}?pageId=${encodeURIComponent(String(pageId))}`);
-        return;
-      }
-
-      if (result.status === "FAILED") {
-        setIsGenerating(false);
-        window.alert(result.error ?? "AI 웹페이지 생성에 실패했습니다. 다시 시도해주세요.");
-        return;
-      }
-
-      pollTimer.current = setTimeout(() => pollUntilDone(jobId), 5000);
-    } catch (error) {
-      setIsGenerating(false);
-      const apiError = error as MarketPageApiError;
-      window.alert(apiError.message ?? "생성 상태 확인에 실패했습니다.");
-    }
-  }
-
-  async function handleInfoComplete() {
-    if (isGenerating) return;
-
-    setIsGenerating(true);
-    try {
-      const result = await createMarketPage(templateType);
-      pollUntilDone(result.jobId ?? result.pageId);
-    } catch (error) {
-      setIsGenerating(false);
-      const apiError = error as MarketPageApiError;
-      window.alert(apiError.message ?? "웹페이지 생성 요청에 실패했습니다.");
-    }
-  }
 
   return (
     <main className={styles.page}>
@@ -165,11 +99,10 @@ export default function TemplateInfoPage() {
           </Link>
           <button
             className={styles.primaryAction}
-            disabled={isGenerating}
             type="button"
-            onClick={handleInfoComplete}
+            onClick={() => router.push("/templates/generating")}
           >
-            {isGenerating ? "생성 중..." : "정보 입력 완료"}
+            정보 입력 완료
           </button>
         </div>
       </section>
