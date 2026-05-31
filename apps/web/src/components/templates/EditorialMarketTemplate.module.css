@@ -1,0 +1,660 @@
+.page {
+  min-height: 100svh;
+  overflow-x: hidden;
+  background: #fff;
+  color: #111;
+  font-family: Pretendard, "Noto Sans KR", Inter, Arial, sans-serif;
+}
+
+.header {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  height: clamp(70px, 4.69vw, 90px);
+  align-items: center;
+  justify-content: space-between;
+  background: #581616;
+  padding: 0 clamp(24px, 4.48vw, 86px);
+}
+
+.logo {
+  display: flex;
+  width: clamp(172px, 12.66vw, 243px);
+  min-height: clamp(48px, 3.33vw, 64px);
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fff;
+  color: #581616;
+  font-size: clamp(20px, 1.46vw, 28px);
+  font-weight: 800;
+  line-height: 1.1;
+  padding: 0 14px;
+  text-align: center;
+  text-decoration: none;
+}
+
+.header nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 3.96vw, 76px);
+}
+
+.header nav a {
+  color: #fff;
+  font-size: clamp(16px, 1.46vw, 28px);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.hero {
+  position: relative;
+  display: flex;
+  min-height: clamp(560px, 58.75vw, 1128px);
+  align-items: flex-end;
+  overflow: hidden;
+  padding: clamp(96px, 41.82vw, 803px) clamp(24px, 5.16vw, 99px)
+    clamp(72px, 7.19vw, 138px);
+}
+
+.heroImage,
+.fullImageBlock img,
+.splitImage img,
+.routeBand img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.hero p {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 1722px);
+  margin: 0;
+  color: #fff;
+  font-size: clamp(18px, 1.46vw, 28px);
+  font-weight: 400;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.editorialSection {
+  background: #fff;
+}
+
+.fullImageBlock {
+  position: relative;
+  min-height: clamp(380px, 34.01vw, 653px);
+  overflow: hidden;
+}
+
+.tint {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 222, 220, 0.75);
+}
+
+.foodWord,
+.cultureWord {
+  position: absolute;
+  z-index: 1;
+  color: #000;
+  font-size: clamp(54px, 5.21vw, 100px);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.foodWord {
+  left: clamp(-28px, 1.56vw, 30px);
+  top: clamp(150px, 14.4vw, 276px);
+  width: clamp(220px, 18.23vw, 350px);
+  text-align: center;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
+
+.wideText {
+  width: min(calc(100% - 88px), 1722px);
+  margin: clamp(72px, 6.46vw, 124px) auto clamp(92px, 7.08vw, 136px);
+  color: #000;
+  font-size: clamp(18px, 1.46vw, 28px);
+  line-height: 1.6;
+}
+
+.splitSection {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 60.26vw) minmax(0, 1fr);
+  min-height: clamp(520px, 38.39vw, 737px);
+  align-items: center;
+  background: #fff;
+}
+
+.splitImage {
+  position: relative;
+  height: 100%;
+  min-height: clamp(520px, 38.39vw, 737px);
+  overflow: hidden;
+}
+
+.splitSection p {
+  justify-self: start;
+  width: min(28.85vw, 554px);
+  min-width: 360px;
+  margin: 0 0 0 clamp(28px, 1.82vw, 35px);
+  padding: 0 clamp(128px, 8vw, 154px) 0 0;
+  color: #000;
+  font-size: clamp(18px, 1.46vw, 28px);
+  line-height: 1.6;
+}
+
+.cultureWord {
+  right: clamp(-154px, -8.02vw, -88px);
+  top: clamp(42px, 5.1vw, 98px);
+  width: clamp(340px, 20.26vw, 389px);
+  text-align: center;
+  transform: rotate(90deg);
+  transform-origin: center;
+}
+
+.routeBand {
+  position: relative;
+  min-height: clamp(180px, 16.04vw, 308px);
+  margin-top: clamp(90px, 8.85vw, 170px);
+  overflow: hidden;
+}
+
+.mapSection {
+  padding: clamp(86px, 4.9vw, 94px) 0 clamp(86px, 4.95vw, 95px);
+}
+
+.mapSection h2 {
+  margin: 0 0 clamp(54px, 5.73vw, 110px);
+  color: #000;
+  font-size: clamp(42px, 3.39vw, 65px);
+  font-weight: 800;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.mapBox {
+  width: 100%;
+  min-height: clamp(360px, 34.01vw, 653px);
+  background: #d9d9d9;
+}
+
+.mapBox > div,
+.mapBox iframe {
+  min-height: clamp(360px, 34.01vw, 653px);
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(36px, 2.97vw, 57px);
+  padding: clamp(44px, 3.13vw, 60px) clamp(24px, 2.5vw, 48px)
+    clamp(72px, 6.25vw, 120px);
+}
+
+.footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(18px, 1.25vw, 24px);
+}
+
+.footer nav a {
+  color: #323232;
+  font-size: clamp(15px, 1.15vw, 22px);
+  line-height: 1;
+  text-decoration: none;
+}
+
+.footer nav a:last-child {
+  margin-left: clamp(0px, 2.5vw, 48px);
+}
+
+.footerInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(44px, 3.54vw, 68px);
+}
+
+.footerInfo div {
+  min-width: min(100%, 209px);
+}
+
+.footerInfo div:first-child {
+  width: min(100%, 320px);
+}
+
+.footerInfo h3 {
+  margin: 0 0 18px;
+  color: #323232;
+  font-size: clamp(17px, 1.3vw, 25px);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.footerInfo p {
+  margin: 0 0 12px;
+  color: #323232;
+  font-size: clamp(15px, 1.15vw, 22px);
+  line-height: 1.2;
+}
+
+.storeHero,
+.detailHero {
+  position: relative;
+  display: flex;
+  min-height: clamp(540px, 45.63vw, 876px);
+  flex-direction: column;
+  align-items: center;
+  overflow: hidden;
+  padding: clamp(180px, 15.63vw, 300px) 24px clamp(70px, 4.69vw, 90px);
+}
+
+.storeHeroTitle,
+.detailHeroTitle {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+}
+
+.storeHeroTitle h1,
+.detailHeroTitle h1 {
+  margin: 0;
+  font-size: clamp(38px, 2.92vw, 56px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.storeHeroTitle span,
+.detailHeroTitle i {
+  display: block;
+  width: clamp(240px, 21.35vw, 410px);
+  height: 3px;
+  margin-top: 10px;
+  background: #fff;
+}
+
+.searchBox {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(calc(100% - 48px), 1048px);
+  height: 72px;
+  align-items: center;
+  margin-top: clamp(220px, 17.14vw, 329px);
+  border: 2px solid #fff;
+  border-radius: 10px;
+  color: #fff;
+}
+
+.searchBox span {
+  position: absolute;
+  left: 38px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: clamp(16px, 1.46vw, 28px);
+  font-weight: 300;
+  pointer-events: none;
+}
+
+.searchBox input {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 24px;
+  padding: 0 86px 0 34px;
+  outline: 0;
+}
+
+.searchBox:focus-within span {
+  opacity: 0;
+}
+
+.searchBox i {
+  position: absolute;
+  right: 48px;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+}
+
+.searchBox i::after {
+  position: absolute;
+  right: -11px;
+  bottom: -8px;
+  width: 14px;
+  height: 2px;
+  background: #fff;
+  content: "";
+  transform: rotate(45deg);
+  transform-origin: left center;
+}
+
+.categorySection {
+  padding: clamp(76px, 8.39vw, 161px) clamp(24px, 2.29vw, 44px) 0;
+}
+
+.categorySection h2 {
+  margin: 0 0 6px;
+  color: #000;
+  font-size: clamp(38px, 2.81vw, 54px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.categorySection p {
+  margin: 0 0 clamp(42px, 3.54vw, 68px);
+  color: #4d4d4d;
+  font-size: clamp(15px, 1.25vw, 24px);
+  line-height: 1.25;
+}
+
+.categoryButtons {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(150px, 290px));
+  justify-content: center;
+  gap: clamp(12px, 1.61vw, 31px);
+}
+
+.categoryButtons button {
+  min-height: 92px;
+  border: 1px solid #000;
+  border-radius: 20px;
+  background: #fff;
+  color: #000;
+  cursor: pointer;
+  font-size: clamp(18px, 1.25vw, 24px);
+}
+
+.categoryButtons button:hover,
+.categoryButtons .activeCategory {
+  background: #581616;
+  color: #fff;
+}
+
+.editorialStoreGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(20px, 1.11vw, 22px) clamp(20px, 1.25vw, 24px);
+  padding: clamp(48px, 3.54vw, 68px) clamp(24px, 4.69vw, 90px)
+    clamp(84px, 9.64vw, 185px);
+}
+
+.editorialStoreCard {
+  display: flex;
+  min-height: clamp(180px, 13.87vw, 266px);
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 14px;
+  border: 1px solid #000;
+  border-radius: 20px;
+  color: #000;
+  padding: clamp(36px, 1.88vw, 40px);
+  text-decoration: none;
+}
+
+.editorialStoreCard strong {
+  font-size: clamp(18px, 1.25vw, 24px);
+  line-height: 1.2;
+}
+
+.editorialStoreCard span {
+  font-size: clamp(17px, 1.15vw, 22px);
+  line-height: 1.2;
+}
+
+.editorialStoreCard:hover {
+  background: rgba(88, 22, 22, 0.05);
+}
+
+.detailPage {
+  background: linear-gradient(180deg, #fff 0%, rgba(255, 233, 233, 0.45) 100%);
+}
+
+.detailHero {
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: clamp(210px, 12.4vw, 238px);
+}
+
+.detailHeroTitle span {
+  margin-bottom: 8px;
+  font-size: clamp(20px, 1.67vw, 32px);
+  font-weight: 700;
+}
+
+.detailHero p {
+  position: relative;
+  z-index: 1;
+  width: min(calc(100% - 48px), 1682px);
+  margin: auto 0 0;
+  color: #fff;
+  font-size: clamp(18px, 1.46vw, 28px);
+  line-height: 1.6;
+}
+
+.detailActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 32px;
+  padding: 34px clamp(32px, 5.42vw, 104px) 0;
+}
+
+.detailActions button {
+  border: 0;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+  font-size: clamp(18px, 1.25vw, 24px);
+  font-weight: 300;
+}
+
+.menuSection {
+  padding: clamp(56px, 4.17vw, 80px) clamp(32px, 7.03vw, 135px)
+    clamp(96px, 6.72vw, 129px);
+}
+
+.menuSection h2,
+.signatureSection h2 {
+  margin: 0 0 clamp(50px, 3.96vw, 76px);
+  color: #000;
+  font-size: clamp(54px, 4.69vw, 90px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.menuImages {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 804px));
+  justify-content: center;
+  gap: clamp(36px, 2.14vw, 41px);
+}
+
+.menuImages img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.signatureSection {
+  padding: 0 clamp(32px, 7.03vw, 135px) clamp(96px, 7.34vw, 141px);
+}
+
+.signatureSection h2 {
+  margin-bottom: clamp(46px, 3.44vw, 66px);
+  font-size: clamp(38px, 3.13vw, 60px);
+}
+
+.signatureGrid {
+  display: grid;
+  grid-template-columns: minmax(280px, 712px) minmax(280px, 845px);
+  gap: clamp(48px, 4.79vw, 92px);
+  align-items: center;
+}
+
+.signaturePhoto {
+  width: 100%;
+  aspect-ratio: 712 / 594;
+  background: #d9d9d9;
+}
+
+.signatureGrid h3 {
+  margin: 0 0 30px;
+  color: #000;
+  font-size: clamp(28px, 2.34vw, 45px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.signatureGrid p {
+  margin: 0;
+  color: #303030;
+  font-size: clamp(18px, 1.46vw, 28px);
+  line-height: 1.43;
+  text-align: justify;
+}
+
+.storeInfoList {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: clamp(72px, 6.72vw, 129px) 0 0;
+  padding: 0;
+  color: #000;
+  font-size: clamp(20px, 1.67vw, 32px);
+  font-weight: 500;
+  line-height: 1.65;
+  list-style: none;
+}
+
+@media (max-width: 900px) {
+  .header {
+    height: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    padding-block: 18px;
+  }
+
+  .logo {
+    width: min(100%, 260px);
+  }
+
+  .header nav {
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .header nav a {
+    font-size: 15px;
+  }
+
+  .hero {
+    min-height: 520px;
+  }
+
+  .foodWord,
+  .cultureWord {
+    font-size: 54px;
+  }
+
+  .foodWord {
+    left: -60px;
+    top: 170px;
+  }
+
+  .wideText {
+    width: min(calc(100% - 40px), 720px);
+  }
+
+  .splitSection {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    align-items: stretch;
+  }
+
+  .splitImage {
+    min-height: 380px;
+  }
+
+  .splitSection p {
+    width: auto;
+    min-width: 0;
+    padding: 48px 20px 72px;
+    margin: 0;
+  }
+
+  .cultureWord {
+    right: 12px;
+    top: 28px;
+    width: auto;
+    transform: none;
+  }
+
+  .storeHero,
+  .detailHero {
+    min-height: 560px;
+    padding-top: 150px;
+  }
+
+  .searchBox {
+    height: 58px;
+    margin-top: 150px;
+  }
+
+  .searchBox span {
+    left: 18px;
+    font-size: 14px;
+  }
+
+  .categoryButtons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .categoryButtons button {
+    min-height: 58px;
+    border-radius: 12px;
+  }
+
+  .editorialStoreGrid {
+    grid-template-columns: 1fr;
+    padding-inline: 20px;
+  }
+
+  .editorialStoreCard {
+    min-height: 150px;
+    border-radius: 14px;
+  }
+
+  .menuImages,
+  .signatureGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .menuSection,
+  .signatureSection {
+    padding-inline: 20px;
+  }
+
+  .storeInfoList {
+    font-size: 18px;
+  }
+}

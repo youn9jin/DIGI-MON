@@ -92,6 +92,7 @@ public class MeController {
                 Market market = marketOpt.get();
                 res.put("marketId", market.getId());
                 res.put("marketName", market.getName());
+                res.put("address", market.getAddress());
             } else {
                 missing.add("market");
             }

@@ -7,9 +7,14 @@ import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import styles from "./Header.module.css";
 
-export default function Header() {
+interface HeaderProps {
+  variant?: "default" | "builder";
+}
+
+export default function Header({ variant = "default" }: HeaderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -19,10 +24,59 @@ export default function Header() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const updateScrolled = () => setIsScrolled(window.scrollY > 12);
+
+    updateScrolled();
+    window.addEventListener("scroll", updateScrolled, { passive: true });
+
+    return () => window.removeEventListener("scroll", updateScrolled);
+  }, []);
+
+  const headerClassName = `${styles.header} ${isScrolled ? styles.scrolledHeader : ""}`;
+
+  if (variant === "builder") {
+    const displayName = user?.displayName || user?.email?.split("@")[0] || "사용자";
+
+    return (
+      <header className={`${headerClassName} ${styles.builderHeader}`}>
+        <div className={styles.headerInner}>
+          <div className={styles.headerLeft}>
+            <div className={styles.logoSlot}>
+              <Link href="/">
+                <div className={styles.logoMark}>
+                  <Image
+                    src="/images/onboarding/market-illustration.png"
+                    alt="DIGI-MON"
+                    width={283}
+                    height={286}
+                    priority
+                    className={styles.logoImage}
+                  />
+                </div>
+              </Link>
+            </div>
+
+            <nav className={styles.primaryNav} aria-label="주요 메뉴">
+              <a href="#">사용방법</a>
+              <a href="#">커뮤니티</a>
+              <a href="/dashboard">웹사이트 관리</a>
+            </nav>
+          </div>
+
+          <nav className={styles.authNav} aria-label="사용자 메뉴">
+            {ready && user && <span className={styles.userName}>{displayName}님</span>}
+            <a href="/mypage">마이페이지</a>
+          </nav>
+        </div>
+      </header>
+    );
+  }
+
   // 깜빡임 방지: auth 상태 확인 전엔 아무것도 렌더하지 않음
   if (!ready) {
     return (
-      <header className={styles.header}>
+      <header className={headerClassName}>
         <div className={styles.headerInner} />
       </header>
     );
@@ -33,7 +87,7 @@ export default function Header() {
     const displayName = user.displayName || "사용자";
 
     return (
-      <header className={styles.header}>
+      <header className={headerClassName}>
         <div className={styles.headerInner}>
           <div className={styles.headerLeft}>
             <div className={styles.logoSlot}>
@@ -75,7 +129,7 @@ export default function Header() {
 
   // 비로그인 상태
   return (
-    <header className={styles.header}>
+    <header className={headerClassName}>
       <div className={styles.headerInner}>
         <div className={styles.headerLeft}>
           <div className={styles.logoSlot}>
