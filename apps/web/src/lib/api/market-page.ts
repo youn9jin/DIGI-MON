@@ -57,6 +57,12 @@ interface RawCreateMarketPageResponse {
   message?: string;
 }
 
+interface MarketPageStatusEvent {
+  pageId?: string | number;
+  status?: MarketPageStatus;
+  error?: string;
+}
+
 async function getAuthorizationHeader(): Promise<HeadersInit> {
   const user = auth.currentUser;
   if (!user) {
@@ -99,7 +105,7 @@ export async function saveMarketPageSetup(
 }
 
 export async function createMarketPage(
-  templateType: TemplateType,
+  templateType?: TemplateType,
 ): Promise<CreateMarketPageResponse> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
   const authHeader = await getAuthorizationHeader();
@@ -109,7 +115,7 @@ export async function createMarketPage(
       "Content-Type": "application/json",
       ...authHeader,
     },
-    body: JSON.stringify({ templateType }),
+    body: templateType ? JSON.stringify({ templateType }) : undefined,
   });
 
   const data = await parseEnvelope<RawCreateMarketPageResponse>(response);
@@ -133,12 +139,64 @@ export async function createMarketPage(
 export async function getMarketPageStatus(
   jobId: string | number,
 ): Promise<MarketPageStatusResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-  const authHeader = await getAuthorizationHeader();
-  const response = await fetch(
-    `${baseUrl}/api/market/page/status/${encodeURIComponent(String(jobId))}`,
-    { headers: authHeader },
-  );
+  return new Promise((resolve, reject) => {
+    subscribeMarketPageStatus(jobId, {
+      onDone: resolve,
+      onFailed: resolve,
+      onError: reject,
+    }).catch(reject);
+  });
+}
 
-  return parseEnvelope<MarketPageStatusResponse>(response);
+export async function subscribeMarketPageStatus(
+  pageId: string | number,
+  callbacks: {
+    onDone: (status: MarketPageStatusResponse) => void;
+    onFailed: (status: MarketPageStatusResponse) => void;
+    onError?: (error: MarketPageApiError) => void;
+  },
+): Promise<() => void> {
+  const user = auth.currentUser;
+  if (!user) {
+    throw { status: 401, message: "로그인이 필요합니다." } as MarketPageApiError;
+  }
+
+  const idToken = await user.getIdToken();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const url = new URL(
+    `${baseUrl}/api/market/page/status/${encodeURIComponent(String(pageId))}`,
+    window.location.origin,
+  );
+  url.searchParams.set("token", idToken);
+
+  const eventSource = new EventSource(url.toString());
+
+  function parseStatus(event: MessageEvent): MarketPageStatusResponse {
+    const data = JSON.parse(event.data) as MarketPageStatusEvent;
+    return {
+      pageId: data.pageId ?? pageId,
+      status: data.status ?? "PENDING",
+      error: data.error,
+    };
+  }
+
+  eventSource.addEventListener("done", (event) => {
+    eventSource.close();
+    callbacks.onDone(parseStatus(event as MessageEvent));
+  });
+
+  eventSource.addEventListener("failed", (event) => {
+    eventSource.close();
+    callbacks.onFailed(parseStatus(event as MessageEvent));
+  });
+
+  eventSource.onerror = () => {
+    eventSource.close();
+    callbacks.onError?.({
+      status: 0,
+      message: "웹페이지 생성 상태 연결에 실패했습니다.",
+    });
+  };
+
+  return () => eventSource.close();
 }
