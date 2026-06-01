@@ -11,6 +11,10 @@ function getFeature(
   return content.features?.[index] ?? {};
 }
 
+function firstText(...values: Array<string | null | undefined>): string {
+  return values.find((value) => value && value.trim().length > 0) ?? "";
+}
+
 export function mapClassicMarketPageContent(
   content: MarketPageContentResponse,
   me?: MeResponse,
@@ -21,13 +25,13 @@ export function mapClassicMarketPageContent(
   return {
     ...(me?.marketName ? { marketName: me.marketName } : {}),
     ...(me?.address ? { address: me.address } : {}),
-    ...(content.intro?.content ? { intro: content.intro.content } : {}),
-    ...(content.hero?.title ? { heroTitle: content.hero.title } : {}),
-    ...(content.hero?.subtitle ? { heroSubtitle: content.hero.subtitle } : {}),
-    ...(content.hero?.description ? { heroBody: content.hero.description } : {}),
-    ...(firstFeature.title ? { secondTitle: firstFeature.title } : {}),
-    ...(firstFeature.description ? { secondBody: firstFeature.description } : {}),
-    ...(secondFeature.title ? { secondSubtitle: secondFeature.title } : {}),
+    intro: firstText(content.intro?.content, content.hero?.description),
+    heroTitle: firstText(content.hero?.title, me?.marketName),
+    heroSubtitle: firstText(content.hero?.subtitle, firstFeature.title),
+    heroBody: firstText(content.hero?.description, content.intro?.content),
+    secondTitle: firstText(firstFeature.title, secondFeature.title),
+    secondSubtitle: firstText(secondFeature.title, firstFeature.title),
+    secondBody: firstText(firstFeature.description, secondFeature.description),
   };
 }
 
@@ -41,13 +45,13 @@ export function mapModernMarketPageContent(
   return {
     ...(me?.marketName ? { marketName: me.marketName } : {}),
     ...(me?.address ? { address: me.address } : {}),
-    ...(content.intro?.content ? { intro: content.intro.content } : {}),
-    ...(content.hero?.title ? { heroTitle: content.hero.title } : {}),
-    ...(content.hero?.subtitle ? { heroSubtitle: content.hero.subtitle } : {}),
-    ...(firstFeature.title ? { featureTitle: firstFeature.title } : {}),
-    ...(firstFeature.description ? { featureBody: firstFeature.description } : {}),
-    ...(secondFeature.title ? { secondFeatureTitle: secondFeature.title } : {}),
-    ...(secondFeature.description ? { secondFeatureBody: secondFeature.description } : {}),
+    intro: firstText(content.intro?.content, content.hero?.description),
+    heroTitle: firstText(content.hero?.title, me?.marketName),
+    heroSubtitle: firstText(content.hero?.subtitle, content.hero?.description),
+    featureTitle: firstText(firstFeature.title, secondFeature.title),
+    featureBody: firstText(firstFeature.description, secondFeature.description),
+    secondFeatureTitle: firstText(secondFeature.title, firstFeature.title),
+    secondFeatureBody: firstText(secondFeature.description, firstFeature.description),
   };
 }
 
@@ -61,9 +65,9 @@ export function mapEditorialMarketPageContent(
   return {
     ...(me?.marketName ? { marketName: me.marketName } : {}),
     ...(me?.address ? { address: me.address } : {}),
-    ...(content.intro?.content ? { intro: content.intro.content } : {}),
-    ...(firstFeature.description ? { foodText: firstFeature.description } : {}),
-    ...(secondFeature.description ? { cultureText: secondFeature.description } : {}),
+    intro: firstText(content.intro?.content, content.hero?.description),
+    foodText: firstText(firstFeature.description, content.hero?.subtitle),
+    cultureText: firstText(secondFeature.description, firstFeature.title),
   };
 }
 
