@@ -114,13 +114,21 @@ async function getAuthorizationHeader(): Promise<HeadersInit> {
 }
 
 async function parseEnvelope<T>(response: Response): Promise<T> {
-  const body = (await response.json().catch(() => ({}))) as ApiEnvelope<T>;
+  const body = (await response.json().catch(() => ({}))) as ApiEnvelope<T> & {
+    message?: string;
+  };
 
   if (!response.ok || body.success === false || !body.data) {
+    const serverMessage = body.error?.message ?? body.message;
+    const message =
+      serverMessage === "Unexpected error occurred"
+        ? "생성 결과를 불러오는 중 서버 오류가 발생했습니다. 다시 생성해보세요."
+        : serverMessage ?? "웹페이지 생성 요청에 실패했습니다.";
+
     throw {
       status: response.status,
       code: body.error?.code,
-      message: body.error?.message ?? "웹페이지 생성 요청에 실패했습니다.",
+      message,
     } as MarketPageApiError;
   }
 

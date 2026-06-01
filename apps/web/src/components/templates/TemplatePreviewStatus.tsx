@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./TemplatePreviewStatus.module.css";
 
 interface TemplatePreviewStatusProps {
@@ -8,16 +8,27 @@ interface TemplatePreviewStatusProps {
   title: string;
 }
 
+const generatedPageIdStorageKey = "generated_market_page_id";
+
 export default function TemplatePreviewStatus({
   message,
   title,
 }: TemplatePreviewStatusProps) {
+  const router = useRouter();
+
+  function handleRetry() {
+    window.sessionStorage.removeItem(generatedPageIdStorageKey);
+    router.push("/templates/generating");
+  }
+
   return (
     <main className={styles.page}>
       <section className={styles.panel}>
         <h1>{title}</h1>
         <p>{message}</p>
-        <Link href="/templates/generating">생성 화면으로 돌아가기</Link>
+        <button type="button" onClick={handleRetry}>
+          다시 생성하기
+        </button>
       </section>
     </main>
   );

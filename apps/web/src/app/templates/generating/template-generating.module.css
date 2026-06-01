@@ -9,25 +9,25 @@
 
 .completionAlert {
   position: fixed;
-  top: 106px;
-  right: 32px;
+  top: 92px;
+  right: 28px;
   z-index: 80;
-  width: min(calc(100vw - 32px), 498px);
-  height: 104px;
-  border-radius: 20px 20px 20px 0;
+  width: min(calc(100vw - 32px), 420px);
+  height: 82px;
+  border-radius: 16px 16px 16px 0;
   background: #fce6d5;
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   color: #000;
   animation: alertSlideIn 220ms ease-out;
 }
 
 .alertLogo {
   position: absolute;
-  top: 29px;
-  left: 29px;
+  top: 24px;
+  left: 24px;
   display: block;
-  width: 33px;
-  height: 23px;
+  width: 28px;
+  height: 20px;
   overflow: hidden;
 }
 
@@ -42,21 +42,21 @@
 
 .completionAlert strong {
   position: absolute;
-  top: 31px;
-  left: 75px;
+  top: 23px;
+  left: 64px;
   color: #000;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 500;
   line-height: 1.2;
 }
 
 .completionAlert p {
   position: absolute;
-  top: 60px;
-  left: 77px;
+  top: 48px;
+  left: 65px;
   margin: 0;
   color: #000;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 400;
   line-height: 1.2;
 }
@@ -168,9 +168,9 @@
 
 @media (max-width: 1000px) {
   .completionAlert {
-    top: 72px;
-    right: 16px;
-    width: min(calc(100vw - 32px), 498px);
+    top: 68px;
+    right: 14px;
+    width: min(calc(100vw - 28px), 420px);
   }
 
   .content {
@@ -224,18 +224,18 @@
 
 @media (max-width: 720px) {
   .completionAlert {
-    height: 96px;
+    height: 84px;
   }
 
   .completionAlert strong {
-    left: 70px;
-    font-size: 16px;
+    left: 62px;
+    font-size: 14px;
   }
 
   .completionAlert p {
-    right: 18px;
-    left: 70px;
-    font-size: 13px;
+    right: 14px;
+    left: 62px;
+    font-size: 12px;
     line-height: 1.35;
   }
 
