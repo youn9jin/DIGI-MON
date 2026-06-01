@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { getMe } from "@/lib/api/me";
 import ExitModal from "@/components/ui/ExitModal";
 import styles from "./layout.module.css";
 
@@ -26,17 +27,10 @@ export default function OnboardingLayout({
         return;
       }
       try {
-        const idToken = await user.getIdToken();
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-        const res = await fetch(`${baseUrl}/api/me`, {
-          headers: { Authorization: `Bearer ${idToken}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.marketId) {
-            // 이미 온보딩 완료
-            router.replace("/dashboard");
-          }
+        const me = await getMe(user);
+        if (me.marketId) {
+          // 이미 온보딩 완료
+          router.replace("/templates");
         }
       } catch {
         // 네트워크 오류는 무시하고 온보딩 계속 진행
