@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Header from "@/components/layout/Header";
-import { type TemplateType } from "@/lib/api/market-page";
+import { type MarketPageSection, type TemplateType } from "@/lib/api/market-page";
 import styles from "./templates.module.css";
 
 const backgroundImage =
@@ -40,23 +40,44 @@ const templates = [
 const featureGroups = [
   {
     title: "시장 소개",
-    options: ["시장 소개", "시장 역사 소개", "찾아오시는 길"],
+    options: [
+      { id: "intro", label: "시장 소개", section: "intro" },
+      { id: "history", label: "시장 역사 소개", section: "history" },
+      { id: "directions", label: "찾아오시는 길", section: "directions" },
+    ],
   },
   {
     title: "점포 안내",
-    options: ["점포 검색하기", "점포 상세 페이지"],
+    options: [
+      { id: "storeSearch", label: "점포 검색하기", section: "stores" },
+      { id: "storeDetail", label: "점포 상세 페이지", section: "stores" },
+    ],
   },
   {
     title: "관광 정보",
-    options: ["주변 관광 정보", "시장 추천 코스"],
+    options: [
+      { id: "tourismNearby", label: "주변 관광 정보", section: "tourism" },
+      { id: "tourismCourse", label: "시장 추천 코스", section: "tourism" },
+    ],
   },
-];
+] satisfies {
+  title: string;
+  options: { id: string; label: string; section: MarketPageSection }[];
+}[];
+
+const defaultFeatureOptionIds = featureGroups.flatMap((group) =>
+  group.options.map((option) => option.id),
+);
+
+const setupStorageKey = "market_page_setup_draft";
 
 export default function TemplateSelectionPage() {
   const router = useRouter();
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("TEMPLATE_3");
   const [previewTemplate, setPreviewTemplate] = useState<TemplateType | null>(null);
   const [openFeature, setOpenFeature] = useState("점포 안내");
+  const [selectedFeatureOptionIds, setSelectedFeatureOptionIds] =
+    useState<string[]>(defaultFeatureOptionIds);
 
   const previewTemplateData = previewTemplate
     ? templates.find((template) => template.id === previewTemplate)
@@ -74,7 +95,32 @@ export default function TemplateSelectionPage() {
   }, [previewTemplate]);
 
   function handleComplete() {
+    const selectedSections = Array.from(
+      new Set(
+        featureGroups.flatMap((group) =>
+          group.options
+            .filter((option) => selectedFeatureOptionIds.includes(option.id))
+            .map((option) => option.section),
+        ),
+      ),
+    );
+
+    window.sessionStorage.setItem(
+      setupStorageKey,
+      JSON.stringify({
+        templateType: selectedTemplate,
+        selectedSections,
+      }),
+    );
     router.push(`/templates/info?template=${encodeURIComponent(selectedTemplate)}`);
+  }
+
+  function toggleFeatureOption(optionId: string) {
+    setSelectedFeatureOptionIds((current) =>
+      current.includes(optionId)
+        ? current.filter((id) => id !== optionId)
+        : [...current, optionId],
+    );
   }
 
   return (
@@ -180,9 +226,13 @@ export default function TemplateSelectionPage() {
                   {isOpen && (
                     <div className={styles.featureOptions}>
                       {group.options.map((option) => (
-                        <label key={option}>
-                          <input defaultChecked type="checkbox" />
-                          <span>{option}</span>
+                        <label key={option.id}>
+                          <input
+                            checked={selectedFeatureOptionIds.includes(option.id)}
+                            type="checkbox"
+                            onChange={() => toggleFeatureOption(option.id)}
+                          />
+                          <span>{option.label}</span>
                         </label>
                       ))}
                     </div>
