@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import ClassicMarketTemplate, {
@@ -11,7 +11,7 @@ import { getMe } from "@/lib/api/me";
 import { auth } from "@/lib/firebase";
 import { mapClassicMarketPageContent } from "@/lib/market-page-template-data";
 
-export default function ClassicTemplatePreviewPage() {
+function ClassicTemplatePreviewContent() {
   const searchParams = useSearchParams();
   const pageId = searchParams.get("pageId");
   const [templateData, setTemplateData] = useState<Partial<ClassicMarketTemplateData>>({});
@@ -41,4 +41,12 @@ export default function ClassicTemplatePreviewPage() {
   }, [pageId]);
 
   return <ClassicMarketTemplate data={templateData} previewMode />;
+}
+
+export default function ClassicTemplatePreviewPage() {
+  return (
+    <Suspense fallback={<ClassicMarketTemplate previewMode />}>
+      <ClassicTemplatePreviewContent />
+    </Suspense>
+  );
 }

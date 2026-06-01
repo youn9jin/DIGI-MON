@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import ModernMarketTemplate, {
@@ -11,7 +11,7 @@ import { getMe } from "@/lib/api/me";
 import { auth } from "@/lib/firebase";
 import { mapModernMarketPageContent } from "@/lib/market-page-template-data";
 
-export default function ModernTemplatePreviewPage() {
+function ModernTemplatePreviewContent() {
   const searchParams = useSearchParams();
   const pageId = searchParams.get("pageId");
   const [templateData, setTemplateData] = useState<Partial<ModernMarketTemplateData>>({});
@@ -41,4 +41,12 @@ export default function ModernTemplatePreviewPage() {
   }, [pageId]);
 
   return <ModernMarketTemplate data={templateData} previewMode />;
+}
+
+export default function ModernTemplatePreviewPage() {
+  return (
+    <Suspense fallback={<ModernMarketTemplate previewMode />}>
+      <ModernTemplatePreviewContent />
+    </Suspense>
+  );
 }

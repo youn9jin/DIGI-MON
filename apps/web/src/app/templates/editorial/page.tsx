@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import EditorialMarketTemplate, {
@@ -11,7 +11,7 @@ import { getMe } from "@/lib/api/me";
 import { auth } from "@/lib/firebase";
 import { mapEditorialMarketPageContent } from "@/lib/market-page-template-data";
 
-export default function EditorialTemplatePreviewPage() {
+function EditorialTemplatePreviewContent() {
   const searchParams = useSearchParams();
   const pageId = searchParams.get("pageId");
   const [templateData, setTemplateData] = useState<Partial<EditorialMarketTemplateData>>({});
@@ -41,4 +41,12 @@ export default function EditorialTemplatePreviewPage() {
   }, [pageId]);
 
   return <EditorialMarketTemplate data={templateData} previewMode />;
+}
+
+export default function EditorialTemplatePreviewPage() {
+  return (
+    <Suspense fallback={<EditorialMarketTemplate previewMode />}>
+      <EditorialTemplatePreviewContent />
+    </Suspense>
+  );
 }
