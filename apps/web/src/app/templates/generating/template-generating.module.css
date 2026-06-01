@@ -7,6 +7,72 @@
   font-family: Pretendard, "Noto Sans KR", Inter, Arial, sans-serif;
 }
 
+.completionAlert {
+  position: fixed;
+  top: 106px;
+  right: 32px;
+  z-index: 80;
+  width: min(calc(100vw - 32px), 498px);
+  height: 104px;
+  border-radius: 20px 20px 20px 0;
+  background: #fce6d5;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.12);
+  color: #000;
+  animation: alertSlideIn 220ms ease-out;
+}
+
+.alertLogo {
+  position: absolute;
+  top: 29px;
+  left: 29px;
+  display: block;
+  width: 33px;
+  height: 23px;
+  overflow: hidden;
+}
+
+.alertLogoImage {
+  position: absolute;
+  top: -206.43%;
+  left: -26.64%;
+  width: 513.93%;
+  height: 733.33%;
+  max-width: none;
+}
+
+.completionAlert strong {
+  position: absolute;
+  top: 31px;
+  left: 75px;
+  color: #000;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.completionAlert p {
+  position: absolute;
+  top: 60px;
+  left: 77px;
+  margin: 0;
+  color: #000;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+@keyframes alertSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .backgroundMark {
   position: absolute;
   top: 170px;
@@ -101,6 +167,12 @@
 }
 
 @media (max-width: 1000px) {
+  .completionAlert {
+    top: 72px;
+    right: 16px;
+    width: min(calc(100vw - 32px), 498px);
+  }
+
   .content {
     width: calc(100% - 48px);
     padding: 230px 24px 0;
@@ -151,6 +223,22 @@
 }
 
 @media (max-width: 720px) {
+  .completionAlert {
+    height: 96px;
+  }
+
+  .completionAlert strong {
+    left: 70px;
+    font-size: 16px;
+  }
+
+  .completionAlert p {
+    right: 18px;
+    left: 70px;
+    font-size: 13px;
+    line-height: 1.35;
+  }
+
   .content h1 {
     font-size: 30px;
   }
