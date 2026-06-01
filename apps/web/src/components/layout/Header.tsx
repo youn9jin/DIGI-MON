@@ -16,7 +16,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [websiteHref, setWebsiteHref] = useState<"/intro" | "/onboarding" | "/templates">("/intro");
+  const [websiteHref, setWebsiteHref] = useState<"/intro" | "/onboarding" | "/dashboard">("/intro");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {

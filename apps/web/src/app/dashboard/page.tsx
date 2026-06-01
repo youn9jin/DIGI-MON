@@ -1,17 +1,33 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import { getMe } from "@/lib/api/me";
+import { onAuthStateChanged } from "firebase/auth";
 import Header from "@/components/layout/Header";
+import { getMe } from "@/lib/api/me";
+import { auth } from "@/lib/firebase";
+import styles from "./dashboard.module.css";
+
+const actions = [
+  {
+    href: "/templates/info",
+    image: "/images/dashboard/info-edit.png",
+    imageClassName: styles.infoImage,
+    label: "웹사이트 상세 정보 수정하기",
+  },
+  {
+    href: "/templates",
+    image: "/images/dashboard/template-change.png",
+    imageClassName: styles.templateImage,
+    label: "다른 템플릿으로 교체하기",
+  },
+];
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [marketName, setMarketName] = useState<string>("");
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -19,71 +35,66 @@ export default function DashboardPage() {
         router.replace("/login");
         return;
       }
-      setUser(currentUser);
 
       try {
         const me = await getMe(currentUser);
         if (!me.marketId) {
-          // 온보딩 미완료 → 온보딩으로
           router.replace("/onboarding");
           return;
         }
-        setMarketName(me.marketName ?? "");
       } catch {
-        // 네트워크 오류 무시
+        // 네트워크 오류가 있어도 관리 화면 자체는 보여준다.
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     });
+
     return () => unsubscribe();
   }, [router]);
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100svh" }}>
-        <p style={{ color: "#6b6b6b", fontFamily: "Pretendard, sans-serif" }}>불러오는 중...</p>
-      </div>
+      <main className={styles.page}>
+        <Header variant="builder" />
+      </main>
     );
   }
 
   return (
-    <div style={{ minHeight: "100svh", background: "#fff", fontFamily: "Pretendard, 'Noto Sans KR', sans-serif" }}>
-      <Header />
-      <main style={{ paddingTop: "clamp(88px, 15svh, 140px)", paddingLeft: "clamp(20px, 8.333vw, 160px)", paddingRight: "clamp(20px, 8.333vw, 160px)" }}>
-        <h1 style={{ fontSize: "clamp(20px, 2.083vw, 40px)", fontWeight: 700, color: "#000", marginBottom: 8 }}>
-          {marketName ? `${marketName} 관리` : "웹사이트 관리"}
-        </h1>
-        <p style={{ color: "#6b6b6b", fontSize: "clamp(13px, 1.042vw, 20px)", marginBottom: 40 }}>
-          안녕하세요, {user?.displayName ?? "사용자"}님. 대시보드 기능이 준비 중입니다.
-        </p>
+    <main className={styles.page}>
+      <Header variant="builder" />
 
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(clamp(200px, 20vw, 280px), 1fr))",
-          gap: "clamp(16px, 1.667vw, 32px)",
-        }}>
-          {["웹사이트 미리보기", "상품 관리", "이벤트 관리", "방문자 통계"].map((item) => (
-            <div
-              key={item}
-              style={{
-                padding: "clamp(20px, 2.083vw, 40px)",
-                borderRadius: "clamp(12px, 1.25vw, 24px)",
-                background: "#fce6d5",
-                boxShadow: "0 2px 12px rgba(9,128,68,0.08)",
-                minHeight: 120,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#6b6b6b",
-                fontSize: "clamp(13px, 1.042vw, 20px)",
-                fontWeight: 500,
-              }}
-            >
-              {item} (준비 중)
-            </div>
-          ))}
-        </div>
-      </main>
-    </div>
+      <div className={styles.backgroundMark} aria-hidden="true">
+        <Image
+          alt=""
+          fill
+          priority
+          sizes="80vw"
+          src="/images/onboarding/generating-background.png"
+        />
+      </div>
+
+      <section className={styles.hero} aria-labelledby="dashboard-title">
+        <h1 id="dashboard-title">우리 시장 웹페이지 수정하기</h1>
+        <p>웹페이지 수정 방법은 ‘사용방법&apos; 탭에서 확인하실 수 있습니다.</p>
+      </section>
+
+      <section className={styles.actionGrid} aria-label="웹사이트 관리 메뉴">
+        {actions.map((action) => (
+          <Link className={styles.actionCard} href={action.href} key={action.label}>
+            <span className={styles.imageWrap} aria-hidden="true">
+              <Image
+                alt=""
+                className={action.imageClassName}
+                fill
+                sizes="266px"
+                src={action.image}
+              />
+            </span>
+            <strong>{action.label}</strong>
+          </Link>
+        ))}
+      </section>
+    </main>
   );
 }
