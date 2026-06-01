@@ -67,13 +67,21 @@ const bannerItems = [
 interface ClassicMarketTemplateProps {
   data?: Partial<ClassicMarketTemplateData>;
   previewMode?: boolean;
+  publicBasePath?: string;
 }
 
 export default function ClassicMarketTemplate({
   data,
   previewMode = false,
+  publicBasePath,
 }: ClassicMarketTemplateProps) {
   const content = { ...DEFAULT_DATA, ...data };
+  const getHref = (href: string) => {
+    if (!publicBasePath) return href;
+    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
+    return `${publicBasePath}${hash}`;
+  };
 
   return (
     <main className={styles.page}>
@@ -84,7 +92,7 @@ export default function ClassicMarketTemplate({
             key={`${item.color}-${index}`}
           >
             {item.label && item.href ? (
-              <Link className={styles.bannerLabel} href={item.href}>
+              <Link className={styles.bannerLabel} href={getHref(item.href)}>
                 {item.label}
               </Link>
             ) : item.label ? (
@@ -126,10 +134,10 @@ export default function ClassicMarketTemplate({
 
       <footer className={styles.footer}>
         <nav className={styles.footerNav} aria-label="하단 메뉴">
-          <Link href="/templates/classic#intro">시장소개</Link>
-          <Link href="/templates/classic/stores">가게안내</Link>
-          <Link href="/templates/classic#tour">관광정보</Link>
-          <Link href="/templates/classic#map">찾아오시는 길</Link>
+          <Link href={getHref("/templates/classic#intro")}>시장소개</Link>
+          <Link href={getHref("/templates/classic/stores")}>가게안내</Link>
+          <Link href={getHref("/templates/classic#tour")}>관광정보</Link>
+          <Link href={getHref("/templates/classic#map")}>찾아오시는 길</Link>
         </nav>
 
         <div className={styles.footerInfo}>

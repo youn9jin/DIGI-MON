@@ -113,6 +113,22 @@ export default function EditorialMarketStoresTemplate({
 }
 
 export function EditorialHeader({ marketName }: { marketName: string }) {
+  return <EditorialHeaderWithBasePath marketName={marketName} />;
+}
+
+export function EditorialHeaderWithBasePath({
+  marketName,
+  publicBasePath,
+}: {
+  marketName: string;
+  publicBasePath?: string;
+}) {
+  const getHref = (href: string) => {
+    if (!publicBasePath) return href;
+    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
+    return `${publicBasePath}${hash}`;
+  };
   const navItems = [
     { label: "정보 안내", href: "/templates/editorial#intro" },
     { label: "점포 안내", href: "/templates/editorial/stores" },
@@ -121,12 +137,12 @@ export function EditorialHeader({ marketName }: { marketName: string }) {
 
   return (
     <header className={styles.header}>
-      <Link className={styles.logo} href="/templates/editorial">
+      <Link className={styles.logo} href={publicBasePath ?? "/templates/editorial"}>
         {marketName}
       </Link>
       <nav aria-label="템플릿 메뉴">
         {navItems.map((item) => (
-          <Link href={item.href} key={item.label}>
+          <Link href={getHref(item.href)} key={item.label}>
             {item.label}
           </Link>
         ))}
@@ -138,17 +154,26 @@ export function EditorialHeader({ marketName }: { marketName: string }) {
 export function EditorialFooter({
   address,
   contact,
+  publicBasePath,
 }: {
   address: string;
   contact: string;
+  publicBasePath?: string;
 }) {
+  const getHref = (href: string) => {
+    if (!publicBasePath) return href;
+    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
+    return `${publicBasePath}${hash}`;
+  };
+
   return (
     <footer className={styles.footer}>
       <nav aria-label="하단 메뉴">
-        <Link href="/templates/editorial#intro">시장소개</Link>
-        <Link href="/templates/editorial/stores">가게안내</Link>
-        <Link href="/templates/editorial#culture">관광정보</Link>
-        <Link href="/templates/editorial#map">찾아오시는 길</Link>
+        <Link href={getHref("/templates/editorial#intro")}>시장소개</Link>
+        <Link href={getHref("/templates/editorial/stores")}>가게안내</Link>
+        <Link href={getHref("/templates/editorial#culture")}>관광정보</Link>
+        <Link href={getHref("/templates/editorial#map")}>찾아오시는 길</Link>
       </nav>
       <div className={styles.footerInfo}>
         <div>

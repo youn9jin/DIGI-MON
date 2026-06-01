@@ -4,7 +4,7 @@ import Image from "next/image";
 import OpenStreetMapEmbed from "./OpenStreetMapEmbed";
 import {
   EditorialFooter,
-  EditorialHeader,
+  EditorialHeaderWithBasePath,
 } from "./EditorialMarketStoresTemplate";
 import TemplateGenerationActions from "./TemplateGenerationActions";
 import styles from "./EditorialMarketTemplate.module.css";
@@ -42,17 +42,22 @@ const DEFAULT_DATA: EditorialMarketTemplateData = {
 interface EditorialMarketTemplateProps {
   data?: Partial<EditorialMarketTemplateData>;
   previewMode?: boolean;
+  publicBasePath?: string;
 }
 
 export default function EditorialMarketTemplate({
   data,
   previewMode = false,
+  publicBasePath,
 }: EditorialMarketTemplateProps) {
   const content = { ...DEFAULT_DATA, ...data };
 
   return (
     <main className={styles.page}>
-      <EditorialHeader marketName={content.marketName} />
+      <EditorialHeaderWithBasePath
+        marketName={content.marketName}
+        publicBasePath={publicBasePath}
+      />
 
       <section className={styles.hero} id="intro" aria-label="시장 정보 안내">
         <Image
@@ -97,7 +102,11 @@ export default function EditorialMarketTemplate({
         </div>
       </section>
 
-      <EditorialFooter address={content.address} contact={content.contact} />
+      <EditorialFooter
+        address={content.address}
+        contact={content.contact}
+        publicBasePath={publicBasePath}
+      />
 
       {previewMode && (
         <TemplateGenerationActions

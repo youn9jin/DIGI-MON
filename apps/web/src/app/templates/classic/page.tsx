@@ -75,7 +75,7 @@ function ClassicTemplatePreviewContent() {
     );
   }
 
-  return <ClassicMarketTemplate data={templateData} previewMode />;
+  return <ClassicMarketTemplate data={templateData} previewMode={!pageId} />;
 }
 
 export default function ClassicTemplatePreviewPage() {

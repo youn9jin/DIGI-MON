@@ -75,7 +75,7 @@ function EditorialTemplatePreviewContent() {
     );
   }
 
-  return <EditorialMarketTemplate data={templateData} previewMode />;
+  return <EditorialMarketTemplate data={templateData} previewMode={!pageId} />;
 }
 
 export default function EditorialTemplatePreviewPage() {

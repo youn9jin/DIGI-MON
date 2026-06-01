@@ -75,7 +75,7 @@ function ModernTemplatePreviewContent() {
     );
   }
 
-  return <ModernMarketTemplate data={templateData} previewMode />;
+  return <ModernMarketTemplate data={templateData} previewMode={!pageId} />;
 }
 
 export default function ModernTemplatePreviewPage() {
