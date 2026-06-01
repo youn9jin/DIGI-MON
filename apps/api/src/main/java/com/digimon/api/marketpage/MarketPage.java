@@ -41,6 +41,16 @@ public class MarketPage {
     @Builder.Default
     private Boolean isPublished = false;
 
+    /** 비동기 생성 상태. DB 컬럼은 VARCHAR(20) NOT NULL DEFAULT 'PENDING'. */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false, length = 20)
+    @Builder.Default
+    private MarketPageStatus status = MarketPageStatus.PENDING;
+
+    /** FastAPI /generate 응답 본문 전체를 JSON 문자열로 저장. 생성 시작 시 null 로 초기화. */
+    @Column(name = "content_json", columnDefinition = "TEXT")
+    private String contentJson;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

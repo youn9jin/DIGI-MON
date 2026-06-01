@@ -4,6 +4,14 @@ import com.digimon.api.associations.AlreadyOnboardedException;
 import com.digimon.api.auth.AuthAccountConflictException;
 import com.digimon.api.auth.ForbiddenException;
 import com.digimon.api.auth.UnauthorizedException;
+import com.digimon.api.marketpage.AlreadyInProgressException;
+import com.digimon.api.marketpage.InvalidSectionValueException;
+import com.digimon.api.marketpage.InvalidTemplateTypeException;
+import com.digimon.api.marketpage.MarketPageMarketNotFoundException;
+import com.digimon.api.marketpage.NoSectionsSelectedException;
+import com.digimon.api.marketpage.PageNotFoundException;
+import com.digimon.api.marketpage.PageNotReadyException;
+import com.digimon.api.marketpage.SetupNotCompletedException;
 import com.digimon.api.store.MarketNotFoundException;
 import com.digimon.api.store.StoreNotFoundException;
 import com.digimon.api.store.TooManyStoresException;
@@ -43,6 +51,82 @@ public class GlobalExceptionHandler {
         ResponseWrapper<Void> body = ResponseWrapper.error(
                 "MARKET_NOT_FOUND",
                 ex.getMessage() != null ? ex.getMessage() : "등록된 시장이 없습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
+    /**
+     * POST /api/market/page 의 MARKET_NOT_FOUND. 같은 code 지만 status 가 다르므로
+     * 별도 예외 클래스로 분리되어 있다(Q1-B).
+     */
+    @ExceptionHandler(MarketPageMarketNotFoundException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleMarketPageMarketNotFound(MarketPageMarketNotFoundException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "MARKET_NOT_FOUND",
+                ex.getMessage() != null ? ex.getMessage() : "등록된 시장이 없습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(InvalidTemplateTypeException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleInvalidTemplateType(InvalidTemplateTypeException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "INVALID_TEMPLATE_TYPE",
+                ex.getMessage() != null ? ex.getMessage() : "templateType 은 TEMPLATE_1, TEMPLATE_2, TEMPLATE_3 중 하나여야 합니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(AlreadyInProgressException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleAlreadyInProgress(AlreadyInProgressException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "ALREADY_IN_PROGRESS",
+                ex.getMessage() != null ? ex.getMessage() : "이미 생성 중인 페이지가 있습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(NoSectionsSelectedException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleNoSectionsSelected(NoSectionsSelectedException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "NO_SECTIONS_SELECTED",
+                ex.getMessage() != null ? ex.getMessage() : "선택된 섹션이 없습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(InvalidSectionValueException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleInvalidSectionValue(InvalidSectionValueException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "INVALID_SECTION_VALUE",
+                ex.getMessage() != null ? ex.getMessage() : "허용되지 않은 섹션 값입니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(SetupNotCompletedException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleSetupNotCompleted(SetupNotCompletedException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "SETUP_NOT_COMPLETED",
+                ex.getMessage() != null ? ex.getMessage() : "페이지 생성 설정이 완료되지 않았습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(PageNotFoundException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handlePageNotFound(PageNotFoundException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "PAGE_NOT_FOUND",
+                ex.getMessage() != null ? ex.getMessage() : "해당 페이지를 찾을 수 없습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(PageNotReadyException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handlePageNotReady(PageNotReadyException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "PAGE_NOT_READY",
+                ex.getMessage() != null ? ex.getMessage() : "페이지 생성이 아직 완료되지 않았습니다.",
                 null);
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }

@@ -10,6 +10,7 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { getMe, getWebsiteEntryPath } from "@/lib/api/me";
 import Header from "@/components/layout/Header";
 import EmailInput from "@/components/ui/EmailInput";
 import styles from "../auth.module.css";
@@ -29,8 +30,9 @@ export default function LoginPage() {
     setErrorMessage("");
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.push("/dashboard");
+      const credential = await signInWithEmailAndPassword(auth, email, password);
+      const me = await getMe(credential.user);
+      router.push(getWebsiteEntryPath(me));
     } catch (err: unknown) {
       const code = (err as { code?: string }).code;
       if (code === "auth/user-not-found" || code === "auth/wrong-password" || code === "auth/invalid-credential") {
@@ -54,8 +56,9 @@ export default function LoginPage() {
 
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(auth, provider);
-      router.push("/dashboard");
+      const credential = await signInWithPopup(auth, provider);
+      const me = await getMe(credential.user);
+      router.push(getWebsiteEntryPath(me));
     } catch {
       setErrorMessage("구글 로그인에 실패했습니다.");
     } finally {

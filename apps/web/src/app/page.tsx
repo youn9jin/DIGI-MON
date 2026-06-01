@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { getMe, getWebsiteEntryPath } from "@/lib/api/me";
 import Header from "@/components/layout/Header";
 import styles from "./landing.module.css";
 
@@ -18,19 +19,9 @@ export default function LandingPage() {
         return;
       }
 
-      // 로그인 상태 → 온보딩 여부 확인
       try {
-        const idToken = await user.getIdToken();
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-        const res = await fetch(`${baseUrl}/api/me`, {
-          headers: { Authorization: `Bearer ${idToken}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setCtaHref(data.marketId ? "/dashboard" : "/onboarding");
-        } else {
-          setCtaHref("/onboarding");
-        }
+        const me = await getMe(user);
+        setCtaHref(getWebsiteEntryPath(me));
       } catch {
         setCtaHref("/onboarding");
       }

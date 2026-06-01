@@ -1,9 +1,47 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { onAuthStateChanged } from "firebase/auth";
 import Header from "@/components/layout/Header";
+import { auth } from "@/lib/firebase";
+import { getMe, getWebsiteEntryPath } from "@/lib/api/me";
 import styles from "../landing.module.css";
 
 export default function IntroPage() {
+  const router = useRouter();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setIsCheckingAuth(false);
+        return;
+      }
+
+      try {
+        const me = await getMe(user);
+        router.replace(getWebsiteEntryPath(me));
+      } catch {
+        router.replace("/onboarding");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [router]);
+
+  if (isCheckingAuth) {
+    return (
+      <main className={styles.viewport}>
+        <div className={styles.canvas}>
+          <Header />
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className={styles.viewport}>
       <div className={styles.canvas} data-node-id="148:1868">

@@ -1,0 +1,567 @@
+.page {
+  min-height: 100svh;
+  overflow-x: hidden;
+  background: linear-gradient(180deg, #929292 0%, #262626 50%, #000 100%);
+  color: #fff;
+  font-family: Inter, Pretendard, "Noto Sans KR", Arial, sans-serif;
+}
+
+.header {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  width: 100%;
+  height: clamp(62px, 4.79vw, 92px);
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #fff;
+  background: #222;
+  padding: 0 clamp(16px, 2.4vw, 46px);
+}
+
+.brand {
+  color: #fff;
+  font-size: clamp(20px, 1.82vw, 35px);
+  font-weight: 800;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.header nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(24px, 6.15vw, 118px);
+}
+
+.header nav a,
+.header nav span {
+  color: #fff;
+  font-size: clamp(14px, 1.15vw, 22px);
+  font-weight: 400;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.hero {
+  display: flex;
+  min-height: clamp(260px, 22.03vw, 423px);
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(rgba(66, 66, 66, 0.85), rgba(66, 66, 66, 0.85)),
+    #d9d9d9;
+  padding: clamp(72px, 7.76vw, 149px) 24px clamp(64px, 7.45vw, 143px);
+  text-align: center;
+}
+
+.hero > div {
+  width: min(100%, 873px);
+}
+
+.hero h1 {
+  margin: 0 0 18px;
+  font-size: clamp(42px, 3.39vw, 65px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.hero p {
+  width: min(100%, 853px);
+  margin: 0 auto;
+  font-size: clamp(15px, 1.09vw, 21px);
+  font-weight: 300;
+  line-height: 1.43;
+  text-align: justify;
+}
+
+.introSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(68px, 5.63vw, 108px);
+  padding: clamp(72px, 5.26vw, 101px) 0 clamp(92px, 7.34vw, 141px);
+}
+
+.sectionTitle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+}
+
+.sectionTitle h2 {
+  margin: 0;
+  font-size: clamp(28px, 2.08vw, 40px);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.sectionTitle span {
+  display: block;
+  width: clamp(92px, 7.14vw, 137px);
+  height: 3px;
+  background: #fff;
+}
+
+.photoStrip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(260px, 1fr));
+  gap: clamp(20px, 2.29vw, 44px);
+  width: min(100%, 2144px);
+  margin-left: clamp(-113px, -5.88vw, 0px);
+}
+
+.photoStrip div {
+  min-height: clamp(300px, 24.79vw, 476px);
+  background: #d9d9d9;
+}
+
+.introText {
+  width: min(calc(100% - 48px), 1102px);
+  text-align: center;
+}
+
+.introText p {
+  margin: 0 0 30px;
+  font-size: clamp(16px, 1.2vw, 23px);
+  font-weight: 300;
+  line-height: 1.3;
+}
+
+.featureRows {
+  display: flex;
+  width: min(calc(100% - 48px), 1561px);
+  flex-direction: column;
+  margin: 0 auto;
+  padding-bottom: clamp(84px, 7.81vw, 150px);
+}
+
+.featureRow {
+  display: grid;
+  grid-template-columns: minmax(0, 787px) minmax(0, 753px);
+  gap: 21px;
+  align-items: center;
+}
+
+.featureRowReverse {
+  grid-template-columns: minmax(0, 753px) minmax(0, 787px);
+}
+
+.featurePhoto {
+  width: 100%;
+  min-height: clamp(240px, 18.23vw, 350px);
+  background: #d9d9d9;
+}
+
+.featureRow article {
+  display: flex;
+  min-height: clamp(240px, 18.23vw, 350px);
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.featureRow h2 {
+  margin: 0;
+  font-size: clamp(34px, 2.6vw, 50px);
+  font-weight: 500;
+  line-height: 0.6;
+  text-align: left;
+}
+
+.featureRow p {
+  margin: 0;
+  font-size: clamp(16px, 1.2vw, 23px);
+  font-weight: 300;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  background: linear-gradient(180deg, rgba(36, 35, 35, 0), #000 60%);
+  padding: clamp(44px, 3.13vw, 60px) clamp(24px, 2.5vw, 48px) clamp(72px, 6.25vw, 120px);
+}
+
+.footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(18px, 1.25vw, 24px);
+}
+
+.footer nav a {
+  color: #fff;
+  font-size: clamp(15px, 1.15vw, 22px);
+  line-height: 1;
+  text-decoration: none;
+}
+
+.footer nav a:last-child {
+  margin-left: clamp(0px, 2.5vw, 48px);
+}
+
+.footerInfo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(44px, 3.54vw, 68px);
+}
+
+.footerInfo div {
+  min-width: min(100%, 209px);
+}
+
+.footerInfo div:first-child {
+  width: min(100%, 320px);
+}
+
+.footerInfo h3 {
+  margin: 0 0 18px;
+  font-size: clamp(17px, 1.3vw, 25px);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.footerInfo p {
+  margin: 0 0 12px;
+  font-size: clamp(15px, 1.15vw, 22px);
+  line-height: 1.2;
+}
+
+.storeGuidePage {
+  background: linear-gradient(180deg, #929292 0%, #262626 50%, #000 100%);
+}
+
+.storeGuideHero {
+  position: relative;
+  display: flex;
+  min-height: clamp(360px, 31.41vw, 603px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: clamp(150px, 15.73vw, 302px) 24px clamp(90px, 9.01vw, 173px);
+  text-align: center;
+}
+
+.storeGuideHeroImage,
+.storeGuideHero > div {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.storeGuideHeroImage {
+  object-fit: cover;
+  object-position: center;
+}
+
+.storeGuideHero > div {
+  background: rgba(54, 54, 54, 0.85);
+}
+
+.storeGuideHero article {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(100%, 873px);
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.storeGuideHero h1 {
+  margin: 0;
+  font-size: clamp(42px, 3.39vw, 65px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.storeGuideHero p {
+  margin: 0;
+  font-size: clamp(17px, 1.2vw, 23px);
+  font-weight: 300;
+  line-height: 1.3;
+}
+
+.modernCategorySection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  padding: clamp(48px, 3.33vw, 64px) clamp(20px, 6.88vw, 132px) 12px;
+}
+
+.modernCategorySection h2 {
+  margin: 0;
+  color: #ebebeb;
+  font-size: clamp(36px, 2.81vw, 54px);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.modernCategoryList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: clamp(18px, 4.43vw, 85px);
+  width: 100%;
+}
+
+.modernCategoryList button {
+  display: inline-flex;
+  min-width: clamp(144px, 12.19vw, 234px);
+  min-height: clamp(54px, 4.64vw, 89px);
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #ebebeb;
+  border-radius: 20px;
+  background: transparent;
+  color: #ebebeb;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: clamp(16px, 1.25vw, 24px);
+  line-height: 1;
+  padding: 0 clamp(28px, 3.13vw, 60px);
+}
+
+.modernCategoryList button:hover,
+.modernCategoryList .activeModernCategory {
+  background: #ebebeb;
+  color: #111;
+}
+
+.modernStoreGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px 20px;
+  padding: clamp(42px, 4.01vw, 77px) clamp(20px, 6.88vw, 132px) clamp(122px, 13.54vw, 260px);
+}
+
+.modernStoreCard {
+  display: flex;
+  min-height: clamp(160px, 12.45vw, 239px);
+  flex-direction: column;
+  justify-content: flex-end;
+  border: 1px solid #ededed;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #ebebeb;
+  padding: clamp(28px, 1.88vw, 36px) clamp(24px, 2.08vw, 40px);
+  text-decoration: none;
+  transition: background 150ms ease, transform 150ms ease;
+}
+
+.modernStoreCard:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+.modernStoreCard span {
+  margin-bottom: 10px;
+  color: #ebebeb;
+  font-size: clamp(17px, 1.25vw, 24px);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.modernStoreCard h3 {
+  margin: 0 0 8px;
+  color: #ebebeb;
+  font-size: clamp(16px, 1.15vw, 22px);
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.modernStoreCard p {
+  margin: 0;
+  color: rgba(235, 235, 235, 0.7);
+  font-size: clamp(13px, 0.94vw, 18px);
+  line-height: 1.35;
+}
+
+.modernStoreDetailPage {
+  background: linear-gradient(180deg, #929292 0%, #262626 50%, #000 100%);
+}
+
+.modernStoreDetailHero {
+  position: relative;
+  min-height: clamp(360px, 31.41vw, 603px);
+  overflow: hidden;
+  padding: clamp(150px, 13.33vw, 256px) 24px clamp(72px, 5.73vw, 110px);
+  text-align: center;
+}
+
+.modernStoreDetailHero > div:first-of-type {
+  position: absolute;
+  inset: 0;
+  background: rgba(72, 72, 72, 0.85);
+}
+
+.modernStoreDetailHero article {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: min(100%, 873px);
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin: 0 auto;
+}
+
+.modernStoreDetailHero h1 {
+  margin: 0;
+  font-size: clamp(42px, 3.39vw, 65px);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.modernStoreDetailHero p {
+  margin: 0;
+  font-size: clamp(17px, 1.2vw, 23px);
+  font-weight: 300;
+  line-height: 1.3;
+}
+
+.modernStoreDetailHero ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.modernStoreDetailHero li {
+  font-size: clamp(15px, 1.04vw, 20px);
+  line-height: 1.75;
+}
+
+.modernDetailActions {
+  position: absolute !important;
+  right: clamp(42px, 5.21vw, 100px);
+  bottom: clamp(24px, 2.6vw, 50px);
+  z-index: 1;
+  display: flex;
+  gap: 42px;
+  width: auto !important;
+  height: auto !important;
+}
+
+.modernDetailActions button {
+  border: 0;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: clamp(16px, 1.25vw, 24px);
+  font-weight: 300;
+  line-height: 1.875;
+  padding: 0;
+}
+
+.modernDetailGallery {
+  display: grid;
+  grid-template-columns: minmax(0, 771px) minmax(0, 771px);
+  gap: clamp(54px, 3.65vw, 70px);
+  width: min(calc(100% - 96px), 1612px);
+  margin: 0 auto;
+  padding: clamp(72px, 7.66vw, 147px) 0 clamp(120px, 12.5vw, 240px);
+}
+
+.modernDetailGallery h2 {
+  margin: 0 0 44px;
+  font-size: clamp(30px, 2.08vw, 40px);
+  font-weight: 800;
+  line-height: 1.75;
+}
+
+.menuBoardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 371px));
+  gap: 29px;
+}
+
+.menuBoardGrid div {
+  min-height: clamp(390px, 30.42vw, 584px);
+  background: #d9d9d9;
+}
+
+.foodGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 371px));
+  gap: 24px 29px;
+}
+
+.foodGrid div {
+  min-height: clamp(260px, 19.38vw, 372px);
+  background: #d9d9d9;
+}
+
+@media (max-width: 1100px) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+    height: auto;
+    gap: 18px;
+    padding-block: 22px;
+  }
+
+  .header nav {
+    gap: 18px;
+  }
+
+  .photoStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: calc(100% - 40px);
+    margin-left: 0;
+  }
+
+  .featureRow,
+  .featureRowReverse {
+    grid-template-columns: 1fr;
+  }
+
+  .featureRowReverse article {
+    order: 2;
+  }
+
+  .featureRowReverse .featurePhoto {
+    order: 1;
+  }
+
+  .modernStoreGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .modernDetailGallery {
+    grid-template-columns: 1fr;
+    width: calc(100% - 40px);
+  }
+
+  .menuBoardGrid,
+  .foodGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .photoStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .modernStoreGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .menuBoardGrid,
+  .foodGrid {
+    grid-template-columns: 1fr;
+  }
+}
