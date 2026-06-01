@@ -1,3 +1,4 @@
+import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
 export type TemplateType = "TEMPLATE_1" | "TEMPLATE_2" | "TEMPLATE_3";
@@ -88,12 +89,26 @@ interface MarketPageStatusEvent {
   error?: string;
 }
 
-async function getAuthorizationHeader(): Promise<HeadersInit> {
-  const user = auth.currentUser;
+async function getAuthenticatedUser(): Promise<User> {
+  const currentUser = auth.currentUser;
+  if (currentUser) return currentUser;
+
+  const user = await new Promise<User | null>((resolve) => {
+    const unsubscribe = onAuthStateChanged(auth, (changedUser) => {
+      unsubscribe();
+      resolve(changedUser);
+    });
+  });
+
   if (!user) {
     throw { status: 401, message: "로그인이 필요합니다." } as MarketPageApiError;
   }
 
+  return user;
+}
+
+async function getAuthorizationHeader(): Promise<HeadersInit> {
+  const user = await getAuthenticatedUser();
   const idToken = await user.getIdToken();
   return { Authorization: `Bearer ${idToken}` };
 }
@@ -181,11 +196,7 @@ export async function subscribeMarketPageStatus(
     onError?: (error: MarketPageApiError) => void;
   },
 ): Promise<() => void> {
-  const user = auth.currentUser;
-  if (!user) {
-    throw { status: 401, message: "로그인이 필요합니다." } as MarketPageApiError;
-  }
-
+  const user = await getAuthenticatedUser();
   const idToken = await user.getIdToken();
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
   const url = new URL(
