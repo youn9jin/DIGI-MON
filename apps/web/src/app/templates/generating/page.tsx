@@ -18,7 +18,9 @@ const logoImage =
 const heroLogoImage = "/images/onboarding/generating-hero-logo.png";
 const generatedPageIdStorageKey = "generated_market_page_id";
 const setupStorageKey = "market_page_setup_draft";
+const generationVersionStorageKey = "market_page_generation_version";
 let createMarketPagePromise: ReturnType<typeof createMarketPage> | null = null;
+let createMarketPagePromiseKey: string | null = null;
 
 function getStoredTemplatePreviewHref(): string {
   if (typeof window === "undefined") return "/templates/editorial";
@@ -32,6 +34,16 @@ function getStoredTemplatePreviewHref(): string {
   } catch {
     return "/templates/editorial";
   }
+}
+
+function getGenerationRequestKey(): string {
+  if (typeof window === "undefined") return "server";
+
+  return (
+    window.sessionStorage.getItem(generationVersionStorageKey) ??
+    window.sessionStorage.getItem(setupStorageKey) ??
+    "default"
+  );
 }
 
 export default function TemplateGeneratingPage() {
@@ -85,6 +97,12 @@ export default function TemplateGeneratingPage() {
           return;
         }
 
+        const requestKey = getGenerationRequestKey();
+        if (createMarketPagePromiseKey !== requestKey) {
+          createMarketPagePromise = null;
+          createMarketPagePromiseKey = requestKey;
+        }
+
         createMarketPagePromise ??= createMarketPage();
         const created = await createMarketPagePromise;
         if (!isMounted) return;
@@ -95,6 +113,7 @@ export default function TemplateGeneratingPage() {
         await subscribeStatus(created.pageId);
       } catch (error) {
         createMarketPagePromise = null;
+        createMarketPagePromiseKey = null;
         if (!isMounted) return;
         const apiError = error as MarketPageApiError;
         setStatus("FAILED");
@@ -115,6 +134,7 @@ export default function TemplateGeneratingPage() {
     hasStarted.current = false;
     unsubscribeRef.current?.();
     createMarketPagePromise = null;
+    createMarketPagePromiseKey = null;
     window.sessionStorage.removeItem(generatedPageIdStorageKey);
     window.location.reload();
   }

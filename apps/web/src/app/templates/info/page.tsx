@@ -12,26 +12,23 @@ import {
 } from "@/lib/api/market-page";
 import styles from "./template-info.module.css";
 
-const backgroundImage =
-  "https://www.figma.com/api/mcp/asset/3734902e-c1bf-4629-b5d5-f55aba4c23ce";
-const locationPreviewImage =
-  "https://www.figma.com/api/mcp/asset/2319ccd1-19b2-4d12-b6a1-72d89b228c56";
+const backgroundImage = "/images/templates/info-preview/info-background.png";
 
 const textFields = [
   {
-    id: "intro",
+    id: "intro" as const,
     title: "시장 소개 작성하기",
     placeholder: "시장 소개를 작성해주세요.",
     rows: 4,
   },
   {
-    id: "history",
+    id: "history" as const,
     title: "시장 역사 작성하기",
     placeholder: "시장 역사를 작성해주세요.",
     rows: 4,
   },
   {
-    id: "directions",
+    id: "directions" as const,
     title: "시장 찾아오는 길 작성하기",
     placeholder:
       "지도에서 제공하는 내용보다 더 쉬운 길찾기 방법이 있다면 알려주세요. 예) 충무로역 6번 출구에서 직진한 후 메가커피 골목으로 들어오면 시장 주 출입구가 있습니다.",
@@ -41,11 +38,101 @@ const textFields = [
 
 const setupStorageKey = "market_page_setup_draft";
 const generatedPageIdStorageKey = "generated_market_page_id";
+const generationVersionStorageKey = "market_page_generation_version";
+
+type PreviewTarget = "intro" | "history" | "directions" | "stores";
+
+interface PreviewConfig {
+  title: string;
+  modalClassName: string;
+  canvasClassName: string;
+  images: {
+    alt: string;
+    className: string;
+    sizes: string;
+    src: string;
+  }[];
+  highlights?: string[];
+  instruction?: string;
+  instructionClassName?: string;
+}
 
 interface SetupDraft {
   templateType: TemplateType;
   selectedSections: MarketPageSection[];
 }
+
+const commonPreviewConfig: PreviewConfig = {
+  title: "미리보기",
+  modalClassName: styles.previewModalDefault,
+  canvasClassName: styles.previewCanvasDefault,
+  images: [
+    {
+      alt: "선택한 템플릿 미리보기",
+      className: styles.previewImageFill,
+      sizes: "1074px",
+      src: "/images/templates/info-preview/directions-preview.png",
+    },
+  ],
+  highlights: [styles.directionsHighlight],
+  instruction: "흰색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+  instructionClassName: styles.previewInstructionLight,
+};
+
+const template3PreviewConfigs: Record<PreviewTarget, PreviewConfig> = {
+  intro: {
+    title: "미리보기",
+    modalClassName: styles.previewModalDefault,
+    canvasClassName: styles.previewCanvasIntro,
+    images: [
+      {
+        alt: "시장 소개 글 위치 미리보기",
+        className: styles.previewImageFill,
+        sizes: "1149px",
+        src: "/images/templates/info-preview/intro-preview.png",
+      },
+    ],
+    highlights: [styles.introHighlight],
+    instruction: "흰색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+    instructionClassName: styles.previewInstructionDark,
+  },
+  history: {
+    title: "미리보기",
+    modalClassName: styles.previewModalDefault,
+    canvasClassName: styles.previewCanvasHistory,
+    images: [
+      {
+        alt: "시장 역사 글 위치 미리보기",
+        className: styles.previewImageFill,
+        sizes: "919px",
+        src: "/images/templates/info-preview/history-preview.png",
+      },
+    ],
+    highlights: [styles.historyHighlightTop, styles.historyHighlightBottom],
+    instruction: "검정색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+    instructionClassName: styles.previewInstructionDark,
+  },
+  directions: commonPreviewConfig,
+  stores: {
+    title: "미리보기",
+    modalClassName: styles.previewModalStores,
+    canvasClassName: styles.previewCanvasStores,
+    images: [
+      {
+        alt: "점포 검색 페이지 미리보기",
+        className: styles.storePreviewLeft,
+        sizes: "549px",
+        src: "/images/templates/info-preview/stores-preview-left.png",
+      },
+      {
+        alt: "점포 상세 페이지 미리보기",
+        className: styles.storePreviewRight,
+        sizes: "549px",
+        src: "/images/templates/info-preview/stores-preview-right.png",
+      },
+    ],
+  },
+};
 
 function getTemplateType(value: string | null): TemplateType {
   if (value === "TEMPLATE_1" || value === "TEMPLATE_2" || value === "TEMPLATE_3") {
@@ -84,6 +171,14 @@ function getSetupDraft(): SetupDraft {
   };
 }
 
+function getPreviewConfig(templateType: TemplateType, target: PreviewTarget): PreviewConfig {
+  if (templateType === "TEMPLATE_3") {
+    return template3PreviewConfigs[target];
+  }
+
+  return commonPreviewConfig;
+}
+
 export default function TemplateInfoPage() {
   const router = useRouter();
   const [setupDraft] = useState<SetupDraft>(getSetupDraft);
@@ -92,8 +187,11 @@ export default function TemplateInfoPage() {
     historyText: "",
     directionsText: "",
   });
-  const [previewTarget, setPreviewTarget] = useState<string | null>(null);
+  const [previewTarget, setPreviewTarget] = useState<PreviewTarget | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const previewConfig = previewTarget
+    ? getPreviewConfig(setupDraft.templateType, previewTarget)
+    : null;
   const isInfoComplete =
     marketContent.introText.trim().length > 0 &&
     marketContent.historyText.trim().length > 0 &&
@@ -110,6 +208,7 @@ export default function TemplateInfoPage() {
         marketContent,
       });
       window.sessionStorage.removeItem(generatedPageIdStorageKey);
+      window.sessionStorage.setItem(generationVersionStorageKey, String(Date.now()));
       router.push("/templates/generating");
     } catch (error) {
       const apiError = error as MarketPageApiError;
@@ -204,26 +303,35 @@ export default function TemplateInfoPage() {
         </div>
       </section>
 
-      {previewTarget && (
+      {previewConfig && (
         <div className={styles.previewOverlay} role="dialog" aria-modal="true">
-          <div className={styles.previewModal}>
+          <div className={`${styles.previewModal} ${previewConfig.modalClassName}`}>
             <button
               className={styles.closePreview}
               type="button"
               aria-label="미리보기 닫기"
               onClick={() => setPreviewTarget(null)}
             />
-            <h2>시장 소개 작성 미리보기</h2>
-            <div className={styles.previewCanvas}>
-              <Image
-                alt="선택한 템플릿 미리보기"
-                fill
-                sizes="1074px"
-                src={locationPreviewImage}
-              />
-              <div className={styles.highlightBox} aria-hidden="true" />
+            <h2>{previewConfig.title}</h2>
+            <div className={`${styles.previewCanvas} ${previewConfig.canvasClassName}`}>
+              {previewConfig.images.map((image) => (
+                <span className={image.className} key={image.src}>
+                  <Image alt={image.alt} fill sizes={image.sizes} src={image.src} />
+                </span>
+              ))}
+              {previewConfig.highlights?.map((highlightClassName) => (
+                <span
+                  aria-hidden="true"
+                  className={`${styles.highlightBox} ${highlightClassName}`}
+                  key={highlightClassName}
+                />
+              ))}
             </div>
-            <p>흰색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다</p>
+            {previewConfig.instruction && (
+              <p className={previewConfig.instructionClassName}>
+                {previewConfig.instruction}
+              </p>
+            )}
           </div>
         </div>
       )}

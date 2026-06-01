@@ -242,12 +242,20 @@
 
 .previewModal {
   position: relative;
-  width: min(100%, 1343px);
-  height: 910px;
-  overflow: hidden;
+  width: min(calc(100vw - 48px), 1343px);
+  max-height: calc(100svh - 48px);
+  overflow: auto;
   border-radius: clamp(42px, 5.21vw, 100px);
   background: rgba(253, 253, 253, 0.95);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+}
+
+.previewModalDefault {
+  height: 910px;
+}
+
+.previewModalStores {
+  height: 1323px;
 }
 
 .closePreview {
@@ -298,22 +306,82 @@
 
 .previewCanvas {
   position: absolute;
+  overflow: hidden;
+}
+
+.previewCanvasDefault {
   top: 98px;
   left: 50%;
   width: min(80%, 1074px);
   height: 812px;
-  overflow: hidden;
   background: #5c5c5c;
   transform: translateX(-50%);
 }
 
-.previewCanvas img {
+.previewCanvasIntro {
+  top: 99px;
+  left: 50%;
+  width: min(calc(100% - 194px), 1149px);
+  height: 812px;
+  transform: translateX(-50%);
+}
+
+.previewCanvasHistory {
+  top: 99px;
+  left: 50%;
+  width: min(calc(100% - 424px), 919px);
+  height: 812px;
+  transform: translateX(-50%);
+}
+
+.previewCanvasStores {
+  top: 194px;
+  left: 50%;
+  width: min(calc(100% - 220px), 1123px);
+  height: min(1039px, calc((100vw - 220px) * 0.9252));
+  min-height: 560px;
+  overflow: visible;
+  transform: translateX(-50%);
+}
+
+.previewImageFill,
+.storePreviewLeft,
+.storePreviewRight {
+  position: absolute;
+  display: block;
+}
+
+.previewImageFill {
+  inset: 0;
+}
+
+.storePreviewLeft {
+  top: 0;
+  left: 0;
+  width: 48.89%;
+  height: 48.32%;
+}
+
+.storePreviewRight {
+  top: 0;
+  left: 51.11%;
+  width: 48.89%;
+  height: 100%;
+}
+
+.previewImageFill img,
+.storePreviewLeft img,
+.storePreviewRight img {
   object-fit: cover;
   object-position: top center;
 }
 
 .highlightBox {
   position: absolute;
+  pointer-events: none;
+}
+
+.directionsHighlight {
   left: 14.43%;
   bottom: 82px;
   width: 71.14%;
@@ -321,18 +389,51 @@
   border: 2px solid #fff;
 }
 
-.previewModal > p {
+.introHighlight {
+  left: 4.7%;
+  top: 66.38%;
+  width: 90.08%;
+  height: 18.84%;
+  border: 2px solid #fff;
+}
+
+.historyHighlightTop {
+  left: 2.39%;
+  top: 40.15%;
+  width: 89.01%;
+  height: 12.19%;
+  border: 2px solid #131313;
+}
+
+.historyHighlightBottom {
+  left: 62.46%;
+  top: 76.35%;
+  width: 28.94%;
+  height: 23.15%;
+  border: 2px solid #131313;
+}
+
+.previewInstructionDark,
+.previewInstructionLight {
   position: absolute;
   bottom: 37px;
   left: 50%;
   z-index: 2;
   margin: 0;
-  color: #fff;
   font-size: 15px;
-  font-weight: 300;
+  font-weight: 500;
   text-align: center;
   transform: translateX(-50%);
   white-space: nowrap;
+}
+
+.previewInstructionDark {
+  color: #131313;
+}
+
+.previewInstructionLight {
+  color: #fff;
+  font-weight: 300;
 }
 
 @media (max-width: 900px) {
@@ -340,6 +441,16 @@
     width: calc(100% - 28px);
     border-radius: 42px;
     padding: 52px 28px 56px;
+  }
+
+  .previewCanvasIntro,
+  .previewCanvasHistory {
+    width: calc(100% - 56px);
+  }
+
+  .previewCanvasStores {
+    width: calc(100% - 56px);
+    height: calc((100vw - 104px) * 0.9252);
   }
 }
 
@@ -400,14 +511,35 @@
     border-radius: 34px;
   }
 
-  .previewCanvas {
+  .previewModalStores {
+    height: 840px;
+  }
+
+  .previewCanvasDefault,
+  .previewCanvasIntro,
+  .previewCanvasHistory {
     top: 86px;
     width: 86%;
     height: 520px;
   }
 
-  .highlightBox {
+  .previewCanvasStores {
+    top: 112px;
+    width: calc(100% - 44px);
+    height: calc((100vw - 72px) * 0.9252);
+    min-height: 460px;
+  }
+
+  .directionsHighlight {
     bottom: 58px;
     height: 112px;
+  }
+
+  .previewInstructionDark,
+  .previewInstructionLight {
+    bottom: 28px;
+    width: calc(100% - 40px);
+    font-size: 13px;
+    white-space: normal;
   }
 }
