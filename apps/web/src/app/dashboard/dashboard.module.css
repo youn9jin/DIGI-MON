@@ -9,11 +9,11 @@
 
 .backgroundMark {
   position: absolute;
-  top: 170px;
+  top: clamp(126px, 15.74svh, 170px);
   left: 50%;
-  width: min(80.73vw, 1550px);
-  height: min(41.2vw, 791px);
-  opacity: 0.15;
+  width: min(88vw, 1550px);
+  height: min(44.84vw, 791px);
+  opacity: 0.22;
   pointer-events: none;
   transform: translateX(-50%);
 }
@@ -27,7 +27,7 @@
 .hero {
   position: relative;
   z-index: 1;
-  padding-top: clamp(142px, 24.58svh, 266px);
+  padding-top: clamp(132px, 24.35svh, 263px);
   text-align: center;
 }
 
@@ -51,16 +51,16 @@
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: repeat(2, minmax(280px, 552px));
+  grid-template-columns: repeat(2, minmax(260px, 432px));
   justify-content: center;
-  gap: clamp(32px, 2.92vw, 56px);
-  margin-top: clamp(54px, 7.68svh, 83px);
+  gap: clamp(30px, 3.13vw, 60px);
+  margin-top: clamp(42px, 5.93svh, 64px);
 }
 
 .actionCard {
   display: flex;
-  width: min(100%, 552px);
-  height: 337px;
+  width: min(100%, 432px);
+  height: 263px;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
@@ -81,9 +81,9 @@
 .imageWrap {
   position: relative;
   display: block;
-  width: 266px;
-  height: 154px;
-  margin-top: 46px;
+  width: 178px;
+  height: 103px;
+  margin-top: 40px;
 }
 
 .infoImage {
@@ -97,9 +97,9 @@
 }
 
 .actionCard strong {
-  margin-top: 41px;
+  margin-top: 32px;
   color: #131313;
-  font-size: clamp(22px, 1.56vw, 30px);
+  font-size: clamp(20px, 1.35vw, 26px);
   font-weight: 600;
   line-height: 1.22;
 }
@@ -117,12 +117,12 @@
 
   .actionGrid {
     grid-template-columns: 1fr;
-    width: min(100% - 48px, 552px);
+    width: min(100% - 48px, 432px);
     margin: 48px auto 0;
   }
 
   .actionCard {
-    height: 300px;
+    height: 263px;
   }
 }
 
