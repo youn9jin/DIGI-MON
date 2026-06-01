@@ -15,6 +15,8 @@ import styles from "./template-generating.module.css";
 const logoImage =
   "/images/onboarding/generating-background.png";
 const heroLogoImage = "/images/onboarding/generating-hero-logo.png";
+const generatedPageIdStorageKey = "generated_market_page_id";
+let createMarketPagePromise: ReturnType<typeof createMarketPage> | null = null;
 
 export default function TemplateGeneratingPage() {
   const hasStarted = useRef(false);
@@ -29,39 +31,52 @@ export default function TemplateGeneratingPage() {
 
     let isMounted = true;
 
+    async function subscribeStatus(targetPageId: string | number) {
+      unsubscribeRef.current = await subscribeMarketPageStatus(targetPageId, {
+        onDone: (result) => {
+          if (!isMounted) return;
+          setStatus("DONE");
+          setPageId(result.pageId ?? targetPageId);
+          window.sessionStorage.setItem(
+            generatedPageIdStorageKey,
+            String(result.pageId ?? targetPageId),
+          );
+        },
+        onFailed: (result) => {
+          if (!isMounted) return;
+          setStatus("FAILED");
+          setErrorMessage(result.error ?? "AI 웹페이지 생성에 실패했습니다. 다시 시도해주세요.");
+        },
+        onError: (error) => {
+          if (!isMounted) return;
+          setStatus("FAILED");
+          setErrorMessage(error.message);
+        },
+      });
+    }
+
     async function startGeneration() {
       try {
         setStatus("PENDING");
         setErrorMessage("");
 
-        const created = await createMarketPage();
+        const storedPageId = window.sessionStorage.getItem(generatedPageIdStorageKey);
+        if (storedPageId) {
+          setPageId(storedPageId);
+          await subscribeStatus(storedPageId);
+          return;
+        }
+
+        createMarketPagePromise ??= createMarketPage();
+        const created = await createMarketPagePromise;
         if (!isMounted) return;
 
         setPageId(created.pageId);
-        window.sessionStorage.setItem("generated_market_page_id", String(created.pageId));
+        window.sessionStorage.setItem(generatedPageIdStorageKey, String(created.pageId));
 
-        unsubscribeRef.current = await subscribeMarketPageStatus(created.pageId, {
-          onDone: (result) => {
-            if (!isMounted) return;
-            setStatus("DONE");
-            setPageId(result.pageId ?? created.pageId);
-            window.sessionStorage.setItem(
-              "generated_market_page_id",
-              String(result.pageId ?? created.pageId),
-            );
-          },
-          onFailed: (result) => {
-            if (!isMounted) return;
-            setStatus("FAILED");
-            setErrorMessage(result.error ?? "AI 웹페이지 생성에 실패했습니다. 다시 시도해주세요.");
-          },
-          onError: (error) => {
-            if (!isMounted) return;
-            setStatus("FAILED");
-            setErrorMessage(error.message);
-          },
-        });
+        await subscribeStatus(created.pageId);
       } catch (error) {
+        createMarketPagePromise = null;
         if (!isMounted) return;
         const apiError = error as MarketPageApiError;
         setStatus("FAILED");
@@ -81,6 +96,8 @@ export default function TemplateGeneratingPage() {
   function handleRetry() {
     hasStarted.current = false;
     unsubscribeRef.current?.();
+    createMarketPagePromise = null;
+    window.sessionStorage.removeItem(generatedPageIdStorageKey);
     window.location.reload();
   }
 
