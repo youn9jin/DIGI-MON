@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { getMe } from "@/lib/api/me";
 import Header from "@/components/layout/Header";
 
 export default function DashboardPage() {
@@ -21,20 +22,13 @@ export default function DashboardPage() {
       setUser(currentUser);
 
       try {
-        const idToken = await currentUser.getIdToken();
-        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
-        const res = await fetch(`${baseUrl}/api/me`, {
-          headers: { Authorization: `Bearer ${idToken}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (!data.marketId) {
-            // 온보딩 미완료 → 온보딩으로
-            router.replace("/onboarding");
-            return;
-          }
-          setMarketName(data.marketName ?? "");
+        const me = await getMe(currentUser);
+        if (!me.marketId) {
+          // 온보딩 미완료 → 온보딩으로
+          router.replace("/onboarding");
+          return;
         }
+        setMarketName(me.marketName ?? "");
       } catch {
         // 네트워크 오류 무시
       } finally {
