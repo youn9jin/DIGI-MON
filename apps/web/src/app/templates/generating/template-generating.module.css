@@ -60,6 +60,14 @@
   line-height: 45px;
 }
 
+.pageId {
+  display: inline-block;
+  margin-top: 18px;
+  color: #6f6f6f;
+  font-size: 16px;
+  font-weight: 500;
+}
+
 .guideButton {
   position: absolute;
   top: clamp(500px, 61.3svh, 662px);
@@ -71,8 +79,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 30px;
+  border: 0;
   background: #fff2c5;
   color: #000;
+  cursor: pointer;
+  font-family: inherit;
   font-size: clamp(16px, 1.15vw, 22px);
   font-weight: 500;
   line-height: 45px;

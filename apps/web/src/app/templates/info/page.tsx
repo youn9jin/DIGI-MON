@@ -41,6 +41,7 @@ const textFields = [
 ];
 
 const setupStorageKey = "market_page_setup_draft";
+const generatedPageIdStorageKey = "generated_market_page_id";
 
 interface SetupDraft {
   templateType: TemplateType;
@@ -105,6 +106,7 @@ export default function TemplateInfoPage() {
         selectedSections: setupDraft.selectedSections,
         marketContent,
       });
+      window.sessionStorage.removeItem(generatedPageIdStorageKey);
       router.push("/templates/generating");
     } catch (error) {
       const apiError = error as MarketPageApiError;
