@@ -1,12 +1,14 @@
 package com.digimon.api.marketpage;
 
 import com.digimon.api.auth.FirebaseTokenService;
+import com.digimon.api.auth.ForbiddenException;
 import com.digimon.api.global.ResponseWrapper;
 import com.digimon.api.marketpage.dto.MarketPageContentResponse;
 import com.digimon.api.user.User;
 import com.digimon.api.user.UserService;
 import com.google.firebase.auth.FirebaseToken;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,16 +75,19 @@ public class MarketPageController {
     /**
      * SSE 구독. EventSource 는 커스텀 헤더를 못 보내므로 ID 토큰을 token 쿼리 파라미터로 받는다.
      *
-     * 반환 타입이 Object 인 이유: 401 은 기존 패턴과 동일하게 raw Map(ResponseEntity)으로 주고,
+     * 반환 타입이 Object 인 이유: 401/404/403 은 ResponseEntity(JSON)로 주고,
      * 정상 흐름은 SseEmitter 를 반환해야 한다(Spring 이 SseEmitter 를 보고 자동으로 text/event-stream 세팅).
-     * produces 를 명시하지 않는다 — 명시하면 401 의 Map 응답이 event-stream 으로 직렬화되려다 깨진다.
-     * 404(PAGE_NOT_FOUND)/403(FORBIDDEN) 은 connectStatus 가 던지는 예외를 GlobalExceptionHandler 가 처리.
+     *
+     * 중요: EventSource 는 Accept: text/event-stream 으로 요청하므로, 에러 응답을 그냥 반환하거나
+     * GlobalExceptionHandler 로 흘리면 JSON 컨버터가 text/event-stream 협상에 실패(406)한다.
+     * 따라서 모든 에러 응답은 jsonError() 로 Content-Type 을 application/json 으로 명시해 반환하고,
+     * 404/403 도 여기서 직접 catch 하여 GlobalExceptionHandler 로 넘기지 않는다.
      */
     @GetMapping("/market/page/status/{pageId}")
     public Object getPageStatus(@PathVariable Long pageId,
                                 @RequestParam(value = "token", required = false) String token) {
         if (token == null || token.isBlank()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+            return jsonError(HttpStatus.UNAUTHORIZED, Map.of(
                     "message", "Missing token query parameter"
             ));
         }
@@ -91,14 +96,32 @@ public class MarketPageController {
         try {
             decoded = firebaseTokenService.verify(token);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+            return jsonError(HttpStatus.UNAUTHORIZED, Map.of(
                     "message", "Invalid ID token",
                     "error", e.getMessage()
             ));
         }
 
         User user = userService.getOrCreateFromFirebase(decoded);
-        return marketPageService.connectStatus(pageId, user.getId());
+        try {
+            return marketPageService.connectStatus(pageId, user.getId());
+        } catch (PageNotFoundException e) {
+            return jsonError(HttpStatus.NOT_FOUND,
+                    ResponseWrapper.error("PAGE_NOT_FOUND", e.getMessage(), null));
+        } catch (ForbiddenException e) {
+            return jsonError(HttpStatus.FORBIDDEN,
+                    ResponseWrapper.error("FORBIDDEN", e.getMessage(), null));
+        }
+    }
+
+    /**
+     * SSE 엔드포인트는 Accept: text/event-stream 으로 호출되므로, 비-SSE 에러 응답은
+     * Content-Type 을 application/json 으로 명시해 협상 실패(406)를 피한다.
+     */
+    private ResponseEntity<?> jsonError(HttpStatus status, Object body) {
+        return ResponseEntity.status(status)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(body);
     }
 
     /**
