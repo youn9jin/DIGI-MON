@@ -76,12 +76,21 @@ export default function TemplateGeneratingPage() {
         },
         onFailed: (result) => {
           if (!isMounted) return;
+          createMarketPagePromise = null;
+          createMarketPagePromiseKey = null;
+          window.sessionStorage.removeItem(generatedPageIdStorageKey);
           setStatus("FAILED");
           setShowCompletionAlert(false);
-          setErrorMessage(result.error ?? "AI 웹페이지 생성에 실패했습니다. 다시 시도해주세요.");
+          setErrorMessage(
+            result.error ??
+              "AI가 웹페이지 내용을 생성하지 못했습니다. 다시 생성해보세요.",
+          );
         },
         onError: (error) => {
           if (!isMounted) return;
+          createMarketPagePromise = null;
+          createMarketPagePromiseKey = null;
+          window.sessionStorage.removeItem(generatedPageIdStorageKey);
           setStatus("FAILED");
           setShowCompletionAlert(false);
           setErrorMessage(error.message);
@@ -121,6 +130,7 @@ export default function TemplateGeneratingPage() {
         createMarketPagePromiseKey = null;
         if (!isMounted) return;
         const apiError = error as MarketPageApiError;
+        window.sessionStorage.removeItem(generatedPageIdStorageKey);
         setStatus("FAILED");
         setShowCompletionAlert(false);
         setErrorMessage(apiError.message ?? "웹페이지 생성 요청에 실패했습니다.");
