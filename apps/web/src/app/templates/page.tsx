@@ -9,11 +9,11 @@ import { type MarketPageSection, type TemplateType } from "@/lib/api/market-page
 import styles from "./templates.module.css";
 
 const backgroundImage =
-  "https://www.figma.com/api/mcp/asset/301564db-6807-4086-bf01-cc2b4bc2f3eb";
+  "/images/templates/selection-background.webp";
 const templateImages: Record<TemplateType, string> = {
-  TEMPLATE_3: "https://www.figma.com/api/mcp/asset/5200cb65-fb68-4917-a15e-8bc8523693ae",
-  TEMPLATE_2: "https://www.figma.com/api/mcp/asset/51c33f53-4e69-41c6-a67b-2d251ba8c684",
-  TEMPLATE_1: "https://www.figma.com/api/mcp/asset/5ca337be-f99c-4b35-9566-dcf425fde118",
+  TEMPLATE_3: "/images/templates/template-editorial.webp",
+  TEMPLATE_2: "/images/templates/template-modern.webp",
+  TEMPLATE_1: "/images/templates/template-classic.webp",
 };
 
 const templates = [
