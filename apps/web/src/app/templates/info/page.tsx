@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Header from "@/components/layout/Header";
@@ -95,9 +94,13 @@ export default function TemplateInfoPage() {
   });
   const [previewTarget, setPreviewTarget] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const isInfoComplete =
+    marketContent.introText.trim().length > 0 &&
+    marketContent.historyText.trim().length > 0 &&
+    marketContent.directionsText.trim().length > 0;
 
   async function handleInfoComplete() {
-    if (isSaving) return;
+    if (isSaving || !isInfoComplete) return;
 
     setIsSaving(true);
     try {
@@ -190,12 +193,9 @@ export default function TemplateInfoPage() {
         </form>
 
         <div className={styles.actions}>
-          <Link className={styles.secondaryAction} href="/templates">
-            저장 후 나가기
-          </Link>
           <button
             className={styles.primaryAction}
-            disabled={isSaving}
+            disabled={isSaving || !isInfoComplete}
             type="button"
             onClick={handleInfoComplete}
           >

@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Header from "@/components/layout/Header";
@@ -78,6 +77,8 @@ export default function TemplateSelectionPage() {
   const [openFeature, setOpenFeature] = useState("점포 안내");
   const [selectedFeatureOptionIds, setSelectedFeatureOptionIds] =
     useState<string[]>(defaultFeatureOptionIds);
+  const canCompleteSelection =
+    selectedTemplate !== null && selectedFeatureOptionIds.length > 0;
 
   const previewTemplateData = previewTemplate
     ? templates.find((template) => template.id === previewTemplate)
@@ -95,6 +96,8 @@ export default function TemplateSelectionPage() {
   }, [previewTemplate]);
 
   function handleComplete() {
+    if (!canCompleteSelection) return;
+
     const selectedSections = Array.from(
       new Set(
         featureGroups.flatMap((group) =>
@@ -244,11 +247,9 @@ export default function TemplateSelectionPage() {
         </section>
 
         <div className={styles.actions}>
-          <Link className={styles.secondaryAction} href="/">
-            저장 후 나가기
-          </Link>
           <button
             className={styles.primaryAction}
+            disabled={!canCompleteSelection}
             type="button"
             onClick={handleComplete}
           >

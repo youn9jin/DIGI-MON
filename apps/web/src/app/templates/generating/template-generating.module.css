@@ -44,6 +44,10 @@
   padding: clamp(250px, 44.44svh, 480px) 0 0 min(11.77vw, 226px);
 }
 
+.doneContent {
+  padding-top: clamp(250px, 44.44svh, 480px);
+}
+
 .content h1 {
   margin: 0 0 19px;
   color: #131313;
@@ -62,10 +66,11 @@
 
 .pageId {
   display: inline-block;
-  margin-top: 18px;
+  margin-top: 52px;
   color: #6f6f6f;
-  font-size: 16px;
+  font-size: clamp(18px, 1.25vw, 24px);
   font-weight: 500;
+  line-height: 1.2;
 }
 
 .guideButton {
@@ -91,6 +96,10 @@
   text-decoration: none;
 }
 
+.doneButton {
+  top: min(76.76svh, 829px);
+}
+
 @media (max-width: 1000px) {
   .content {
     width: calc(100% - 48px);
@@ -113,6 +122,10 @@
     width: min(100% - 48px, 432px);
     height: 68px;
     margin: 42px auto 0;
+  }
+
+  .doneButton {
+    margin-top: 42px;
   }
 }
 
