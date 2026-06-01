@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { getMe, getWebsiteEntryPath } from "@/lib/api/me";
 import styles from "./Header.module.css";
 
 interface HeaderProps {
@@ -15,10 +16,25 @@ export default function Header({ variant = "default" }: HeaderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [websiteHref, setWebsiteHref] = useState<"/intro" | "/onboarding" | "/templates">("/intro");
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+
+      if (!currentUser) {
+        setWebsiteHref("/intro");
+        setReady(true);
+        return;
+      }
+
+      try {
+        const me = await getMe(currentUser);
+        setWebsiteHref(getWebsiteEntryPath(me));
+      } catch {
+        setWebsiteHref("/onboarding");
+      }
+
       setReady(true);
     });
     return () => unsubscribe();
@@ -60,7 +76,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
             <nav className={styles.primaryNav} aria-label="주요 메뉴">
               <a href="#">사용방법</a>
               <a href="#">커뮤니티</a>
-              <a href="/dashboard">웹사이트 관리</a>
+              <Link href={websiteHref}>웹사이트 관리</Link>
             </nav>
           </div>
 
@@ -108,7 +124,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
             <nav className={styles.primaryNav} aria-label="주요 메뉴">
               <a href="#">사용방법</a>
               <a href="#">커뮤니티</a>
-              <a href="/dashboard">웹사이트 관리</a>
+              <Link href={websiteHref}>웹사이트 관리</Link>
             </nav>
           </div>
 
