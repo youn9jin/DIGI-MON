@@ -9,6 +9,8 @@ import com.digimon.api.marketpage.InvalidSectionValueException;
 import com.digimon.api.marketpage.InvalidTemplateTypeException;
 import com.digimon.api.marketpage.MarketPageMarketNotFoundException;
 import com.digimon.api.marketpage.NoSectionsSelectedException;
+import com.digimon.api.marketpage.PageNotFoundException;
+import com.digimon.api.marketpage.PageNotReadyException;
 import com.digimon.api.marketpage.SetupNotCompletedException;
 import com.digimon.api.store.MarketNotFoundException;
 import com.digimon.api.store.StoreNotFoundException;
@@ -109,6 +111,24 @@ public class GlobalExceptionHandler {
                 ex.getMessage() != null ? ex.getMessage() : "페이지 생성 설정이 완료되지 않았습니다.",
                 null);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(PageNotFoundException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handlePageNotFound(PageNotFoundException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "PAGE_NOT_FOUND",
+                ex.getMessage() != null ? ex.getMessage() : "해당 페이지를 찾을 수 없습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+    }
+
+    @ExceptionHandler(PageNotReadyException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handlePageNotReady(PageNotReadyException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "PAGE_NOT_READY",
+                ex.getMessage() != null ? ex.getMessage() : "페이지 생성이 아직 완료되지 않았습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
     @ExceptionHandler(StoreNotFoundException.class)
