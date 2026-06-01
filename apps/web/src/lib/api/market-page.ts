@@ -50,6 +50,31 @@ export interface MarketPageSetupResponse {
   selectedSections: MarketPageSection[];
 }
 
+export interface MarketPageContentResponse {
+  pageId: string | number;
+  templateType?: TemplateType | string | null;
+  selectedSections?: MarketPageSection[] | string[] | null;
+  hero?: {
+    title?: string;
+    subtitle?: string;
+    description?: string;
+  } | null;
+  intro?: {
+    content?: string;
+  } | null;
+  features?: {
+    title?: string;
+    description?: string;
+  }[] | null;
+  storeHighlights?: {
+    storeName?: string;
+    highlight?: string;
+  }[] | null;
+  cta?: {
+    text?: string;
+  } | null;
+}
+
 interface RawCreateMarketPageResponse {
   pageId?: string | number;
   jobId?: string | number;
@@ -199,4 +224,17 @@ export async function subscribeMarketPageStatus(
   };
 
   return () => eventSource.close();
+}
+
+export async function getMarketPageContent(
+  pageId: string | number,
+): Promise<MarketPageContentResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const authHeader = await getAuthorizationHeader();
+  const response = await fetch(
+    `${baseUrl}/api/market/page/${encodeURIComponent(String(pageId))}`,
+    { headers: authHeader },
+  );
+
+  return parseEnvelope<MarketPageContentResponse>(response);
 }

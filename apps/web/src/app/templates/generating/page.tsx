@@ -10,13 +10,29 @@ import {
   type MarketPageApiError,
   type MarketPageStatus,
 } from "@/lib/api/market-page";
+import { getTemplatePreviewHref } from "@/lib/market-page-template-data";
 import styles from "./template-generating.module.css";
 
 const logoImage =
   "/images/onboarding/generating-background.png";
 const heroLogoImage = "/images/onboarding/generating-hero-logo.png";
 const generatedPageIdStorageKey = "generated_market_page_id";
+const setupStorageKey = "market_page_setup_draft";
 let createMarketPagePromise: ReturnType<typeof createMarketPage> | null = null;
+
+function getStoredTemplatePreviewHref(): string {
+  if (typeof window === "undefined") return "/templates/editorial";
+
+  const storedSetup = window.sessionStorage.getItem(setupStorageKey);
+  if (!storedSetup) return "/templates/editorial";
+
+  try {
+    const parsed = JSON.parse(storedSetup) as { templateType?: string };
+    return getTemplatePreviewHref(parsed.templateType);
+  } catch {
+    return "/templates/editorial";
+  }
+}
 
 export default function TemplateGeneratingPage() {
   const hasStarted = useRef(false);
@@ -24,12 +40,14 @@ export default function TemplateGeneratingPage() {
   const [status, setStatus] = useState<MarketPageStatus>("PENDING");
   const [errorMessage, setErrorMessage] = useState("");
   const [pageId, setPageId] = useState<string | number | null>(null);
+  const [previewHref, setPreviewHref] = useState("/templates/editorial");
 
   useEffect(() => {
     if (hasStarted.current) return;
     hasStarted.current = true;
 
     let isMounted = true;
+    setPreviewHref(getStoredTemplatePreviewHref());
 
     async function subscribeStatus(targetPageId: string | number) {
       unsubscribeRef.current = await subscribeMarketPageStatus(targetPageId, {
@@ -144,6 +162,10 @@ export default function TemplateGeneratingPage() {
         <button className={styles.guideButton} type="button" onClick={handleRetry}>
           다시 생성하기
         </button>
+      ) : status === "DONE" && pageId ? (
+        <Link className={styles.guideButton} href={`${previewHref}?pageId=${encodeURIComponent(String(pageId))}`}>
+          생성된 웹페이지 확인하기
+        </Link>
       ) : (
         <Link className={styles.guideButton} href="/">
           홈 화면에서 웹페이지 수정 방법 확인하기
