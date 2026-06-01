@@ -92,6 +92,13 @@ public class MarketPageGenerationService {
                     // ReactorClientHttpConnector 의 responseTimeout(60s) 이 그대로 적용된다.
                     .block();
 
+            // HTTP 는 성공(2xx)이지만 바디가 비어있는 경우(예: 빈 응답/204). AI 응답 없음으로 간주 → FAILED.
+            if (responseJson == null || responseJson.isBlank()) {
+                self.markFailed(pageId);
+                sseEmitterManager.sendFailed(pageId, "AI 서버 응답이 비어 있습니다.");
+                return;
+            }
+
             self.markDone(pageId, responseJson);
             sseEmitterManager.sendDone(pageId);
 
