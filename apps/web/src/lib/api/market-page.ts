@@ -32,6 +32,24 @@ export interface MarketPageApiError {
   message: string;
 }
 
+export type MarketPageSection = "intro" | "history" | "directions" | "stores" | "tourism";
+
+export interface MarketPageSetupRequest {
+  templateType: TemplateType;
+  selectedSections: MarketPageSection[];
+  marketContent?: {
+    introText?: string;
+    historyText?: string;
+    directionsText?: string;
+  };
+}
+
+export interface MarketPageSetupResponse {
+  marketId: string | number;
+  templateType: TemplateType;
+  selectedSections: MarketPageSection[];
+}
+
 interface RawCreateMarketPageResponse {
   pageId?: string | number;
   jobId?: string | number;
@@ -61,6 +79,23 @@ async function parseEnvelope<T>(response: Response): Promise<T> {
   }
 
   return body.data;
+}
+
+export async function saveMarketPageSetup(
+  setup: MarketPageSetupRequest,
+): Promise<MarketPageSetupResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const authHeader = await getAuthorizationHeader();
+  const response = await fetch(`${baseUrl}/api/market/page/setup`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeader,
+    },
+    body: JSON.stringify(setup),
+  });
+
+  return parseEnvelope<MarketPageSetupResponse>(response);
 }
 
 export async function createMarketPage(

@@ -5,6 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Header from "@/components/layout/Header";
+import {
+  saveMarketPageSetup,
+  type MarketPageApiError,
+  type MarketPageSection,
+  type TemplateType,
+} from "@/lib/api/market-page";
 import styles from "./template-info.module.css";
 
 const backgroundImage =
@@ -34,9 +40,78 @@ const textFields = [
   },
 ];
 
+const setupStorageKey = "market_page_setup_draft";
+
+interface SetupDraft {
+  templateType: TemplateType;
+  selectedSections: MarketPageSection[];
+}
+
+function getTemplateType(value: string | null): TemplateType {
+  if (value === "TEMPLATE_1" || value === "TEMPLATE_2" || value === "TEMPLATE_3") {
+    return value;
+  }
+
+  return "TEMPLATE_3";
+}
+
+function getSetupDraft(): SetupDraft {
+  if (typeof window === "undefined") {
+    return {
+      templateType: "TEMPLATE_3",
+      selectedSections: ["intro", "history", "directions", "stores", "tourism"],
+    };
+  }
+
+  const stored = window.sessionStorage.getItem(setupStorageKey);
+  if (stored) {
+    try {
+      const parsed = JSON.parse(stored) as Partial<SetupDraft>;
+      if (parsed.templateType && parsed.selectedSections?.length) {
+        return {
+          templateType: getTemplateType(parsed.templateType),
+          selectedSections: parsed.selectedSections,
+        };
+      }
+    } catch {
+      window.sessionStorage.removeItem(setupStorageKey);
+    }
+  }
+
+  return {
+    templateType: getTemplateType(new URLSearchParams(window.location.search).get("template")),
+    selectedSections: ["intro", "history", "directions", "stores", "tourism"],
+  };
+}
+
 export default function TemplateInfoPage() {
   const router = useRouter();
+  const [setupDraft] = useState<SetupDraft>(getSetupDraft);
+  const [marketContent, setMarketContent] = useState({
+    introText: "",
+    historyText: "",
+    directionsText: "",
+  });
   const [previewTarget, setPreviewTarget] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  async function handleInfoComplete() {
+    if (isSaving) return;
+
+    setIsSaving(true);
+    try {
+      await saveMarketPageSetup({
+        templateType: setupDraft.templateType,
+        selectedSections: setupDraft.selectedSections,
+        marketContent,
+      });
+      router.push("/templates/generating");
+    } catch (error) {
+      const apiError = error as MarketPageApiError;
+      window.alert(apiError.message ?? "웹페이지 생성 설정 저장에 실패했습니다.");
+      setIsSaving(false);
+    }
+  }
 
   return (
     <main className={styles.page}>
@@ -69,7 +144,26 @@ export default function TemplateInfoPage() {
                   글 위치 확인하기
                 </button>
               </div>
-              <textarea aria-label={field.title} placeholder={field.placeholder} rows={field.rows} />
+              <textarea
+                aria-label={field.title}
+                placeholder={field.placeholder}
+                rows={field.rows}
+                value={
+                  field.id === "intro"
+                    ? marketContent.introText
+                    : field.id === "history"
+                      ? marketContent.historyText
+                      : marketContent.directionsText
+                }
+                onChange={(event) => {
+                  const value = event.target.value;
+                  setMarketContent((current) => {
+                    if (field.id === "intro") return { ...current, introText: value };
+                    if (field.id === "history") return { ...current, historyText: value };
+                    return { ...current, directionsText: value };
+                  });
+                }}
+              />
               <button className={styles.aiButton} type="button">
                 AI 도움받기
               </button>
@@ -99,10 +193,11 @@ export default function TemplateInfoPage() {
           </Link>
           <button
             className={styles.primaryAction}
+            disabled={isSaving}
             type="button"
-            onClick={() => router.push("/templates/generating")}
+            onClick={handleInfoComplete}
           >
-            정보 입력 완료
+            {isSaving ? "저장 중..." : "정보 입력 완료"}
           </button>
         </div>
       </section>
