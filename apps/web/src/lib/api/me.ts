@@ -55,6 +55,6 @@ export async function getMe(user: User): Promise<MeResponse> {
   return unwrapMeResponse(body);
 }
 
-export function getWebsiteEntryPath(me: MeResponse): "/templates" | "/onboarding" {
-  return me.marketId ? "/templates" : "/onboarding";
+export function getWebsiteEntryPath(me: MeResponse): "/dashboard" | "/onboarding" {
+  return me.marketId ? "/dashboard" : "/onboarding";
 }
