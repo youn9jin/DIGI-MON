@@ -138,7 +138,10 @@ export default function TemplateGeneratingPage() {
         />
       </div>
 
-      <section className={styles.content} aria-label="웹페이지 생성 중">
+      <section
+        className={`${styles.content} ${status === "DONE" ? styles.doneContent : ""}`}
+        aria-label={status === "DONE" ? "웹페이지 생성 완료" : "웹페이지 생성 중"}
+      >
         <h1>
           {status === "DONE"
             ? "우리 시장 맞춤 웹페이지 생성 완료"
@@ -155,7 +158,9 @@ export default function TemplateGeneratingPage() {
             ? "웹페이지 관리 화면에서 결과를 확인해보세요"
             : "기다리시는 동안 웹페이지 관리 방법을 확인해보세요"}
         </p>
-        {pageId && <span className={styles.pageId}>생성 요청 번호 {pageId}</span>}
+        {status === "DONE" && pageId && (
+          <span className={styles.pageId}>생성 요청 번호 {pageId}</span>
+        )}
       </section>
 
       {status === "FAILED" ? (
@@ -163,7 +168,10 @@ export default function TemplateGeneratingPage() {
           다시 생성하기
         </button>
       ) : status === "DONE" && pageId ? (
-        <Link className={styles.guideButton} href={`${previewHref}?pageId=${encodeURIComponent(String(pageId))}`}>
+        <Link
+          className={`${styles.guideButton} ${styles.doneButton}`}
+          href={`${previewHref}?pageId=${encodeURIComponent(String(pageId))}`}
+        >
           생성된 웹페이지 확인하기
         </Link>
       ) : (
