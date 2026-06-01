@@ -53,6 +53,7 @@ export default function TemplateGeneratingPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [pageId, setPageId] = useState<string | number | null>(null);
   const [previewHref, setPreviewHref] = useState("/templates/editorial");
+  const [showCompletionAlert, setShowCompletionAlert] = useState(false);
 
   useEffect(() => {
     if (hasStarted.current) return;
@@ -66,6 +67,7 @@ export default function TemplateGeneratingPage() {
         onDone: (result) => {
           if (!isMounted) return;
           setStatus("DONE");
+          setShowCompletionAlert(true);
           setPageId(result.pageId ?? targetPageId);
           window.sessionStorage.setItem(
             generatedPageIdStorageKey,
@@ -75,11 +77,13 @@ export default function TemplateGeneratingPage() {
         onFailed: (result) => {
           if (!isMounted) return;
           setStatus("FAILED");
+          setShowCompletionAlert(false);
           setErrorMessage(result.error ?? "AI 웹페이지 생성에 실패했습니다. 다시 시도해주세요.");
         },
         onError: (error) => {
           if (!isMounted) return;
           setStatus("FAILED");
+          setShowCompletionAlert(false);
           setErrorMessage(error.message);
         },
       });
@@ -89,6 +93,7 @@ export default function TemplateGeneratingPage() {
       try {
         setStatus("PENDING");
         setErrorMessage("");
+        setShowCompletionAlert(false);
 
         const storedPageId = window.sessionStorage.getItem(generatedPageIdStorageKey);
         if (storedPageId) {
@@ -117,6 +122,7 @@ export default function TemplateGeneratingPage() {
         if (!isMounted) return;
         const apiError = error as MarketPageApiError;
         setStatus("FAILED");
+        setShowCompletionAlert(false);
         setErrorMessage(apiError.message ?? "웹페이지 생성 요청에 실패했습니다.");
       }
     }
@@ -142,6 +148,27 @@ export default function TemplateGeneratingPage() {
   return (
     <main className={styles.page}>
       <Header variant="builder" />
+
+      {showCompletionAlert && (
+        <aside
+          className={styles.completionAlert}
+          role="status"
+          aria-live="polite"
+          aria-label="웹사이트 생성 완료 알림"
+        >
+          <span className={styles.alertLogo} aria-hidden="true">
+            <Image
+              src="/images/onboarding/market-illustration.png"
+              alt=""
+              width={283}
+              height={286}
+              className={styles.alertLogoImage}
+            />
+          </span>
+          <strong>웹사이트 생성 완료 알림</strong>
+          <p>웹사이트 생성이 완료되었습니다. 생성된 웹사이트를 확인하세요!</p>
+        </aside>
+      )}
 
       <div className={styles.backgroundMark} aria-hidden="true">
         <Image alt="" width={1550} height={791} priority src={logoImage} />
