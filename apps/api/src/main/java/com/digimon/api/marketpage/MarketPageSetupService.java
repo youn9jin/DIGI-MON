@@ -101,6 +101,10 @@ public class MarketPageSetupService {
             config.setIntroText(content != null ? content.getIntroText() : null);
             config.setHistoryText(content != null ? content.getHistoryText() : null);
             config.setDirectionsText(content != null ? content.getDirectionsText() : null);
+            // 요청 이미지 URL 은 null 을 포함해 그대로 덮어쓴다.
+            config.setHeroImageUrl(request.getHeroImageUrl());
+            config.setLogoImageUrl(request.getLogoImageUrl());
+            config.setIntroImageUrl(request.getIntroImageUrl());
         } else {
             config = MarketPageConfig.builder()
                     .market(market)
@@ -109,12 +113,22 @@ public class MarketPageSetupService {
                     .introText(content != null ? content.getIntroText() : null)
                     .historyText(content != null ? content.getHistoryText() : null)
                     .directionsText(content != null ? content.getDirectionsText() : null)
+                    // 요청 이미지 URL 은 null 을 포함해 그대로 저장한다.
+                    .heroImageUrl(request.getHeroImageUrl())
+                    .logoImageUrl(request.getLogoImageUrl())
+                    .introImageUrl(request.getIntroImageUrl())
                     .build();
         }
 
         marketPageConfigRepository.save(config);
 
-        return new Result(market.getId(), templateType, sectionsToSave);
+        return new Result(
+                market.getId(),
+                templateType,
+                sectionsToSave,
+                config.getHeroImageUrl(),
+                config.getLogoImageUrl(),
+                config.getIntroImageUrl());
     }
 
     /** saveSetup 결과 컨테이너. 컨트롤러에서 LinkedHashMap 응답 구성에 사용. */
@@ -122,11 +136,22 @@ public class MarketPageSetupService {
         private final Long marketId;
         private final String templateType;
         private final List<String> selectedSections;
+        private final String heroImageUrl;
+        private final String logoImageUrl;
+        private final String introImageUrl;
 
-        public Result(Long marketId, String templateType, List<String> selectedSections) {
+        public Result(Long marketId,
+                      String templateType,
+                      List<String> selectedSections,
+                      String heroImageUrl,
+                      String logoImageUrl,
+                      String introImageUrl) {
             this.marketId = marketId;
             this.templateType = templateType;
             this.selectedSections = selectedSections;
+            this.heroImageUrl = heroImageUrl;
+            this.logoImageUrl = logoImageUrl;
+            this.introImageUrl = introImageUrl;
         }
 
         public Long getMarketId() {
@@ -139,6 +164,18 @@ public class MarketPageSetupService {
 
         public List<String> getSelectedSections() {
             return selectedSections;
+        }
+
+        public String getHeroImageUrl() {
+            return heroImageUrl;
+        }
+
+        public String getLogoImageUrl() {
+            return logoImageUrl;
+        }
+
+        public String getIntroImageUrl() {
+            return introImageUrl;
         }
     }
 }

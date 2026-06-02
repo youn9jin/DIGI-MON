@@ -23,4 +23,13 @@ public class SaveMarketPageSetupRequest {
     private String templateType;
     private List<String> selectedSections;
     private MarketContentDto marketContent;
+
+    /** 공개 페이지 hero 이미지 URL. null 이면 DB 에 null 로 저장. */
+    private String heroImageUrl;
+
+    /** 공개 페이지 logo 이미지 URL. null 이면 DB 에 null 로 저장. */
+    private String logoImageUrl;
+
+    /** 공개 페이지 intro 이미지 URL. null 이면 DB 에 null 로 저장. */
+    private String introImageUrl;
 }
