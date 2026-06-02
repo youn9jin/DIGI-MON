@@ -53,6 +53,20 @@ export interface MarketPageSetupResponse {
   selectedSections: MarketPageSection[];
 }
 
+export interface UpdateMarketPageTextRequest {
+  heroSubtitle?: string;
+  introContent?: string;
+  feature1Description?: string;
+  feature2Description?: string;
+  historyText?: string;
+  directionsText?: string;
+}
+
+export interface UpdateMarketPageTextResponse {
+  marketId: string | number;
+  updatedFields: (keyof UpdateMarketPageTextRequest)[];
+}
+
 export interface MarketPageContentResponse {
   pageId: string | number;
   marketId?: string | number;
@@ -170,6 +184,23 @@ export async function saveMarketPageSetup(
   });
 
   return parseEnvelope<MarketPageSetupResponse>(response);
+}
+
+export async function updateMarketPageText(
+  text: UpdateMarketPageTextRequest,
+): Promise<UpdateMarketPageTextResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const authHeader = await getAuthorizationHeader();
+  const response = await fetch(`${baseUrl}/api/market/page/text`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeader,
+    },
+    body: JSON.stringify(text),
+  });
+
+  return parseEnvelope<UpdateMarketPageTextResponse>(response);
 }
 
 export async function createMarketPage(

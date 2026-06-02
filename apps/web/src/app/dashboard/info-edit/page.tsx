@@ -1,15 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useSyncExternalStore } from "react";
+import { type FormEvent, useMemo, useState, useSyncExternalStore } from "react";
 import Header from "@/components/layout/Header";
-import { type TemplateType } from "@/lib/api/market-page";
+import {
+  type MarketPageApiError,
+  type TemplateType,
+  type UpdateMarketPageTextRequest,
+  updateMarketPageText,
+} from "@/lib/api/market-page";
 import styles from "../manage.module.css";
 
 const setupStorageKey = "market_page_setup_draft";
 
+type MarketTextFieldId = "marketIntro" | "summary" | "history" | "intro1" | "intro2" | "parking";
+
 type MarketField = {
-  id: string;
+  id: MarketTextFieldId;
   label: string;
   placeholder: string;
   rows: 1 | 4;
@@ -106,6 +113,40 @@ const marketFieldsByTemplate: Record<TemplateType, MarketField[]> = {
   ],
 };
 
+const textApiFieldByTemplate: Record<
+  TemplateType,
+  Partial<Record<MarketTextFieldId, keyof UpdateMarketPageTextRequest>>
+> = {
+  TEMPLATE_1: {
+    marketIntro: "introContent",
+    intro1: "feature1Description",
+    intro2: "feature2Description",
+    parking: "directionsText",
+  },
+  TEMPLATE_2: {
+    summary: "heroSubtitle",
+    history: "historyText",
+    intro1: "feature1Description",
+    intro2: "feature2Description",
+    parking: "directionsText",
+  },
+  TEMPLATE_3: {
+    summary: "heroSubtitle",
+    intro1: "feature1Description",
+    intro2: "feature2Description",
+    parking: "directionsText",
+  },
+};
+
+const textMaxLengthByApiField: Record<keyof UpdateMarketPageTextRequest, number> = {
+  heroSubtitle: 50,
+  introContent: 300,
+  feature1Description: 300,
+  feature2Description: 300,
+  historyText: 200,
+  directionsText: 500,
+};
+
 function getTemplateType(value?: string | null): TemplateType | null {
   if (value === "TEMPLATE_1" || value === "TEMPLATE_2" || value === "TEMPLATE_3") {
     return value;
@@ -135,8 +176,16 @@ function subscribeToTemplateType() {
   return () => {};
 }
 
+function getFieldMaxLength(apiField?: keyof UpdateMarketPageTextRequest) {
+  return apiField ? textMaxLengthByApiField[apiField] : undefined;
+}
+
 export default function InfoEditPage() {
   const [tab, setTab] = useState<"market" | "store">("market");
+  const [marketValues, setMarketValues] = useState<Partial<Record<MarketTextFieldId, string>>>({});
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
+  const [saveError, setSaveError] = useState("");
   const templateType = useSyncExternalStore<TemplateType>(
     subscribeToTemplateType,
     getInitialTemplateType,
@@ -144,6 +193,51 @@ export default function InfoEditPage() {
   );
 
   const marketFields = marketFieldsByTemplate[templateType];
+  const apiFieldByFieldId = useMemo(() => textApiFieldByTemplate[templateType], [templateType]);
+
+  function updateFieldValue(fieldId: MarketTextFieldId, value: string) {
+    setMarketValues((current) => ({
+      ...current,
+      [fieldId]: value,
+    }));
+    setSaveMessage("");
+    setSaveError("");
+  }
+
+  async function handleSaveMarketText(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const payload = marketFields.reduce<UpdateMarketPageTextRequest>((result, field) => {
+      const apiField = apiFieldByFieldId[field.id];
+      const value = marketValues[field.id]?.trim();
+
+      if (apiField && value) {
+        result[apiField] = value;
+      }
+
+      return result;
+    }, {});
+
+    if (Object.keys(payload).length === 0) {
+      setSaveError("수정할 내용을 입력해주세요.");
+      setSaveMessage("");
+      return;
+    }
+
+    setIsSaving(true);
+    setSaveError("");
+    setSaveMessage("");
+
+    try {
+      await updateMarketPageText(payload);
+      setSaveMessage("수정한 문구를 저장했어요.");
+    } catch (error) {
+      const apiError = error as Partial<MarketPageApiError>;
+      setSaveError(apiError.message ?? "문구 저장에 실패했습니다.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   return (
     <main className={styles.page}>
@@ -186,23 +280,34 @@ export default function InfoEditPage() {
         </div>
 
         {tab === "market" ? (
-          <form className={styles.form}>
+          <form className={styles.form} onSubmit={handleSaveMarketText}>
             {marketFields.map((field) => (
               <div className={styles.field} key={`${templateType}-${field.id}`}>
                 <label htmlFor={`${templateType}-${field.id}`}>{field.label}</label>
                 {field.rows === 1 ? (
-                  <input id={`${templateType}-${field.id}`} placeholder={field.placeholder} />
+                  <input
+                    id={`${templateType}-${field.id}`}
+                    maxLength={getFieldMaxLength(apiFieldByFieldId[field.id])}
+                    placeholder={field.placeholder}
+                    value={marketValues[field.id] ?? ""}
+                    onChange={(event) => updateFieldValue(field.id, event.target.value)}
+                  />
                 ) : (
                   <textarea
                     id={`${templateType}-${field.id}`}
+                    maxLength={getFieldMaxLength(apiFieldByFieldId[field.id])}
                     placeholder={field.placeholder}
                     rows={field.rows}
+                    value={marketValues[field.id] ?? ""}
+                    onChange={(event) => updateFieldValue(field.id, event.target.value)}
                   />
                 )}
               </div>
             ))}
-            <button className={styles.saveButton} type="button">
-              저장하기
+            {saveError ? <p className={styles.formError}>{saveError}</p> : null}
+            {saveMessage ? <p className={styles.formMessage}>{saveMessage}</p> : null}
+            <button className={styles.saveButton} type="submit" disabled={isSaving}>
+              {isSaving ? "저장 중" : "저장하기"}
             </button>
           </form>
         ) : (
