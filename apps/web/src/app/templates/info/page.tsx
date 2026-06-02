@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import * as XLSX from "xlsx";
 import Header from "@/components/layout/Header";
 import {
   saveMarketPageSetup,
@@ -10,6 +11,7 @@ import {
   type MarketPageSection,
   type TemplateType,
 } from "@/lib/api/market-page";
+import { createStores, type StoreCreateItem } from "@/lib/api/stores";
 import styles from "./template-info.module.css";
 
 const backgroundImage = "/images/templates/info-preview/info-background.png";
@@ -40,15 +42,16 @@ const setupStorageKey = "market_page_setup_draft";
 const generatedPageIdStorageKey = "generated_market_page_id";
 const generationVersionStorageKey = "market_page_generation_version";
 
-type PreviewTarget = "intro" | "history" | "directions" | "stores";
+type PreviewTarget = "intro" | "history" | "stores";
 
 interface PreviewConfig {
   title: string;
-  modalClassName: string;
+  modalClassName?: string;
   canvasClassName: string;
   images: {
     alt: string;
     className: string;
+    imageClassName?: string;
     sizes: string;
     src: string;
   }[];
@@ -62,75 +65,169 @@ interface SetupDraft {
   selectedSections: MarketPageSection[];
 }
 
-const commonPreviewConfig: PreviewConfig = {
-  title: "미리보기",
-  modalClassName: styles.previewModalDefault,
-  canvasClassName: styles.previewCanvasDefault,
-  images: [
-    {
-      alt: "선택한 템플릿 미리보기",
-      className: styles.previewImageFill,
-      sizes: "1074px",
-      src: "/images/templates/info-preview/directions-preview.png",
-    },
-  ],
-  highlights: [styles.directionsHighlight],
-  instruction: "흰색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
-  instructionClassName: styles.previewInstructionLight,
+const storeHeaderMap: Record<keyof StoreCreateItem, string[]> = {
+  name: ["name", "점포명", "가게명", "상호명", "상호"],
+  category: ["category", "업종", "카테고리", "분류"],
+  items: ["items", "취급품목", "취급 품목", "대표메뉴", "대표 메뉴", "품목"],
+  operatingHours: ["operating_hours", "operatingHours", "영업시간", "운영시간", "운영 시간"],
+  yearsOfOperation: ["years_of_operation", "yearsOfOperation", "운영연수", "운영 연수"],
+  contact: ["contact", "연락처", "전화번호", "대표 연락처"],
+  description: ["description", "점포소개", "점포 소개", "소개"],
 };
 
-const template3PreviewConfigs: Record<PreviewTarget, PreviewConfig> = {
-  intro: {
-    title: "미리보기",
-    modalClassName: styles.previewModalDefault,
-    canvasClassName: styles.previewCanvasIntro,
-    images: [
-      {
-        alt: "시장 소개 글 위치 미리보기",
-        className: styles.previewImageFill,
-        sizes: "1149px",
-        src: "/images/templates/info-preview/intro-preview.png",
-      },
-    ],
-    highlights: [styles.introHighlight],
-    instruction: "흰색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
-    instructionClassName: styles.previewInstructionDark,
+const previewConfigs: Record<TemplateType, Record<PreviewTarget, PreviewConfig>> = {
+  TEMPLATE_1: {
+    intro: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate3Intro,
+      images: [
+        {
+          alt: "시장 소개 글 위치 미리보기",
+          className: styles.previewImageFill,
+          sizes: "900px",
+          src: "/images/templates/info-preview/template3-intro-preview.png",
+        },
+      ],
+      highlights: [styles.template3IntroHighlight],
+      instruction: "흰색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+      instructionClassName: styles.previewInstructionDark,
+    },
+    history: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate3History,
+      images: [
+        {
+          alt: "시장 역사 글 위치 미리보기",
+          className: styles.previewImageFill,
+          sizes: "720px",
+          src: "/images/templates/info-preview/template3-history-preview.png",
+        },
+      ],
+      highlights: [styles.template3HistoryHighlightTop, styles.template3HistoryHighlightBottom],
+      instruction: "검정색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+      instructionClassName: styles.previewInstructionMiddle,
+    },
+    stores: {
+      title: "미리보기",
+      modalClassName: styles.previewModalTall,
+      canvasClassName: styles.previewCanvasTemplate3Stores,
+      images: [
+        {
+          alt: "점포 검색 페이지 미리보기",
+          className: styles.template3StorePreviewLeft,
+          sizes: "470px",
+          src: "/images/templates/info-preview/template1-stores-preview-left.png",
+        },
+        {
+          alt: "점포 상세 페이지 미리보기",
+          className: styles.template3StorePreviewRight,
+          sizes: "462px",
+          src: "/images/templates/info-preview/template1-stores-preview-right.png",
+        },
+      ],
+    },
   },
-  history: {
-    title: "미리보기",
-    modalClassName: styles.previewModalDefault,
-    canvasClassName: styles.previewCanvasHistory,
-    images: [
-      {
-        alt: "시장 역사 글 위치 미리보기",
-        className: styles.previewImageFill,
-        sizes: "919px",
-        src: "/images/templates/info-preview/history-preview.png",
-      },
-    ],
-    highlights: [styles.historyHighlightTop, styles.historyHighlightBottom],
-    instruction: "검정색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
-    instructionClassName: styles.previewInstructionDark,
+  TEMPLATE_2: {
+    intro: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate2Intro,
+      images: [
+        {
+          alt: "시장 소개 글 위치 미리보기",
+          className: styles.previewImageFill,
+          imageClassName: styles.template2IntroImage,
+          sizes: "840px",
+          src: "/images/templates/info-preview/template2-intro-preview.png",
+        },
+      ],
+      highlights: [styles.template2IntroHighlight],
+      instruction: "초록색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+      instructionClassName: styles.previewInstructionLight,
+    },
+    history: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate2History,
+      images: [
+        {
+          alt: "시장 역사 글 위치 미리보기",
+          className: styles.previewImageFill,
+          imageClassName: styles.template2HistoryImage,
+          sizes: "840px",
+          src: "/images/templates/info-preview/template2-history-preview.png",
+        },
+      ],
+      highlights: [styles.template2HistoryHighlightTop, styles.template2HistoryHighlightBottom],
+      instruction: "초록색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+      instructionClassName: styles.previewInstructionLight,
+    },
+    stores: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate2Stores,
+      images: [
+        {
+          alt: "점포 검색 페이지 미리보기",
+          className: styles.template2StorePreviewLeft,
+          sizes: "470px",
+          src: "/images/templates/info-preview/template2-stores-preview-left.png",
+        },
+        {
+          alt: "점포 상세 페이지 미리보기",
+          className: styles.template2StorePreviewRight,
+          sizes: "462px",
+          src: "/images/templates/info-preview/template2-stores-preview-right.png",
+        },
+      ],
+    },
   },
-  directions: commonPreviewConfig,
-  stores: {
-    title: "미리보기",
-    modalClassName: styles.previewModalStores,
-    canvasClassName: styles.previewCanvasStores,
-    images: [
-      {
-        alt: "점포 검색 페이지 미리보기",
-        className: styles.storePreviewLeft,
-        sizes: "549px",
-        src: "/images/templates/info-preview/stores-preview-left.png",
-      },
-      {
-        alt: "점포 상세 페이지 미리보기",
-        className: styles.storePreviewRight,
-        sizes: "549px",
-        src: "/images/templates/info-preview/stores-preview-right.png",
-      },
-    ],
+  TEMPLATE_3: {
+    intro: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate1Intro,
+      images: [
+        {
+          alt: "시장 소개 글 위치 미리보기",
+          className: styles.previewImageFill,
+          sizes: "900px",
+          src: "/images/templates/info-preview/template1-intro-preview.png",
+        },
+      ],
+      highlights: [styles.template1IntroHighlight],
+      instruction: "검정색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+      instructionClassName: styles.previewInstructionDark,
+    },
+    history: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate1History,
+      images: [
+        {
+          alt: "시장 역사 글 위치 미리보기",
+          className: styles.previewImageFill,
+          sizes: "720px",
+          src: "/images/templates/info-preview/template1-history-preview.png",
+        },
+      ],
+      highlights: [styles.template1HistoryHighlightMain, styles.template1HistoryHighlightSide],
+      instruction: "검정색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+      instructionClassName: styles.previewInstructionDark,
+    },
+    stores: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate1Stores,
+      images: [
+        {
+          alt: "점포 검색 페이지 미리보기",
+          className: styles.template1StorePreviewLeft,
+          sizes: "470px",
+          src: "/images/templates/info-preview/template1-stores-preview-left.png",
+        },
+        {
+          alt: "점포 상세 페이지 미리보기",
+          className: styles.template1StorePreviewRight,
+          sizes: "462px",
+          src: "/images/templates/info-preview/template1-stores-preview-right.png",
+        },
+      ],
+    },
   },
 };
 
@@ -139,24 +236,26 @@ function getTemplateType(value: string | null): TemplateType {
     return value;
   }
 
-  return "TEMPLATE_3";
+  return "TEMPLATE_1";
 }
 
 function getSetupDraft(): SetupDraft {
   if (typeof window === "undefined") {
     return {
-      templateType: "TEMPLATE_3",
+      templateType: "TEMPLATE_1",
       selectedSections: ["intro", "history", "directions", "stores", "tourism"],
     };
   }
 
+  const queryTemplate = new URLSearchParams(window.location.search).get("template");
+  const templateTypeFromQuery = queryTemplate ? getTemplateType(queryTemplate) : null;
   const stored = window.sessionStorage.getItem(setupStorageKey);
   if (stored) {
     try {
       const parsed = JSON.parse(stored) as Partial<SetupDraft>;
       if (parsed.templateType && parsed.selectedSections?.length) {
         return {
-          templateType: getTemplateType(parsed.templateType),
+          templateType: templateTypeFromQuery ?? getTemplateType(parsed.templateType),
           selectedSections: parsed.selectedSections,
         };
       }
@@ -166,17 +265,56 @@ function getSetupDraft(): SetupDraft {
   }
 
   return {
-    templateType: getTemplateType(new URLSearchParams(window.location.search).get("template")),
+    templateType: templateTypeFromQuery ?? "TEMPLATE_1",
     selectedSections: ["intro", "history", "directions", "stores", "tourism"],
   };
 }
 
-function getPreviewConfig(templateType: TemplateType, target: PreviewTarget): PreviewConfig {
-  if (templateType === "TEMPLATE_3") {
-    return template3PreviewConfigs[target];
-  }
+function getPreviewConfig(_templateType: TemplateType, target: PreviewTarget): PreviewConfig {
+  return previewConfigs[_templateType][target];
+}
 
-  return commonPreviewConfig;
+function normalizeHeader(value: string): string {
+  return value.toLowerCase().replace(/[\s_/-]/g, "");
+}
+
+function normalizeCategory(value: string): string {
+  const trimmed = value.trim();
+  if (trimmed === "농/수산물" || trimmed === "농수산" || trimmed === "농수산물") {
+    return "농수산물";
+  }
+  return trimmed;
+}
+
+function getCell(row: Record<string, unknown>, field: keyof StoreCreateItem): string {
+  const aliases = storeHeaderMap[field].map(normalizeHeader);
+  const entry = Object.entries(row).find(([key]) => aliases.includes(normalizeHeader(key)));
+  const value = entry?.[1];
+  return value == null ? "" : String(value).trim();
+}
+
+async function parseStoreSheet(file: File): Promise<StoreCreateItem[]> {
+  const buffer = await file.arrayBuffer();
+  const workbook = XLSX.read(buffer, { type: "array" });
+  const firstSheetName = workbook.SheetNames[0];
+  const worksheet = firstSheetName ? workbook.Sheets[firstSheetName] : undefined;
+  if (!worksheet) return [];
+
+  const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, {
+    defval: "",
+  });
+
+  return rows
+    .map((row) => ({
+      name: getCell(row, "name"),
+      category: normalizeCategory(getCell(row, "category")),
+      items: getCell(row, "items"),
+      operatingHours: getCell(row, "operatingHours"),
+      yearsOfOperation: getCell(row, "yearsOfOperation"),
+      contact: getCell(row, "contact"),
+      description: getCell(row, "description"),
+    }))
+    .filter((store) => store.name.length > 0 || store.category.length > 0);
 }
 
 export default function TemplateInfoPage() {
@@ -189,19 +327,73 @@ export default function TemplateInfoPage() {
   });
   const [previewTarget, setPreviewTarget] = useState<PreviewTarget | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [storeFileName, setStoreFileName] = useState("");
+  const [storeUploadMessage, setStoreUploadMessage] = useState("");
+  const [stores, setStores] = useState<StoreCreateItem[]>([]);
+  const needsStoreFile = setupDraft.selectedSections.includes("stores");
   const previewConfig = previewTarget
     ? getPreviewConfig(setupDraft.templateType, previewTarget)
     : null;
   const isInfoComplete =
     marketContent.introText.trim().length > 0 &&
     marketContent.historyText.trim().length > 0 &&
-    marketContent.directionsText.trim().length > 0;
+    marketContent.directionsText.trim().length > 0 &&
+    (!needsStoreFile || stores.length > 0);
+
+  useEffect(() => {
+    if (!previewTarget) return;
+
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+    };
+  }, [previewTarget]);
+
+  async function handleStoreFileChange(file: File | undefined) {
+    setStoreUploadMessage("");
+    setStores([]);
+
+    if (!file) {
+      setStoreFileName("");
+      return;
+    }
+
+    setStoreFileName(file.name);
+    try {
+      const parsedStores = await parseStoreSheet(file);
+      if (parsedStores.length === 0) {
+        setStoreUploadMessage("읽을 수 있는 점포 정보가 없습니다.");
+        return;
+      }
+      setStores(parsedStores);
+      setStoreUploadMessage(`${parsedStores.length}개 점포 정보를 읽었어요.`);
+    } catch {
+      setStoreUploadMessage("파일을 읽지 못했습니다. xlsx 또는 csv 파일인지 확인해주세요.");
+    }
+  }
 
   async function handleInfoComplete() {
     if (isSaving || !isInfoComplete) return;
 
     setIsSaving(true);
     try {
+      if (stores.length > 0) {
+        const result = await createStores(stores);
+        if (result.failedItems?.length > 0) {
+          const firstFailed = result.failedItems[0];
+          window.alert(
+            `${result.successCount}개 등록, ${result.failedItems.length}개 실패했습니다.\n${firstFailed.name ?? "점포"}: ${firstFailed.reason}`,
+          );
+          setIsSaving(false);
+          return;
+        }
+      }
+
       await saveMarketPageSetup({
         templateType: setupDraft.templateType,
         selectedSections: setupDraft.selectedSections,
@@ -244,9 +436,11 @@ export default function TemplateInfoPage() {
                 <h3>
                   {index + 1}. {field.title}
                 </h3>
-                <button type="button" onClick={() => setPreviewTarget(field.id)}>
-                  글 위치 확인하기
-                </button>
+                {field.id !== "directions" && (
+                  <button type="button" onClick={() => setPreviewTarget(field.id)}>
+                    글 위치 확인하기
+                  </button>
+                )}
               </div>
               <textarea
                 aria-label={field.title}
@@ -285,9 +479,16 @@ export default function TemplateInfoPage() {
               시장 점포의 정보(영업시간, 연락처, 대표메뉴 등)가 담긴 파일을 업로드해주세요.
             </p>
             <label className={styles.fileUpload}>
-              <input type="file" />
-              <span>파일 첨부</span>
+              <input
+                type="file"
+                accept=".xlsx,.xls,.csv"
+                onChange={(event) => handleStoreFileChange(event.target.files?.[0])}
+              />
+              <span>{storeFileName || "파일 첨부"}</span>
             </label>
+            {storeUploadMessage && (
+              <p className={styles.storeUploadMessage}>{storeUploadMessage}</p>
+            )}
           </section>
         </form>
 
@@ -305,7 +506,9 @@ export default function TemplateInfoPage() {
 
       {previewConfig && (
         <div className={styles.previewOverlay} role="dialog" aria-modal="true">
-          <div className={`${styles.previewModal} ${previewConfig.modalClassName}`}>
+          <div
+            className={`${styles.previewModal} ${previewConfig.modalClassName ?? ""}`}
+          >
             <button
               className={styles.closePreview}
               type="button"
@@ -316,7 +519,13 @@ export default function TemplateInfoPage() {
             <div className={`${styles.previewCanvas} ${previewConfig.canvasClassName}`}>
               {previewConfig.images.map((image) => (
                 <span className={image.className} key={image.src}>
-                  <Image alt={image.alt} fill sizes={image.sizes} src={image.src} />
+                  <Image
+                    alt={image.alt}
+                    className={image.imageClassName}
+                    fill
+                    sizes={image.sizes}
+                    src={image.src}
+                  />
                 </span>
               ))}
               {previewConfig.highlights?.map((highlightClassName) => (
@@ -328,7 +537,7 @@ export default function TemplateInfoPage() {
               ))}
             </div>
             {previewConfig.instruction && (
-              <p className={previewConfig.instructionClassName}>
+              <p className={previewConfig.instructionClassName ?? styles.previewInstructionDark}>
                 {previewConfig.instruction}
               </p>
             )}

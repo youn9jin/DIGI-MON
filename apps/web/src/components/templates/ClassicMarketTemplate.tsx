@@ -22,7 +22,7 @@ export interface ClassicMarketTemplateData {
 }
 
 const DEFAULT_DATA: ClassicMarketTemplateData = {
-  marketName: "DIGI-MON 전통시장",
+  marketName: "Market Name",
   intro: "시장만의 매력과 대표 먹거리, 상점 정보를 한눈에 볼 수 있는 전통시장 웹사이트입니다.",
   address: "서울특별시 중구 전통시장로 12",
   contact: "02-0000-0000",
@@ -67,13 +67,21 @@ const bannerItems = [
 interface ClassicMarketTemplateProps {
   data?: Partial<ClassicMarketTemplateData>;
   previewMode?: boolean;
+  publicBasePath?: string;
 }
 
 export default function ClassicMarketTemplate({
   data,
   previewMode = false,
+  publicBasePath,
 }: ClassicMarketTemplateProps) {
   const content = { ...DEFAULT_DATA, ...data };
+  const getHref = (href: string) => {
+    if (!publicBasePath) return href;
+    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
+    return `${publicBasePath}${hash}`;
+  };
 
   return (
     <main className={styles.page}>
@@ -84,7 +92,7 @@ export default function ClassicMarketTemplate({
             key={`${item.color}-${index}`}
           >
             {item.label && item.href ? (
-              <Link className={styles.bannerLabel} href={item.href}>
+              <Link className={styles.bannerLabel} href={getHref(item.href)}>
                 {item.label}
               </Link>
             ) : item.label ? (
@@ -126,10 +134,10 @@ export default function ClassicMarketTemplate({
 
       <footer className={styles.footer}>
         <nav className={styles.footerNav} aria-label="하단 메뉴">
-          <Link href="/templates/classic#intro">시장소개</Link>
-          <Link href="/templates/classic/stores">가게안내</Link>
-          <Link href="/templates/classic#tour">관광정보</Link>
-          <Link href="/templates/classic#map">찾아오시는 길</Link>
+          <Link href={getHref("/templates/classic#intro")}>시장소개</Link>
+          <Link href={getHref("/templates/classic/stores")}>가게안내</Link>
+          <Link href={getHref("/templates/classic#tour")}>관광정보</Link>
+          <Link href={getHref("/templates/classic#map")}>찾아오시는 길</Link>
         </nav>
 
         <div className={styles.footerInfo}>
@@ -153,7 +161,7 @@ export default function ClassicMarketTemplate({
       {previewMode && (
         <TemplateGenerationActions
           previewHref="/templates/classic"
-          templateType="TEMPLATE_1"
+          templateType="TEMPLATE_3"
         />
       )}
     </main>

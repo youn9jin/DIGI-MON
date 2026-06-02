@@ -11,8 +11,31 @@ function getFeature(
   return content.features?.[index] ?? {};
 }
 
+function getStoreHighlight(
+  content: MarketPageContentResponse,
+  index: number,
+): { storeName?: string; highlight?: string } {
+  return content.storeHighlights?.[index] ?? {};
+}
+
 function firstText(...values: Array<string | null | undefined>): string {
   return values.find((value) => value && value.trim().length > 0) ?? "";
+}
+
+function optionalText(value: string): string | undefined {
+  return value.trim().length > 0 ? value : undefined;
+}
+
+function commonMarketFields(content: MarketPageContentResponse, me?: MeResponse) {
+  const marketName = optionalText(firstText(content.marketName, me?.marketName));
+  const address = optionalText(firstText(content.address, me?.address));
+  const contact = optionalText(firstText(content.contact));
+
+  return {
+    ...(marketName ? { marketName } : {}),
+    ...(address ? { address } : {}),
+    ...(contact ? { contact } : {}),
+  };
 }
 
 export function mapClassicMarketPageContent(
@@ -23,10 +46,9 @@ export function mapClassicMarketPageContent(
   const secondFeature = getFeature(content, 1);
 
   return {
-    ...(me?.marketName ? { marketName: me.marketName } : {}),
-    ...(me?.address ? { address: me.address } : {}),
+    ...commonMarketFields(content, me),
     intro: firstText(content.intro?.content, content.hero?.description),
-    heroTitle: firstText(content.hero?.title, me?.marketName),
+    heroTitle: firstText(content.hero?.title, content.marketName, me?.marketName),
     heroSubtitle: firstText(content.hero?.subtitle, firstFeature.title),
     heroBody: firstText(content.hero?.description, content.intro?.content),
     secondTitle: firstText(firstFeature.title, secondFeature.title),
@@ -43,10 +65,9 @@ export function mapModernMarketPageContent(
   const secondFeature = getFeature(content, 1);
 
   return {
-    ...(me?.marketName ? { marketName: me.marketName } : {}),
-    ...(me?.address ? { address: me.address } : {}),
+    ...commonMarketFields(content, me),
     intro: firstText(content.intro?.content, content.hero?.description),
-    heroTitle: firstText(content.hero?.title, me?.marketName),
+    heroTitle: firstText(content.hero?.title, content.marketName, me?.marketName),
     heroSubtitle: firstText(content.hero?.subtitle, content.hero?.description),
     featureTitle: firstText(firstFeature.title, secondFeature.title),
     featureBody: firstText(firstFeature.description, secondFeature.description),
@@ -61,18 +82,26 @@ export function mapEditorialMarketPageContent(
 ): Partial<EditorialMarketTemplateData> {
   const firstFeature = getFeature(content, 0);
   const secondFeature = getFeature(content, 1);
+  const firstStore = getStoreHighlight(content, 0);
 
   return {
-    ...(me?.marketName ? { marketName: me.marketName } : {}),
-    ...(me?.address ? { address: me.address } : {}),
+    ...commonMarketFields(content, me),
     intro: firstText(content.intro?.content, content.hero?.description),
-    foodText: firstText(firstFeature.description, content.hero?.subtitle),
+    foodText: firstText(firstStore.highlight, firstFeature.description, content.hero?.subtitle),
     cultureText: firstText(secondFeature.description, firstFeature.title),
   };
 }
 
+export function getGeneratedMarketPageHref(pageId: string | number): string {
+  return `/markets/${encodeURIComponent(String(pageId))}`;
+}
+
+export function getTemplateRouteSlug(templateType?: string | null): string {
+  if (templateType === "TEMPLATE_1") return "editorial";
+  if (templateType === "TEMPLATE_2") return "modern";
+  return "classic";
+}
+
 export function getTemplatePreviewHref(templateType?: string | null): string {
-  if (templateType === "TEMPLATE_1") return "/templates/classic";
-  if (templateType === "TEMPLATE_2") return "/templates/modern";
-  return "/templates/editorial";
+  return `/templates/${getTemplateRouteSlug(templateType)}`;
 }

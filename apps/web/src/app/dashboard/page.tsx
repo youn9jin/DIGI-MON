@@ -12,13 +12,13 @@ import styles from "./dashboard.module.css";
 
 const actions = [
   {
-    href: "/templates/info",
+    href: "/dashboard/info-edit",
     image: "/images/dashboard/info-edit.png",
     imageClassName: styles.infoImage,
     label: "웹사이트 상세 정보 수정하기",
   },
   {
-    href: "/templates",
+    href: "/dashboard/template-change",
     image: "/images/dashboard/template-change.png",
     imageClassName: styles.templateImage,
     label: "다른 템플릿으로 교체하기",

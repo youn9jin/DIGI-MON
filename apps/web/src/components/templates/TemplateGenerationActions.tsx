@@ -9,6 +9,7 @@ import {
   type MarketPageApiError,
   type TemplateType,
 } from "@/lib/api/market-page";
+import { getGeneratedMarketPageHref } from "@/lib/market-page-template-data";
 import styles from "./ClassicMarketTemplate.module.css";
 
 interface TemplateGenerationActionsProps {
@@ -30,7 +31,6 @@ function getServerEmbeddedSnapshot() {
 
 export default function TemplateGenerationActions({
   templateType,
-  previewHref,
 }: TemplateGenerationActionsProps) {
   const router = useRouter();
   const pollTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -56,7 +56,7 @@ export default function TemplateGenerationActions({
       if (result.status === "DONE") {
         setIsGenerating(false);
         const pageId = result.pageId ?? jobId;
-        router.push(`${previewHref}?pageId=${encodeURIComponent(String(pageId))}`);
+        router.push(getGeneratedMarketPageHref(pageId));
         return;
       }
 

@@ -9,12 +9,9 @@ import {
 } from "./EditorialMarketStoresTemplate";
 import styles from "./EditorialMarketTemplate.module.css";
 
-const heroImage =
-  "https://www.figma.com/api/mcp/asset/7ef789ad-3a1b-41f6-a97a-34fb50eb3cf6";
-const menuImage1 =
-  "https://www.figma.com/api/mcp/asset/4682c63f-93dd-4c20-a7b9-2c9426e8ce1c";
-const menuImage2 =
-  "https://www.figma.com/api/mcp/asset/a7605c2b-d3ec-4db9-9abf-51f0443aadfd";
+const heroImage = "/images/templates/preview/editorial-store-detail-hero.png";
+const menuImage1 = "/images/templates/preview/editorial-menu-1.png";
+const menuImage2 = "/images/templates/preview/editorial-menu-2.png";
 
 interface EditorialMarketStoreDetailTemplateProps {
   store: ClassicStore;
@@ -22,18 +19,20 @@ interface EditorialMarketStoreDetailTemplateProps {
   address?: string;
   contact?: string;
   previewMode?: boolean;
+  publicBasePath?: string;
 }
 
 export default function EditorialMarketStoreDetailTemplate({
   store,
-  marketName = "Market name",
+  marketName = "Market Name",
   address = "상세주소 text",
   contact = "TELEPHONENUM",
   previewMode = false,
+  publicBasePath,
 }: EditorialMarketStoreDetailTemplateProps) {
   return (
     <main className={`${styles.page} ${styles.detailPage}`}>
-      <EditorialHeader marketName={marketName} />
+      <EditorialHeader marketName={marketName} publicBasePath={publicBasePath} />
 
       <section className={styles.detailHero} aria-label="가게 상세">
         <Image
@@ -86,12 +85,16 @@ export default function EditorialMarketStoreDetailTemplate({
         </ul>
       </section>
 
-      <EditorialFooter address={address} contact={contact} />
+      <EditorialFooter
+        address={address}
+        contact={contact}
+        publicBasePath={publicBasePath}
+      />
 
       {previewMode && (
         <TemplateGenerationActions
           previewHref="/templates/editorial"
-          templateType="TEMPLATE_3"
+          templateType="TEMPLATE_1"
         />
       )}
     </main>

@@ -7,14 +7,14 @@ import TemplateGenerationActions from "./TemplateGenerationActions";
 import { classicStores } from "./classicStoreData";
 import styles from "./ModernMarketTemplate.module.css";
 
-const imgMarketMainPhoto =
-  "https://www.figma.com/api/mcp/asset/17ea6abd-5a99-4612-a41d-962f36122174";
+const imgMarketMainPhoto = "/images/templates/preview/modern-store-hero.png";
 
 interface ModernMarketStoresTemplateProps {
   marketName?: string;
   address?: string;
   contact?: string;
   previewMode?: boolean;
+  publicBasePath?: string;
 }
 
 const categories = ["농/수산물", "먹거리", "의류", "생활용품", "기타"];
@@ -26,26 +26,34 @@ const navItems = [
 ];
 
 export default function ModernMarketStoresTemplate({
-  marketName = "Market name",
+  marketName = "Market Name",
   address = "상세주소 text",
   contact = "TELEPHONENUM",
   previewMode = false,
+  publicBasePath,
 }: ModernMarketStoresTemplateProps) {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const stores =
     selectedCategory === "전체"
       ? classicStores
       : classicStores.filter((store) => store.category === selectedCategory);
+  const previewSuffix = publicBasePath ? "?preview=design" : "";
+  const getHref = (href: string) => {
+    if (!publicBasePath) return href;
+    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
+    return `${publicBasePath}${hash}`;
+  };
 
   return (
     <main className={`${styles.page} ${styles.storeGuidePage}`}>
       <header className={styles.header}>
-        <Link className={styles.brand} href="/templates/modern">
+        <Link className={styles.brand} href={publicBasePath ?? "/templates/modern"}>
           {marketName}
         </Link>
         <nav aria-label="템플릿 메뉴">
           {navItems.map((item) => (
-            <Link href={item.href} key={item.label}>
+            <Link href={getHref(item.href)} key={item.label}>
               {item.label}
             </Link>
           ))}
@@ -89,7 +97,7 @@ export default function ModernMarketStoresTemplate({
         {stores.map((store, index) => (
           <Link
             className={styles.modernStoreCard}
-            href={`/templates/modern/stores/${store.id}`}
+            href={`/templates/modern/stores/${store.id}${previewSuffix}`}
             key={`${store.id}-${index}`}
           >
             <span>{store.category}</span>
@@ -101,10 +109,10 @@ export default function ModernMarketStoresTemplate({
 
       <footer className={styles.footer}>
         <nav aria-label="하단 메뉴">
-          <Link href="/templates/modern#intro">시장소개</Link>
-          <Link href="/templates/modern/stores">가게안내</Link>
-          <Link href="/templates/modern#tour">관광정보</Link>
-          <Link href="/templates/modern#map">찾아오시는 길</Link>
+          <Link href={getHref("/templates/modern#intro")}>시장소개</Link>
+          <Link href={getHref("/templates/modern/stores")}>가게안내</Link>
+          <Link href={getHref("/templates/modern#tour")}>관광정보</Link>
+          <Link href={getHref("/templates/modern#map")}>찾아오시는 길</Link>
         </nav>
         <div className={styles.footerInfo}>
           <div>

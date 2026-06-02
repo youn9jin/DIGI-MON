@@ -7,23 +7,24 @@ import TemplateGenerationActions from "./TemplateGenerationActions";
 import { classicStores } from "./classicStoreData";
 import styles from "./EditorialMarketTemplate.module.css";
 
-const heroImage =
-  "https://www.figma.com/api/mcp/asset/8d2d6ac4-5e37-4669-ba6f-d4d6d9554b72";
+const heroImage = "/images/templates/preview/editorial-store-hero.png";
 
 interface EditorialMarketStoresTemplateProps {
   marketName?: string;
   address?: string;
   contact?: string;
   previewMode?: boolean;
+  publicBasePath?: string;
 }
 
 const categories = ["농/수산물", "먹거리", "의류", "생활용품", "기타"];
 
 export default function EditorialMarketStoresTemplate({
-  marketName = "Market name",
+  marketName = "Market Name",
   address = "상세주소 text",
   contact = "TELEPHONENUM",
   previewMode = false,
+  publicBasePath,
 }: EditorialMarketStoresTemplateProps) {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,10 +41,14 @@ export default function EditorialMarketStoresTemplate({
       return matchesCategory && matchesSearch;
     });
   }, [searchTerm, selectedCategory]);
+  const previewSuffix = publicBasePath ? "?preview=design" : "";
 
   return (
     <main className={styles.page}>
-      <EditorialHeader marketName={marketName} />
+      <EditorialHeaderWithBasePath
+        marketName={marketName}
+        publicBasePath={publicBasePath}
+      />
 
       <section className={styles.storeHero} aria-label="점포 찾기">
         <Image
@@ -91,7 +96,7 @@ export default function EditorialMarketStoresTemplate({
         {stores.map((store) => (
           <Link
             className={styles.editorialStoreCard}
-            href={`/templates/editorial/stores/${store.id}`}
+            href={`/templates/editorial/stores/${store.id}${previewSuffix}`}
             key={store.id}
           >
             <strong>{store.category}</strong>
@@ -100,19 +105,50 @@ export default function EditorialMarketStoresTemplate({
         ))}
       </section>
 
-      <EditorialFooter address={address} contact={contact} />
+      <EditorialFooter
+        address={address}
+        contact={contact}
+        publicBasePath={publicBasePath}
+      />
 
       {previewMode && (
         <TemplateGenerationActions
           previewHref="/templates/editorial"
-          templateType="TEMPLATE_3"
+          templateType="TEMPLATE_1"
         />
       )}
     </main>
   );
 }
 
-export function EditorialHeader({ marketName }: { marketName: string }) {
+export function EditorialHeader({
+  marketName,
+  publicBasePath,
+}: {
+  marketName: string;
+  publicBasePath?: string;
+}) {
+  return (
+    <EditorialHeaderWithBasePath
+      marketName={marketName}
+      publicBasePath={publicBasePath}
+    />
+  );
+}
+
+export function EditorialHeaderWithBasePath({
+  marketName,
+  publicBasePath,
+}: {
+  marketName: string;
+  publicBasePath?: string;
+}) {
+  const getHref = (href: string) => {
+    if (!publicBasePath) return href;
+    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
+    return `${publicBasePath}${hash}`;
+  };
   const navItems = [
     { label: "정보 안내", href: "/templates/editorial#intro" },
     { label: "점포 안내", href: "/templates/editorial/stores" },
@@ -121,12 +157,12 @@ export function EditorialHeader({ marketName }: { marketName: string }) {
 
   return (
     <header className={styles.header}>
-      <Link className={styles.logo} href="/templates/editorial">
+      <Link className={styles.logo} href={publicBasePath ?? "/templates/editorial"}>
         {marketName}
       </Link>
       <nav aria-label="템플릿 메뉴">
         {navItems.map((item) => (
-          <Link href={item.href} key={item.label}>
+          <Link href={getHref(item.href)} key={item.label}>
             {item.label}
           </Link>
         ))}
@@ -138,17 +174,26 @@ export function EditorialHeader({ marketName }: { marketName: string }) {
 export function EditorialFooter({
   address,
   contact,
+  publicBasePath,
 }: {
   address: string;
   contact: string;
+  publicBasePath?: string;
 }) {
+  const getHref = (href: string) => {
+    if (!publicBasePath) return href;
+    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
+    return `${publicBasePath}${hash}`;
+  };
+
   return (
     <footer className={styles.footer}>
       <nav aria-label="하단 메뉴">
-        <Link href="/templates/editorial#intro">시장소개</Link>
-        <Link href="/templates/editorial/stores">가게안내</Link>
-        <Link href="/templates/editorial#culture">관광정보</Link>
-        <Link href="/templates/editorial#map">찾아오시는 길</Link>
+        <Link href={getHref("/templates/editorial#intro")}>시장소개</Link>
+        <Link href={getHref("/templates/editorial/stores")}>가게안내</Link>
+        <Link href={getHref("/templates/editorial#culture")}>관광정보</Link>
+        <Link href={getHref("/templates/editorial#map")}>찾아오시는 길</Link>
       </nav>
       <div className={styles.footerInfo}>
         <div>

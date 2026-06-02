@@ -191,6 +191,14 @@
   line-height: 45px;
 }
 
+.storeUploadMessage {
+  width: min(100%, 1155px);
+  margin: 14px 0 0;
+  color: #4f4f4f;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
 .actions {
   display: flex;
   justify-content: center;
@@ -233,38 +241,36 @@
   inset: 0;
   z-index: 100;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  overflow-y: auto;
+  overflow: hidden;
+  overscroll-behavior: contain;
   background: rgba(37, 37, 37, 0.65);
-  padding: 87px 24px;
+  padding: 24px;
 }
 
 .previewModal {
   position: relative;
-  width: min(calc(100vw - 48px), 1343px);
-  max-height: calc(100svh - 48px);
-  overflow: auto;
-  border-radius: clamp(42px, 5.21vw, 100px);
+  width: min(1040px, calc(100vw - 128px), calc((100svh - 160px) * 1.4758));
+  aspect-ratio: 1343 / 910;
+  overflow: hidden;
+  border-radius: clamp(34px, 4.4vw, 72px);
   background: rgba(253, 253, 253, 0.95);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
-.previewModalDefault {
-  height: 910px;
-}
-
-.previewModalStores {
-  height: 1323px;
+.previewModalTall {
+  width: min(1040px, calc(100vw - 128px), calc((100svh - 160px) * 1.0159));
+  aspect-ratio: 1343 / 1323;
 }
 
 .closePreview {
   position: absolute;
-  top: 43px;
-  left: 68px;
+  top: 4.73%;
+  left: 5.06%;
   z-index: 2;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -274,9 +280,9 @@
 .closePreview::before,
 .closePreview::after {
   position: absolute;
-  top: 8px;
-  left: -1px;
-  width: 20px;
+  top: 11px;
+  left: 1px;
+  width: 22px;
   height: 1px;
   background: #000;
   content: "";
@@ -292,15 +298,14 @@
 
 .previewModal h2 {
   position: absolute;
-  top: 38px;
+  top: 4.84%;
   left: 50%;
   z-index: 2;
   margin: 0;
   color: #0f0f0f;
-  font-size: 20px;
+  font-size: clamp(16px, 1.15vw, 20px);
   font-weight: 600;
-  line-height: 24px;
-  text-align: center;
+  line-height: 1.2;
   transform: translateX(-50%);
 }
 
@@ -309,44 +314,33 @@
   overflow: hidden;
 }
 
-.previewCanvasDefault {
-  top: 98px;
-  left: 50%;
-  width: min(80%, 1074px);
-  height: 812px;
-  background: #5c5c5c;
-  transform: translateX(-50%);
+.previewCanvasTemplate1Intro {
+  top: 10.77%;
+  left: 12.43%;
+  width: 76.32%;
+  height: 89.23%;
 }
 
-.previewCanvasIntro {
-  top: 99px;
-  left: 50%;
-  width: min(calc(100% - 194px), 1149px);
-  height: 812px;
-  transform: translateX(-50%);
+.previewCanvasTemplate1History {
+  top: 10.66%;
+  left: 17.13%;
+  width: 65.82%;
+  height: 89.23%;
 }
 
-.previewCanvasHistory {
-  top: 99px;
-  left: 50%;
-  width: min(calc(100% - 424px), 919px);
-  height: 812px;
-  transform: translateX(-50%);
-}
-
-.previewCanvasStores {
-  top: 194px;
-  left: 50%;
-  width: min(calc(100% - 220px), 1123px);
-  height: min(1039px, calc((100vw - 220px) * 0.9252));
-  min-height: 560px;
-  overflow: visible;
-  transform: translateX(-50%);
+.previewCanvasTemplate1Stores,
+.previewCanvasTemplate2Stores,
+.previewCanvasTemplate3Stores {
+  inset: 0;
 }
 
 .previewImageFill,
-.storePreviewLeft,
-.storePreviewRight {
+.template1StorePreviewLeft,
+.template1StorePreviewRight,
+.template2StorePreviewLeft,
+.template2StorePreviewRight,
+.template3StorePreviewLeft,
+.template3StorePreviewRight {
   position: absolute;
   display: block;
 }
@@ -355,76 +349,197 @@
   inset: 0;
 }
 
-.storePreviewLeft {
-  top: 0;
-  left: 0;
-  width: 48.89%;
-  height: 48.32%;
+.template1StorePreviewLeft {
+  top: 16.59%;
+  left: 5.51%;
+  width: 44.23%;
+  height: 71.32%;
 }
 
-.storePreviewRight {
-  top: 0;
-  left: 51.11%;
-  width: 48.89%;
-  height: 100%;
+.template1StorePreviewRight {
+  top: 16.59%;
+  left: 50.93%;
+  width: 43.56%;
+  height: 71.32%;
 }
 
 .previewImageFill img,
-.storePreviewLeft img,
-.storePreviewRight img {
+.template1StorePreviewLeft img,
+.template1StorePreviewRight img,
+.template2StorePreviewLeft img,
+.template2StorePreviewRight img,
+.template3StorePreviewLeft img,
+.template3StorePreviewRight img {
   object-fit: cover;
   object-position: top center;
 }
 
+.template2IntroImage {
+  top: -20.07% !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 209.37% !important;
+  max-width: none !important;
+  object-fit: fill !important;
+}
+
+.template2HistoryImage {
+  top: -0.02% !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 109.22% !important;
+  max-width: none !important;
+  object-fit: fill !important;
+}
+
 .highlightBox {
   position: absolute;
+  border: 2px solid #131313;
   pointer-events: none;
 }
 
-.directionsHighlight {
-  left: 14.43%;
-  bottom: 82px;
-  width: 71.14%;
-  height: 175px;
-  border: 2px solid #fff;
+.template1IntroHighlight {
+  left: 24.88%;
+  top: 31.03%;
+  width: 50.24%;
+  height: 9.48%;
 }
 
-.introHighlight {
+.template1HistoryHighlightMain {
+  left: 0;
+  top: 47.54%;
+  width: 37.9%;
+  height: 29.43%;
+}
+
+.template1HistoryHighlightSide {
+  left: 66.63%;
+  top: 10.22%;
+  width: 33.37%;
+  height: 29.43%;
+}
+
+.previewCanvasTemplate2Intro {
+  top: 10.77%;
+  left: 9.98%;
+  width: 79.97%;
+  height: 89.23%;
+}
+
+.previewCanvasTemplate2History {
+  top: 10.22%;
+  left: 9.98%;
+  width: 79.97%;
+  height: 89.78%;
+}
+
+.template2IntroHighlight {
+  left: 14.43%;
+  top: 68.35%;
+  width: 71.14%;
+  height: 21.55%;
+  border-color: #5af6a3;
+}
+
+.template2HistoryHighlightTop {
+  left: 51.77%;
+  top: 41.98%;
+  width: 39.94%;
+  height: 24.24%;
+  border-color: #5af6a3;
+}
+
+.template2HistoryHighlightBottom {
+  left: 8.85%;
+  top: 67.56%;
+  width: 39.94%;
+  height: 24.24%;
+  border-color: #5af6a3;
+}
+
+.template2StorePreviewLeft {
+  top: 19.78%;
+  left: 5.66%;
+  width: 45.27%;
+  height: 60.33%;
+}
+
+.template2StorePreviewRight {
+  top: 19.78%;
+  left: 51.38%;
+  width: 42.81%;
+  height: 60.33%;
+}
+
+.previewCanvasTemplate3Intro {
+  top: 10.88%;
+  left: 7.82%;
+  width: 85.55%;
+  height: 89.23%;
+}
+
+.previewCanvasTemplate3History {
+  top: 10.88%;
+  left: 16.08%;
+  width: 68.43%;
+  height: 89.23%;
+}
+
+.template3IntroHighlight {
   left: 4.7%;
   top: 66.38%;
   width: 90.08%;
   height: 18.84%;
-  border: 2px solid #fff;
+  border-color: #fff;
 }
 
-.historyHighlightTop {
+.template3HistoryHighlightTop {
   left: 2.39%;
   top: 40.15%;
   width: 89.01%;
   height: 12.19%;
-  border: 2px solid #131313;
 }
 
-.historyHighlightBottom {
+.template3HistoryHighlightBottom {
   left: 62.46%;
   top: 76.35%;
   width: 28.94%;
   height: 23.15%;
-  border: 2px solid #131313;
+}
+
+.template3StorePreviewLeft {
+  top: 14.66%;
+  left: 8.12%;
+  width: 40.88%;
+  height: 37.94%;
+}
+
+.template3StorePreviewRight {
+  top: 14.66%;
+  left: 50.86%;
+  width: 40.88%;
+  height: 78.53%;
 }
 
 .previewInstructionDark,
-.previewInstructionLight {
+.previewInstructionLight,
+.previewInstructionMiddle {
   position: absolute;
-  bottom: 37px;
   left: 50%;
   z-index: 2;
+  width: calc(100% - 96px);
   margin: 0;
-  font-size: 15px;
+  color: #131313;
+  font-size: clamp(13px, 1vw, 15px);
   font-weight: 500;
   text-align: center;
   transform: translateX(-50%);
   white-space: nowrap;
+}
+
+.previewInstructionDark,
+.previewInstructionLight {
+  bottom: 4%;
 }
 
 .previewInstructionDark {
@@ -433,7 +548,11 @@
 
 .previewInstructionLight {
   color: #fff;
-  font-weight: 300;
+}
+
+.previewInstructionMiddle {
+  top: 58.9%;
+  color: #131313;
 }
 
 @media (max-width: 900px) {
@@ -443,15 +562,6 @@
     padding: 52px 28px 56px;
   }
 
-  .previewCanvasIntro,
-  .previewCanvasHistory {
-    width: calc(100% - 56px);
-  }
-
-  .previewCanvasStores {
-    width: calc(100% - 56px);
-    height: calc((100vw - 104px) * 0.9252);
-  }
 }
 
 @media (max-width: 720px) {
@@ -507,39 +617,19 @@
   }
 
   .previewModal {
-    height: 680px;
+    width: calc(100vw - 28px);
     border-radius: 34px;
   }
 
-  .previewModalStores {
-    height: 840px;
-  }
-
-  .previewCanvasDefault,
-  .previewCanvasIntro,
-  .previewCanvasHistory {
-    top: 86px;
-    width: 86%;
-    height: 520px;
-  }
-
-  .previewCanvasStores {
-    top: 112px;
-    width: calc(100% - 44px);
-    height: calc((100vw - 72px) * 0.9252);
-    min-height: 460px;
-  }
-
-  .directionsHighlight {
-    bottom: 58px;
-    height: 112px;
-  }
-
   .previewInstructionDark,
-  .previewInstructionLight {
-    bottom: 28px;
+  .previewInstructionLight,
+  .previewInstructionMiddle {
+    bottom: 20px;
     width: calc(100% - 40px);
-    font-size: 13px;
     white-space: normal;
+  }
+
+  .previewInstructionMiddle {
+    top: auto;
   }
 }

@@ -55,6 +55,9 @@ export interface MarketPageContentResponse {
   pageId: string | number;
   templateType?: TemplateType | string | null;
   selectedSections?: MarketPageSection[] | string[] | null;
+  marketName?: string | null;
+  address?: string | null;
+  contact?: string | null;
   hero?: {
     title?: string;
     subtitle?: string;
@@ -253,6 +256,17 @@ export async function getMarketPageContent(
   const response = await fetch(
     `${baseUrl}/api/market/page/${encodeURIComponent(String(pageId))}`,
     { headers: authHeader },
+  );
+
+  return parseEnvelope<MarketPageContentResponse>(response);
+}
+
+export async function getPublicMarketPageContent(
+  pageId: string | number,
+): Promise<MarketPageContentResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const response = await fetch(
+    `${baseUrl}/api/public/market/page/${encodeURIComponent(String(pageId))}`,
   );
 
   return parseEnvelope<MarketPageContentResponse>(response);

@@ -19,7 +19,7 @@ export interface ModernMarketTemplateData {
 }
 
 const DEFAULT_DATA: ModernMarketTemplateData = {
-  marketName: "DIGI-MON 전통시장",
+  marketName: "Market Name",
   intro:
     "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
   address: "서울특별시 중구 전통시장로 12",
@@ -45,23 +45,32 @@ const navItems = [
 interface ModernMarketTemplateProps {
   data?: Partial<ModernMarketTemplateData>;
   previewMode?: boolean;
+  publicBasePath?: string;
 }
 
 export default function ModernMarketTemplate({
   data,
   previewMode = false,
+  publicBasePath,
 }: ModernMarketTemplateProps) {
   const content = { ...DEFAULT_DATA, ...data };
+  const getHref = (href: string) => {
+    if (!publicBasePath) return href;
+    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    if (href.startsWith("#")) return `${publicBasePath}${href}`;
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
+    return `${publicBasePath}${hash}`;
+  };
 
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <Link className={styles.brand} href="/templates/modern">
-          Market name
+        <Link className={styles.brand} href={publicBasePath ?? "/templates/modern"}>
+          {content.marketName}
         </Link>
         <nav aria-label="템플릿 메뉴">
           {navItems.map((item) => (
-            <Link href={item.href} key={item.label}>
+            <Link href={getHref(item.href)} key={item.label}>
               {item.label}
             </Link>
           ))}
@@ -115,10 +124,10 @@ export default function ModernMarketTemplate({
 
       <footer className={styles.footer}>
         <nav aria-label="하단 메뉴">
-          <Link href="/templates/modern#intro">시장소개</Link>
-          <Link href="/templates/modern/stores">가게안내</Link>
-          <Link href="/templates/modern#tour">관광정보</Link>
-          <Link href="/templates/modern#map">찾아오시는 길</Link>
+          <Link href={getHref("/templates/modern#intro")}>시장소개</Link>
+          <Link href={getHref("/templates/modern/stores")}>가게안내</Link>
+          <Link href={getHref("/templates/modern#tour")}>관광정보</Link>
+          <Link href={getHref("/templates/modern#map")}>찾아오시는 길</Link>
         </nav>
         <div className={styles.footerInfo}>
           <div>

@@ -10,7 +10,7 @@ import {
   type MarketPageApiError,
   type MarketPageStatus,
 } from "@/lib/api/market-page";
-import { getTemplatePreviewHref } from "@/lib/market-page-template-data";
+import { getGeneratedMarketPageHref } from "@/lib/market-page-template-data";
 import styles from "./template-generating.module.css";
 
 const logoImage =
@@ -21,20 +21,6 @@ const setupStorageKey = "market_page_setup_draft";
 const generationVersionStorageKey = "market_page_generation_version";
 let createMarketPagePromise: ReturnType<typeof createMarketPage> | null = null;
 let createMarketPagePromiseKey: string | null = null;
-
-function getStoredTemplatePreviewHref(): string {
-  if (typeof window === "undefined") return "/templates/editorial";
-
-  const storedSetup = window.sessionStorage.getItem(setupStorageKey);
-  if (!storedSetup) return "/templates/editorial";
-
-  try {
-    const parsed = JSON.parse(storedSetup) as { templateType?: string };
-    return getTemplatePreviewHref(parsed.templateType);
-  } catch {
-    return "/templates/editorial";
-  }
-}
 
 function getGenerationRequestKey(): string {
   if (typeof window === "undefined") return "server";
@@ -52,7 +38,6 @@ export default function TemplateGeneratingPage() {
   const [status, setStatus] = useState<MarketPageStatus>("PENDING");
   const [errorMessage, setErrorMessage] = useState("");
   const [pageId, setPageId] = useState<string | number | null>(null);
-  const [previewHref, setPreviewHref] = useState("/templates/editorial");
   const [showCompletionAlert, setShowCompletionAlert] = useState(false);
 
   useEffect(() => {
@@ -60,7 +45,6 @@ export default function TemplateGeneratingPage() {
     hasStarted.current = true;
 
     let isMounted = true;
-    setPreviewHref(getStoredTemplatePreviewHref());
 
     async function subscribeStatus(targetPageId: string | number) {
       unsubscribeRef.current = await subscribeMarketPageStatus(targetPageId, {
@@ -227,7 +211,7 @@ export default function TemplateGeneratingPage() {
       ) : status === "DONE" && pageId ? (
         <Link
           className={`${styles.guideButton} ${styles.doneButton}`}
-          href={`${previewHref}?pageId=${encodeURIComponent(String(pageId))}`}
+          href={getGeneratedMarketPageHref(pageId)}
         >
           생성된 웹페이지 확인하기
         </Link>

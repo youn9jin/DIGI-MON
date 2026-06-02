@@ -15,11 +15,16 @@ import { mapModernMarketPageContent } from "@/lib/market-page-template-data";
 function ModernTemplatePreviewContent() {
   const searchParams = useSearchParams();
   const pageId = searchParams.get("pageId");
+  const isDesignPreview = searchParams.get("preview") === "design";
   const [templateData, setTemplateData] = useState<Partial<ModernMarketTemplateData>>({});
-  const [isLoadingContent, setIsLoadingContent] = useState(Boolean(pageId));
+  const [isLoadingContent, setIsLoadingContent] = useState(Boolean(pageId && !isDesignPreview));
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
+    if (isDesignPreview) {
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
         setIsLoadingContent(false);
@@ -55,7 +60,7 @@ function ModernTemplatePreviewContent() {
     });
 
     return () => unsubscribe();
-  }, [pageId]);
+  }, [pageId, isDesignPreview]);
 
   if (isLoadingContent) {
     return (
@@ -75,7 +80,13 @@ function ModernTemplatePreviewContent() {
     );
   }
 
-  return <ModernMarketTemplate data={templateData} previewMode />;
+  return (
+    <ModernMarketTemplate
+      data={templateData}
+      previewMode={!pageId || isDesignPreview}
+      publicBasePath={isDesignPreview ? "/templates/modern?preview=design" : undefined}
+    />
+  );
 }
 
 export default function ModernTemplatePreviewPage() {
