@@ -24,7 +24,7 @@ const templates = [
     id: "TEMPLATE_2" as const,
     href: "/templates/modern",
     label: "다크 모던형",
-    image: "/images/dashboard/manage-template-2.png",
+    image: "/images/templates/info-preview/template2-intro-preview.png",
     thumbClassName: styles.templateTwo,
   },
   {
