@@ -5,9 +5,12 @@ import com.digimon.api.auth.AuthAccountConflictException;
 import com.digimon.api.auth.ForbiddenException;
 import com.digimon.api.auth.UnauthorizedException;
 import com.digimon.api.marketpage.AlreadyInProgressException;
+import com.digimon.api.marketpage.ContentParseErrorException;
 import com.digimon.api.marketpage.InvalidSectionValueException;
 import com.digimon.api.marketpage.InvalidTemplateTypeException;
+import com.digimon.api.marketpage.FieldTooLongException;
 import com.digimon.api.marketpage.MarketPageMarketNotFoundException;
+import com.digimon.api.marketpage.NoFieldsToUpdateException;
 import com.digimon.api.marketpage.NoSectionsSelectedException;
 import com.digimon.api.marketpage.PageNotFoundException;
 import com.digimon.api.marketpage.PageNotReadyException;
@@ -82,6 +85,24 @@ public class GlobalExceptionHandler {
         ResponseWrapper<Void> body = ResponseWrapper.error(
                 "ALREADY_IN_PROGRESS",
                 ex.getMessage() != null ? ex.getMessage() : "이미 생성 중인 페이지가 있습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(NoFieldsToUpdateException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleNoFieldsToUpdate(NoFieldsToUpdateException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "NO_FIELDS_TO_UPDATE",
+                ex.getMessage() != null ? ex.getMessage() : "수정할 필드가 없습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(FieldTooLongException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleFieldTooLong(FieldTooLongException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "FIELD_TOO_LONG",
+                ex.getMessage() != null ? ex.getMessage() : "필드 글자 수 제한을 초과했습니다.",
                 null);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
@@ -188,6 +209,15 @@ public class GlobalExceptionHandler {
                 "Invalid request body",
                 details);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(ContentParseErrorException.class)
+    public ResponseEntity<ResponseWrapper<Void>> handleContentParseError(ContentParseErrorException ex) {
+        ResponseWrapper<Void> body = ResponseWrapper.error(
+                "CONTENT_PARSE_ERROR",
+                ex.getMessage() != null ? ex.getMessage() : "content_json 파싱에 실패했습니다.",
+                null);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
