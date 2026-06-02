@@ -3,8 +3,14 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Header from "@/components/layout/Header";
-import { type TemplateType } from "@/lib/api/market-page";
+import {
+  type MarketPageApiError,
+  type TemplateType,
+  updateMarketPageTemplate,
+} from "@/lib/api/market-page";
 import styles from "../manage.module.css";
+
+const setupStorageKey = "market_page_setup_draft";
 
 const templates = [
   {
@@ -18,7 +24,7 @@ const templates = [
     id: "TEMPLATE_2" as const,
     href: "/templates/modern",
     label: "다크 모던형",
-    image: "/images/dashboard/manage-template-2.png",
+    image: "/images/templates/info-preview/template2-intro-preview.png",
     thumbClassName: styles.templateTwo,
   },
   {
@@ -30,9 +36,57 @@ const templates = [
   },
 ];
 
+type SetupDraft = {
+  templateType?: TemplateType | string | null;
+};
+
+function getTemplateType(value?: string | null): TemplateType | null {
+  if (value === "TEMPLATE_1" || value === "TEMPLATE_2" || value === "TEMPLATE_3") {
+    return value;
+  }
+
+  return null;
+}
+
+function getInitialTemplateType(): TemplateType {
+  if (typeof window === "undefined") return "TEMPLATE_1";
+
+  try {
+    const savedDraft = window.sessionStorage.getItem(setupStorageKey);
+    if (!savedDraft) return "TEMPLATE_1";
+
+    const parsed = JSON.parse(savedDraft) as SetupDraft;
+    return getTemplateType(parsed.templateType) ?? "TEMPLATE_1";
+  } catch {
+    return "TEMPLATE_1";
+  }
+}
+
+function updateSetupDraftTemplate(templateType: TemplateType) {
+  if (typeof window === "undefined") return;
+
+  try {
+    const savedDraft = window.sessionStorage.getItem(setupStorageKey);
+    const parsed = savedDraft ? (JSON.parse(savedDraft) as SetupDraft) : {};
+    window.sessionStorage.setItem(
+      setupStorageKey,
+      JSON.stringify({
+        ...parsed,
+        templateType,
+      }),
+    );
+  } catch {
+    window.sessionStorage.setItem(setupStorageKey, JSON.stringify({ templateType }));
+  }
+}
+
 export default function TemplateChangePage() {
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("TEMPLATE_1");
+  const [currentTemplate, setCurrentTemplate] = useState<TemplateType>(getInitialTemplateType);
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>(getInitialTemplateType);
   const [previewTemplate, setPreviewTemplate] = useState<TemplateType | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState("");
+  const [saveError, setSaveError] = useState("");
 
   const previewTemplateData = previewTemplate
     ? templates.find((template) => template.id === previewTemplate)
@@ -48,6 +102,24 @@ export default function TemplateChangePage() {
       document.body.style.overflow = previousOverflow;
     };
   }, [previewTemplate]);
+
+  async function handleSaveTemplate() {
+    setIsSaving(true);
+    setSaveMessage("");
+    setSaveError("");
+
+    try {
+      const result = await updateMarketPageTemplate({ templateType: selectedTemplate });
+      setCurrentTemplate(result.templateType);
+      updateSetupDraftTemplate(result.templateType);
+      setSaveMessage("선택한 템플릿으로 교체했어요.");
+    } catch (error) {
+      const apiError = error as Partial<MarketPageApiError>;
+      setSaveError(apiError.message ?? "템플릿 교체에 실패했습니다.");
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   return (
     <main className={styles.page}>
@@ -70,6 +142,7 @@ export default function TemplateChangePage() {
         <div className={styles.templateGrid}>
           {templates.map((template, index) => {
             const selected = selectedTemplate === template.id;
+            const isCurrent = currentTemplate === template.id;
 
             return (
               <div className={styles.templateOption} key={template.id}>
@@ -93,7 +166,7 @@ export default function TemplateChangePage() {
                       src={template.image}
                     />
                   </button>
-                  {selected ? (
+                  {isCurrent ? (
                     <span className={styles.currentLabel}>내 템플릿</span>
                   ) : (
                     <button
@@ -110,8 +183,15 @@ export default function TemplateChangePage() {
           })}
         </div>
 
-        <button className={styles.saveButton} type="button">
-          저장하기
+        {saveError ? <p className={styles.formError}>{saveError}</p> : null}
+        {saveMessage ? <p className={styles.formMessage}>{saveMessage}</p> : null}
+        <button
+          className={styles.saveButton}
+          type="button"
+          disabled={isSaving}
+          onClick={handleSaveTemplate}
+        >
+          {isSaving ? "저장 중" : "저장하기"}
         </button>
       </section>
 

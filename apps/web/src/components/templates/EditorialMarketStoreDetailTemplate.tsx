@@ -9,7 +9,7 @@ import {
 } from "./EditorialMarketStoresTemplate";
 import styles from "./EditorialMarketTemplate.module.css";
 
-const heroImage = "/images/templates/preview/editorial-store-detail-hero.png";
+const heroImage = "/images/templates/preview/editorial-store-hero.png";
 const menuImage1 = "/images/templates/preview/editorial-menu-1.png";
 const menuImage2 = "/images/templates/preview/editorial-menu-2.png";
 

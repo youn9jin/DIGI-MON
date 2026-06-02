@@ -14,7 +14,7 @@ import {
 import { createStores, type StoreCreateItem } from "@/lib/api/stores";
 import styles from "./template-info.module.css";
 
-const backgroundImage = "/images/templates/info-preview/info-background.png";
+const backgroundImage = "/images/onboarding/market-illustration.png";
 
 const textFields = [
   {

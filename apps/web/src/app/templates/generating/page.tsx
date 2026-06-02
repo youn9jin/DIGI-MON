@@ -38,7 +38,9 @@ export default function TemplateGeneratingPage() {
   const [status, setStatus] = useState<MarketPageStatus>("PENDING");
   const [errorMessage, setErrorMessage] = useState("");
   const [pageId, setPageId] = useState<string | number | null>(null);
+  const [publicMarketId, setPublicMarketId] = useState<string | number | null>(null);
   const [showCompletionAlert, setShowCompletionAlert] = useState(false);
+  const generatedHrefId = publicMarketId ?? pageId;
 
   useEffect(() => {
     if (hasStarted.current) return;
@@ -50,12 +52,15 @@ export default function TemplateGeneratingPage() {
       unsubscribeRef.current = await subscribeMarketPageStatus(targetPageId, {
         onDone: (result) => {
           if (!isMounted) return;
+          const generatedId = result.pageId ?? targetPageId;
+          const publicId = result.marketId ?? generatedId;
           setStatus("DONE");
           setShowCompletionAlert(true);
-          setPageId(result.pageId ?? targetPageId);
+          setPageId(generatedId);
+          setPublicMarketId(publicId);
           window.sessionStorage.setItem(
             generatedPageIdStorageKey,
-            String(result.pageId ?? targetPageId),
+            String(generatedId),
           );
         },
         onFailed: (result) => {
@@ -106,6 +111,7 @@ export default function TemplateGeneratingPage() {
         if (!isMounted) return;
 
         setPageId(created.pageId);
+        setPublicMarketId(created.marketId ?? created.pageId);
         window.sessionStorage.setItem(generatedPageIdStorageKey, String(created.pageId));
 
         await subscribeStatus(created.pageId);
@@ -208,10 +214,10 @@ export default function TemplateGeneratingPage() {
         <button className={styles.guideButton} type="button" onClick={handleRetry}>
           다시 생성하기
         </button>
-      ) : status === "DONE" && pageId ? (
+      ) : status === "DONE" && generatedHrefId ? (
         <Link
           className={`${styles.guideButton} ${styles.doneButton}`}
-          href={getGeneratedMarketPageHref(pageId)}
+          href={getGeneratedMarketPageHref(generatedHrefId)}
         >
           생성된 웹페이지 확인하기
         </Link>

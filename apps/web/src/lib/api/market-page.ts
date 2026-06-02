@@ -5,7 +5,7 @@ export type TemplateType = "TEMPLATE_1" | "TEMPLATE_2" | "TEMPLATE_3";
 export type MarketPageStatus = "PENDING" | "DONE" | "FAILED";
 
 interface ApiEnvelope<T> {
-  success: boolean;
+  success?: boolean;
   data?: T;
   error?: {
     code?: string;
@@ -15,6 +15,7 @@ interface ApiEnvelope<T> {
 
 export interface CreateMarketPageResponse {
   pageId: string | number;
+  marketId?: string | number;
   jobId?: string | number;
   status: MarketPageStatus;
   message?: string;
@@ -22,6 +23,7 @@ export interface CreateMarketPageResponse {
 
 export interface MarketPageStatusResponse {
   pageId?: string | number;
+  marketId?: string | number;
   jobId?: string | number;
   status: MarketPageStatus;
   error?: string;
@@ -51,8 +53,32 @@ export interface MarketPageSetupResponse {
   selectedSections: MarketPageSection[];
 }
 
+export interface UpdateMarketPageTextRequest {
+  heroSubtitle?: string;
+  introContent?: string;
+  feature1Description?: string;
+  feature2Description?: string;
+  historyText?: string;
+  directionsText?: string;
+}
+
+export interface UpdateMarketPageTextResponse {
+  marketId: string | number;
+  updatedFields: (keyof UpdateMarketPageTextRequest)[];
+}
+
+export interface UpdateMarketPageTemplateRequest {
+  templateType: TemplateType;
+}
+
+export interface UpdateMarketPageTemplateResponse {
+  marketId: string | number;
+  templateType: TemplateType;
+}
+
 export interface MarketPageContentResponse {
   pageId: string | number;
+  marketId?: string | number;
   templateType?: TemplateType | string | null;
   selectedSections?: MarketPageSection[] | string[] | null;
   marketName?: string | null;
@@ -81,6 +107,7 @@ export interface MarketPageContentResponse {
 
 interface RawCreateMarketPageResponse {
   pageId?: string | number;
+  marketId?: string | number;
   jobId?: string | number;
   status?: MarketPageStatus;
   message?: string;
@@ -88,6 +115,7 @@ interface RawCreateMarketPageResponse {
 
 interface MarketPageStatusEvent {
   pageId?: string | number;
+  marketId?: string | number;
   status?: MarketPageStatus;
   error?: string;
 }
@@ -121,7 +149,7 @@ async function parseEnvelope<T>(response: Response): Promise<T> {
     message?: string;
   };
 
-  if (!response.ok || body.success === false || !body.data) {
+  if (!response.ok || body.success === false) {
     const serverMessage = body.error?.message ?? body.message;
     const message =
       serverMessage === "Unexpected error occurred"
@@ -135,7 +163,19 @@ async function parseEnvelope<T>(response: Response): Promise<T> {
     } as MarketPageApiError;
   }
 
-  return body.data;
+  if ("data" in body) {
+    if (body.data == null) {
+      throw {
+        status: response.status,
+        code: body.error?.code,
+        message: body.error?.message ?? body.message ?? "응답 데이터가 비어 있습니다.",
+      } as MarketPageApiError;
+    }
+
+    return body.data;
+  }
+
+  return body as T;
 }
 
 export async function saveMarketPageSetup(
@@ -155,6 +195,40 @@ export async function saveMarketPageSetup(
   return parseEnvelope<MarketPageSetupResponse>(response);
 }
 
+export async function updateMarketPageText(
+  text: UpdateMarketPageTextRequest,
+): Promise<UpdateMarketPageTextResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const authHeader = await getAuthorizationHeader();
+  const response = await fetch(`${baseUrl}/api/market/page/text`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeader,
+    },
+    body: JSON.stringify(text),
+  });
+
+  return parseEnvelope<UpdateMarketPageTextResponse>(response);
+}
+
+export async function updateMarketPageTemplate(
+  template: UpdateMarketPageTemplateRequest,
+): Promise<UpdateMarketPageTemplateResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const authHeader = await getAuthorizationHeader();
+  const response = await fetch(`${baseUrl}/api/market/page/template`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeader,
+    },
+    body: JSON.stringify(template),
+  });
+
+  return parseEnvelope<UpdateMarketPageTemplateResponse>(response);
+}
+
 export async function createMarketPage(
   templateType?: TemplateType,
 ): Promise<CreateMarketPageResponse> {
@@ -170,7 +244,7 @@ export async function createMarketPage(
   });
 
   const data = await parseEnvelope<RawCreateMarketPageResponse>(response);
-  const pageId = data.pageId ?? data.jobId;
+  const pageId = data.pageId ?? data.jobId ?? data.marketId;
 
   if (pageId == null) {
     throw {
@@ -181,6 +255,7 @@ export async function createMarketPage(
 
   return {
     pageId,
+    marketId: data.marketId,
     jobId: data.jobId,
     status: data.status ?? "PENDING",
     message: data.message,
@@ -222,6 +297,7 @@ export async function subscribeMarketPageStatus(
     const data = JSON.parse(event.data) as MarketPageStatusEvent;
     return {
       pageId: data.pageId ?? pageId,
+      marketId: data.marketId,
       status: data.status ?? "PENDING",
       error: data.error,
     };
@@ -262,11 +338,11 @@ export async function getMarketPageContent(
 }
 
 export async function getPublicMarketPageContent(
-  pageId: string | number,
+  marketId: string | number,
 ): Promise<MarketPageContentResponse> {
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
   const response = await fetch(
-    `${baseUrl}/api/public/market/page/${encodeURIComponent(String(pageId))}`,
+    `${baseUrl}/api/market/${encodeURIComponent(String(marketId))}`,
   );
 
   return parseEnvelope<MarketPageContentResponse>(response);

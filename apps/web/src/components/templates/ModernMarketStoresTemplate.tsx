@@ -7,7 +7,7 @@ import TemplateGenerationActions from "./TemplateGenerationActions";
 import { classicStores } from "./classicStoreData";
 import styles from "./ModernMarketTemplate.module.css";
 
-const imgMarketMainPhoto = "/images/templates/preview/modern-store-hero.png";
+const imgMarketMainPhoto = "/images/templates/preview/editorial-hero.png";
 
 interface ModernMarketStoresTemplateProps {
   marketName?: string;

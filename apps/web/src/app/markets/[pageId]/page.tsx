@@ -26,8 +26,8 @@ import {
 
 export default function PublicMarketPage() {
   const params = useParams<{ pageId: string }>();
-  const pageId = params.pageId;
-  const publicBasePath = useMemo(() => `/markets/${encodeURIComponent(pageId)}`, [pageId]);
+  const marketId = params.pageId;
+  const publicBasePath = useMemo(() => `/markets/${encodeURIComponent(marketId)}`, [marketId]);
   const [content, setContent] = useState<MarketPageContentResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
@@ -38,7 +38,7 @@ export default function PublicMarketPage() {
     async function loadContent() {
       try {
         setIsLoading(true);
-        const data = await getPublicMarketPageContent(pageId);
+        const data = await getPublicMarketPageContent(marketId);
         if (!isMounted) return;
         setContent(data);
         setErrorMessage("");
@@ -61,7 +61,7 @@ export default function PublicMarketPage() {
     return () => {
       isMounted = false;
     };
-  }, [pageId]);
+  }, [marketId]);
 
   if (isLoading) {
     return (
