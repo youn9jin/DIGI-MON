@@ -6,8 +6,7 @@ import TemplateGenerationActions from "./TemplateGenerationActions";
 import type { ClassicStore } from "./classicStoreData";
 import styles from "./ModernMarketTemplate.module.css";
 
-const imgMarketMainPhoto =
-  "https://www.figma.com/api/mcp/asset/9c785e28-9af2-452e-98ca-c67852bf383c";
+const imgMarketMainPhoto = "/images/templates/preview/modern-store-detail-hero.png";
 
 interface ModernMarketStoreDetailTemplateProps {
   store: ClassicStore;
@@ -15,6 +14,7 @@ interface ModernMarketStoreDetailTemplateProps {
   address?: string;
   contact?: string;
   previewMode?: boolean;
+  publicBasePath?: string;
 }
 
 const navItems = [
@@ -25,20 +25,28 @@ const navItems = [
 
 export default function ModernMarketStoreDetailTemplate({
   store,
-  marketName = "Market name",
+  marketName = "Market Name",
   address = "상세주소 text",
   contact = "TELEPHONENUM",
   previewMode = false,
+  publicBasePath,
 }: ModernMarketStoreDetailTemplateProps) {
+  const getHref = (href: string) => {
+    if (!publicBasePath) return href;
+    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
+    return `${publicBasePath}${hash}`;
+  };
+
   return (
     <main className={`${styles.page} ${styles.modernStoreDetailPage}`}>
       <header className={styles.header}>
-        <Link className={styles.brand} href="/templates/modern">
+        <Link className={styles.brand} href={publicBasePath ?? "/templates/modern"}>
           {marketName}
         </Link>
         <nav aria-label="템플릿 메뉴">
           {navItems.map((item) => (
-            <Link href={item.href} key={item.label}>
+            <Link href={getHref(item.href)} key={item.label}>
               {item.label}
             </Link>
           ))}
@@ -93,10 +101,10 @@ export default function ModernMarketStoreDetailTemplate({
 
       <footer className={styles.footer}>
         <nav aria-label="하단 메뉴">
-          <Link href="/templates/modern#intro">시장소개</Link>
-          <Link href="/templates/modern/stores">가게안내</Link>
-          <Link href="/templates/modern#tour">관광정보</Link>
-          <Link href="/templates/modern#map">찾아오시는 길</Link>
+          <Link href={getHref("/templates/modern#intro")}>시장소개</Link>
+          <Link href={getHref("/templates/modern/stores")}>가게안내</Link>
+          <Link href={getHref("/templates/modern#tour")}>관광정보</Link>
+          <Link href={getHref("/templates/modern#map")}>찾아오시는 길</Link>
         </nav>
         <div className={styles.footerInfo}>
           <div>

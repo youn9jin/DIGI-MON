@@ -7,23 +7,24 @@ import TemplateGenerationActions from "./TemplateGenerationActions";
 import { classicStores } from "./classicStoreData";
 import styles from "./EditorialMarketTemplate.module.css";
 
-const heroImage =
-  "https://www.figma.com/api/mcp/asset/8d2d6ac4-5e37-4669-ba6f-d4d6d9554b72";
+const heroImage = "/images/templates/preview/editorial-store-hero.png";
 
 interface EditorialMarketStoresTemplateProps {
   marketName?: string;
   address?: string;
   contact?: string;
   previewMode?: boolean;
+  publicBasePath?: string;
 }
 
 const categories = ["농/수산물", "먹거리", "의류", "생활용품", "기타"];
 
 export default function EditorialMarketStoresTemplate({
-  marketName = "Market name",
+  marketName = "Market Name",
   address = "상세주소 text",
   contact = "TELEPHONENUM",
   previewMode = false,
+  publicBasePath,
 }: EditorialMarketStoresTemplateProps) {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchTerm, setSearchTerm] = useState("");
@@ -40,10 +41,14 @@ export default function EditorialMarketStoresTemplate({
       return matchesCategory && matchesSearch;
     });
   }, [searchTerm, selectedCategory]);
+  const previewSuffix = publicBasePath ? "?preview=design" : "";
 
   return (
     <main className={styles.page}>
-      <EditorialHeader marketName={marketName} />
+      <EditorialHeaderWithBasePath
+        marketName={marketName}
+        publicBasePath={publicBasePath}
+      />
 
       <section className={styles.storeHero} aria-label="점포 찾기">
         <Image
@@ -91,7 +96,7 @@ export default function EditorialMarketStoresTemplate({
         {stores.map((store) => (
           <Link
             className={styles.editorialStoreCard}
-            href={`/templates/editorial/stores/${store.id}`}
+            href={`/templates/editorial/stores/${store.id}${previewSuffix}`}
             key={store.id}
           >
             <strong>{store.category}</strong>
@@ -100,7 +105,11 @@ export default function EditorialMarketStoresTemplate({
         ))}
       </section>
 
-      <EditorialFooter address={address} contact={contact} />
+      <EditorialFooter
+        address={address}
+        contact={contact}
+        publicBasePath={publicBasePath}
+      />
 
       {previewMode && (
         <TemplateGenerationActions
@@ -112,8 +121,19 @@ export default function EditorialMarketStoresTemplate({
   );
 }
 
-export function EditorialHeader({ marketName }: { marketName: string }) {
-  return <EditorialHeaderWithBasePath marketName={marketName} />;
+export function EditorialHeader({
+  marketName,
+  publicBasePath,
+}: {
+  marketName: string;
+  publicBasePath?: string;
+}) {
+  return (
+    <EditorialHeaderWithBasePath
+      marketName={marketName}
+      publicBasePath={publicBasePath}
+    />
+  );
 }
 
 export function EditorialHeaderWithBasePath({

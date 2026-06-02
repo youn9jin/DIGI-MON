@@ -45,7 +45,7 @@ const bannerItems = [
 ];
 
 export default function ClassicMarketIntroTemplate({
-  marketName = "DIGI-MON 전통시장",
+  marketName = "Market Name",
   totalStores = "NN",
   address = "상세주소 text",
   contact = "TELEPHONENUM",

@@ -9,14 +9,10 @@ import {
 import TemplateGenerationActions from "./TemplateGenerationActions";
 import styles from "./EditorialMarketTemplate.module.css";
 
-const heroImage =
-  "https://www.figma.com/api/mcp/asset/d125c421-7bb3-4edf-a8f7-1a9b05bdcbfe";
-const foodImage =
-  "https://www.figma.com/api/mcp/asset/c5821f2a-78f1-4a99-8b95-e1f07f662c7b";
-const cultureImage =
-  "https://www.figma.com/api/mcp/asset/decbe206-1839-4570-9a47-e67f461c3cf3";
-const routeImage =
-  "https://www.figma.com/api/mcp/asset/e4c4bece-0925-4805-b729-d5fa8fe854aa";
+const heroImage = "/images/templates/preview/editorial-hero.png";
+const foodImage = "/images/templates/preview/editorial-food.png";
+const cultureImage = "/images/templates/preview/editorial-culture.png";
+const routeImage = "/images/templates/preview/editorial-route.png";
 
 export interface EditorialMarketTemplateData {
   marketName: string;
@@ -28,7 +24,7 @@ export interface EditorialMarketTemplateData {
 }
 
 const DEFAULT_DATA: EditorialMarketTemplateData = {
-  marketName: "Market name",
+  marketName: "Market Name",
   intro:
     "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.",
   foodText:

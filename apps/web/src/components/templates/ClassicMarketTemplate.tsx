@@ -22,7 +22,7 @@ export interface ClassicMarketTemplateData {
 }
 
 const DEFAULT_DATA: ClassicMarketTemplateData = {
-  marketName: "DIGI-MON 전통시장",
+  marketName: "Market Name",
   intro: "시장만의 매력과 대표 먹거리, 상점 정보를 한눈에 볼 수 있는 전통시장 웹사이트입니다.",
   address: "서울특별시 중구 전통시장로 12",
   contact: "02-0000-0000",

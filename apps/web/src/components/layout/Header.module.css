@@ -29,7 +29,6 @@
 }
 
 .builderHeader {
-  height: 75px;
   background: #fce6d5;
   backdrop-filter: none;
 }
@@ -137,7 +136,7 @@
   }
 
   .builderHeader {
-    height: 56px;
+    height: clamp(47px, 6.944svh, 75px);
   }
 
   .builderHeader .headerInner {

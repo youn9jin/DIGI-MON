@@ -15,11 +15,16 @@ import { mapEditorialMarketPageContent } from "@/lib/market-page-template-data";
 function EditorialTemplatePreviewContent() {
   const searchParams = useSearchParams();
   const pageId = searchParams.get("pageId");
+  const isDesignPreview = searchParams.get("preview") === "design";
   const [templateData, setTemplateData] = useState<Partial<EditorialMarketTemplateData>>({});
-  const [isLoadingContent, setIsLoadingContent] = useState(Boolean(pageId));
+  const [isLoadingContent, setIsLoadingContent] = useState(Boolean(pageId && !isDesignPreview));
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
+    if (isDesignPreview) {
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
         setIsLoadingContent(false);
@@ -55,7 +60,7 @@ function EditorialTemplatePreviewContent() {
     });
 
     return () => unsubscribe();
-  }, [pageId]);
+  }, [pageId, isDesignPreview]);
 
   if (isLoadingContent) {
     return (
@@ -75,7 +80,13 @@ function EditorialTemplatePreviewContent() {
     );
   }
 
-  return <EditorialMarketTemplate data={templateData} previewMode={!pageId} />;
+  return (
+    <EditorialMarketTemplate
+      data={templateData}
+      previewMode={!pageId || isDesignPreview}
+      publicBasePath={isDesignPreview ? "/templates/editorial?preview=design" : undefined}
+    />
+  );
 }
 
 export default function EditorialTemplatePreviewPage() {

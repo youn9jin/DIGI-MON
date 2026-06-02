@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import EditorialMarketStoresTemplate from "@/components/templates/EditorialMarketStoresTemplate";
 import { auth } from "@/lib/firebase";
+import { useIsDesignPreview } from "@/lib/use-design-preview";
 
 interface PreviewData {
   marketName?: string;
@@ -11,9 +12,12 @@ interface PreviewData {
 }
 
 export default function EditorialTemplateStoresPage() {
+  const isDesignPreview = useIsDesignPreview();
   const [previewData, setPreviewData] = useState<PreviewData>({});
 
   useEffect(() => {
+    if (isDesignPreview) return;
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) return;
 
@@ -36,7 +40,13 @@ export default function EditorialTemplateStoresPage() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [isDesignPreview]);
 
-  return <EditorialMarketStoresTemplate {...previewData} previewMode />;
+  return (
+    <EditorialMarketStoresTemplate
+      {...previewData}
+      previewMode={!isDesignPreview}
+      publicBasePath={isDesignPreview ? "/templates/editorial?preview=design" : undefined}
+    />
+  );
 }

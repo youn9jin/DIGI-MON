@@ -15,11 +15,16 @@ import { mapClassicMarketPageContent } from "@/lib/market-page-template-data";
 function ClassicTemplatePreviewContent() {
   const searchParams = useSearchParams();
   const pageId = searchParams.get("pageId");
+  const isDesignPreview = searchParams.get("preview") === "design";
   const [templateData, setTemplateData] = useState<Partial<ClassicMarketTemplateData>>({});
-  const [isLoadingContent, setIsLoadingContent] = useState(Boolean(pageId));
+  const [isLoadingContent, setIsLoadingContent] = useState(Boolean(pageId && !isDesignPreview));
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
+    if (isDesignPreview) {
+      return;
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
         setIsLoadingContent(false);
@@ -55,7 +60,7 @@ function ClassicTemplatePreviewContent() {
     });
 
     return () => unsubscribe();
-  }, [pageId]);
+  }, [pageId, isDesignPreview]);
 
   if (isLoadingContent) {
     return (
@@ -75,7 +80,13 @@ function ClassicTemplatePreviewContent() {
     );
   }
 
-  return <ClassicMarketTemplate data={templateData} previewMode={!pageId} />;
+  return (
+    <ClassicMarketTemplate
+      data={templateData}
+      previewMode={!pageId || isDesignPreview}
+      publicBasePath={isDesignPreview ? "/templates/classic?preview=design" : undefined}
+    />
+  );
 }
 
 export default function ClassicTemplatePreviewPage() {

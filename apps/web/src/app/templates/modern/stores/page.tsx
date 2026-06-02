@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import ModernMarketStoresTemplate from "@/components/templates/ModernMarketStoresTemplate";
 import { auth } from "@/lib/firebase";
+import { useIsDesignPreview } from "@/lib/use-design-preview";
 
 interface PreviewData {
   marketName?: string;
@@ -11,9 +12,12 @@ interface PreviewData {
 }
 
 export default function ModernTemplateStoresPage() {
+  const isDesignPreview = useIsDesignPreview();
   const [previewData, setPreviewData] = useState<PreviewData>({});
 
   useEffect(() => {
+    if (isDesignPreview) return;
+
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) return;
 
@@ -36,7 +40,13 @@ export default function ModernTemplateStoresPage() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [isDesignPreview]);
 
-  return <ModernMarketStoresTemplate {...previewData} previewMode />;
+  return (
+    <ModernMarketStoresTemplate
+      {...previewData}
+      previewMode={!isDesignPreview}
+      publicBasePath={isDesignPreview ? "/templates/modern?preview=design" : undefined}
+    />
+  );
 }
