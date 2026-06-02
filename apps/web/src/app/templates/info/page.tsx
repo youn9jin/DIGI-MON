@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import Header from "@/components/layout/Header";
 import {
@@ -42,11 +42,10 @@ const setupStorageKey = "market_page_setup_draft";
 const generatedPageIdStorageKey = "generated_market_page_id";
 const generationVersionStorageKey = "market_page_generation_version";
 
-type PreviewTarget = "intro" | "history" | "directions" | "stores";
+type PreviewTarget = "intro" | "history" | "stores";
 
 interface PreviewConfig {
   title: string;
-  modalClassName: string;
   canvasClassName: string;
   images: {
     alt: string;
@@ -56,7 +55,6 @@ interface PreviewConfig {
   }[];
   highlights?: string[];
   instruction?: string;
-  instructionClassName?: string;
 }
 
 interface SetupDraft {
@@ -74,73 +72,50 @@ const storeHeaderMap: Record<keyof StoreCreateItem, string[]> = {
   description: ["description", "점포소개", "점포 소개", "소개"],
 };
 
-const commonPreviewConfig: PreviewConfig = {
-  title: "미리보기",
-  modalClassName: styles.previewModalDefault,
-  canvasClassName: styles.previewCanvasDefault,
-  images: [
-    {
-      alt: "선택한 템플릿 미리보기",
-      className: styles.previewImageFill,
-      sizes: "1074px",
-      src: "/images/templates/info-preview/directions-preview.png",
-    },
-  ],
-  highlights: [styles.directionsHighlight],
-  instruction: "흰색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
-  instructionClassName: styles.previewInstructionLight,
-};
-
-const template3PreviewConfigs: Record<PreviewTarget, PreviewConfig> = {
+const previewConfigs: Record<PreviewTarget, PreviewConfig> = {
   intro: {
     title: "미리보기",
-    modalClassName: styles.previewModalDefault,
     canvasClassName: styles.previewCanvasIntro,
     images: [
       {
         alt: "시장 소개 글 위치 미리보기",
         className: styles.previewImageFill,
-        sizes: "1149px",
-        src: "/images/templates/info-preview/intro-preview.png",
+        sizes: "900px",
+        src: "/images/templates/info-preview/template1-intro-preview.png",
       },
     ],
-    highlights: [styles.introHighlight],
-    instruction: "흰색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
-    instructionClassName: styles.previewInstructionDark,
+    highlights: [styles.template1IntroHighlight],
+    instruction: "검정색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
   },
   history: {
     title: "미리보기",
-    modalClassName: styles.previewModalDefault,
     canvasClassName: styles.previewCanvasHistory,
     images: [
       {
         alt: "시장 역사 글 위치 미리보기",
         className: styles.previewImageFill,
-        sizes: "919px",
-        src: "/images/templates/info-preview/history-preview.png",
+        sizes: "720px",
+        src: "/images/templates/info-preview/template1-history-preview.png",
       },
     ],
-    highlights: [styles.historyHighlightTop, styles.historyHighlightBottom],
+    highlights: [styles.template1HistoryHighlightMain, styles.template1HistoryHighlightSide],
     instruction: "검정색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
-    instructionClassName: styles.previewInstructionDark,
   },
-  directions: commonPreviewConfig,
   stores: {
     title: "미리보기",
-    modalClassName: styles.previewModalStores,
     canvasClassName: styles.previewCanvasStores,
     images: [
       {
         alt: "점포 검색 페이지 미리보기",
         className: styles.storePreviewLeft,
-        sizes: "549px",
-        src: "/images/templates/info-preview/stores-preview-left.png",
+        sizes: "470px",
+        src: "/images/templates/info-preview/template3-stores-preview-left.png",
       },
       {
         alt: "점포 상세 페이지 미리보기",
         className: styles.storePreviewRight,
-        sizes: "549px",
-        src: "/images/templates/info-preview/stores-preview-right.png",
+        sizes: "462px",
+        src: "/images/templates/info-preview/template3-stores-preview-right.png",
       },
     ],
   },
@@ -183,12 +158,8 @@ function getSetupDraft(): SetupDraft {
   };
 }
 
-function getPreviewConfig(templateType: TemplateType, target: PreviewTarget): PreviewConfig {
-  if (templateType === "TEMPLATE_3") {
-    return template3PreviewConfigs[target];
-  }
-
-  return commonPreviewConfig;
+function getPreviewConfig(_templateType: TemplateType, target: PreviewTarget): PreviewConfig {
+  return previewConfigs[target];
 }
 
 function normalizeHeader(value: string): string {
@@ -256,6 +227,20 @@ export default function TemplateInfoPage() {
     marketContent.historyText.trim().length > 0 &&
     marketContent.directionsText.trim().length > 0 &&
     (!needsStoreFile || stores.length > 0);
+
+  useEffect(() => {
+    if (!previewTarget) return;
+
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+    };
+  }, [previewTarget]);
 
   async function handleStoreFileChange(file: File | undefined) {
     setStoreUploadMessage("");
@@ -339,9 +324,11 @@ export default function TemplateInfoPage() {
                 <h3>
                   {index + 1}. {field.title}
                 </h3>
-                <button type="button" onClick={() => setPreviewTarget(field.id)}>
-                  글 위치 확인하기
-                </button>
+                {field.id !== "directions" && (
+                  <button type="button" onClick={() => setPreviewTarget(field.id)}>
+                    글 위치 확인하기
+                  </button>
+                )}
               </div>
               <textarea
                 aria-label={field.title}
@@ -407,7 +394,7 @@ export default function TemplateInfoPage() {
 
       {previewConfig && (
         <div className={styles.previewOverlay} role="dialog" aria-modal="true">
-          <div className={`${styles.previewModal} ${previewConfig.modalClassName}`}>
+          <div className={styles.previewModal}>
             <button
               className={styles.closePreview}
               type="button"
@@ -430,9 +417,7 @@ export default function TemplateInfoPage() {
               ))}
             </div>
             {previewConfig.instruction && (
-              <p className={previewConfig.instructionClassName}>
-                {previewConfig.instruction}
-              </p>
+              <p className={styles.previewInstructionDark}>{previewConfig.instruction}</p>
             )}
           </div>
         </div>
