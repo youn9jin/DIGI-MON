@@ -67,6 +67,15 @@ export interface UpdateMarketPageTextResponse {
   updatedFields: (keyof UpdateMarketPageTextRequest)[];
 }
 
+export interface UpdateMarketPageTemplateRequest {
+  templateType: TemplateType;
+}
+
+export interface UpdateMarketPageTemplateResponse {
+  marketId: string | number;
+  templateType: TemplateType;
+}
+
 export interface MarketPageContentResponse {
   pageId: string | number;
   marketId?: string | number;
@@ -201,6 +210,23 @@ export async function updateMarketPageText(
   });
 
   return parseEnvelope<UpdateMarketPageTextResponse>(response);
+}
+
+export async function updateMarketPageTemplate(
+  template: UpdateMarketPageTemplateRequest,
+): Promise<UpdateMarketPageTemplateResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const authHeader = await getAuthorizationHeader();
+  const response = await fetch(`${baseUrl}/api/market/page/template`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeader,
+    },
+    body: JSON.stringify(template),
+  });
+
+  return parseEnvelope<UpdateMarketPageTemplateResponse>(response);
 }
 
 export async function createMarketPage(
