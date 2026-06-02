@@ -55,8 +55,8 @@ export default function TemplateGenerationActions({
 
       if (result.status === "DONE") {
         setIsGenerating(false);
-        const pageId = result.pageId ?? jobId;
-        router.push(getGeneratedMarketPageHref(pageId));
+        const publicMarketId = result.marketId ?? result.pageId ?? jobId;
+        router.push(getGeneratedMarketPageHref(publicMarketId));
         return;
       }
 
