@@ -136,7 +136,7 @@ export default function ClassicMarketStoreDetailTemplate({
       {previewMode && (
         <TemplateGenerationActions
           previewHref="/templates/classic"
-          templateType="TEMPLATE_1"
+          templateType="TEMPLATE_3"
         />
       )}
     </main>

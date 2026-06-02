@@ -97,9 +97,9 @@ export function getGeneratedMarketPageHref(pageId: string | number): string {
 }
 
 export function getTemplateRouteSlug(templateType?: string | null): string {
-  if (templateType === "TEMPLATE_1") return "classic";
+  if (templateType === "TEMPLATE_1") return "editorial";
   if (templateType === "TEMPLATE_2") return "modern";
-  return "editorial";
+  return "classic";
 }
 
 export function getTemplatePreviewHref(templateType?: string | null): string {

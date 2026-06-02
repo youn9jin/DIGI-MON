@@ -46,15 +46,18 @@ type PreviewTarget = "intro" | "history" | "stores";
 
 interface PreviewConfig {
   title: string;
+  modalClassName?: string;
   canvasClassName: string;
   images: {
     alt: string;
     className: string;
+    imageClassName?: string;
     sizes: string;
     src: string;
   }[];
   highlights?: string[];
   instruction?: string;
+  instructionClassName?: string;
 }
 
 interface SetupDraft {
@@ -72,52 +75,159 @@ const storeHeaderMap: Record<keyof StoreCreateItem, string[]> = {
   description: ["description", "점포소개", "점포 소개", "소개"],
 };
 
-const previewConfigs: Record<PreviewTarget, PreviewConfig> = {
-  intro: {
-    title: "미리보기",
-    canvasClassName: styles.previewCanvasIntro,
-    images: [
-      {
-        alt: "시장 소개 글 위치 미리보기",
-        className: styles.previewImageFill,
-        sizes: "900px",
-        src: "/images/templates/info-preview/template1-intro-preview.png",
-      },
-    ],
-    highlights: [styles.template1IntroHighlight],
-    instruction: "검정색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+const previewConfigs: Record<TemplateType, Record<PreviewTarget, PreviewConfig>> = {
+  TEMPLATE_1: {
+    intro: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate3Intro,
+      images: [
+        {
+          alt: "시장 소개 글 위치 미리보기",
+          className: styles.previewImageFill,
+          sizes: "900px",
+          src: "/images/templates/info-preview/template3-intro-preview.png",
+        },
+      ],
+      highlights: [styles.template3IntroHighlight],
+      instruction: "흰색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+      instructionClassName: styles.previewInstructionDark,
+    },
+    history: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate3History,
+      images: [
+        {
+          alt: "시장 역사 글 위치 미리보기",
+          className: styles.previewImageFill,
+          sizes: "720px",
+          src: "/images/templates/info-preview/template3-history-preview.png",
+        },
+      ],
+      highlights: [styles.template3HistoryHighlightTop, styles.template3HistoryHighlightBottom],
+      instruction: "검정색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+      instructionClassName: styles.previewInstructionMiddle,
+    },
+    stores: {
+      title: "미리보기",
+      modalClassName: styles.previewModalTall,
+      canvasClassName: styles.previewCanvasTemplate3Stores,
+      images: [
+        {
+          alt: "점포 검색 페이지 미리보기",
+          className: styles.template3StorePreviewLeft,
+          sizes: "470px",
+          src: "/images/templates/info-preview/template3-stores-preview-left.png",
+        },
+        {
+          alt: "점포 상세 페이지 미리보기",
+          className: styles.template3StorePreviewRight,
+          sizes: "462px",
+          src: "/images/templates/info-preview/template3-stores-preview-right.png",
+        },
+      ],
+    },
   },
-  history: {
-    title: "미리보기",
-    canvasClassName: styles.previewCanvasHistory,
-    images: [
-      {
-        alt: "시장 역사 글 위치 미리보기",
-        className: styles.previewImageFill,
-        sizes: "720px",
-        src: "/images/templates/info-preview/template1-history-preview.png",
-      },
-    ],
-    highlights: [styles.template1HistoryHighlightMain, styles.template1HistoryHighlightSide],
-    instruction: "검정색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+  TEMPLATE_2: {
+    intro: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate2Intro,
+      images: [
+        {
+          alt: "시장 소개 글 위치 미리보기",
+          className: styles.previewImageFill,
+          imageClassName: styles.template2IntroImage,
+          sizes: "840px",
+          src: "/images/templates/info-preview/template2-intro-preview.png",
+        },
+      ],
+      highlights: [styles.template2IntroHighlight],
+      instruction: "초록색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+      instructionClassName: styles.previewInstructionLight,
+    },
+    history: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate2History,
+      images: [
+        {
+          alt: "시장 역사 글 위치 미리보기",
+          className: styles.previewImageFill,
+          imageClassName: styles.template2HistoryImage,
+          sizes: "840px",
+          src: "/images/templates/info-preview/template2-history-preview.png",
+        },
+      ],
+      highlights: [styles.template2HistoryHighlightTop, styles.template2HistoryHighlightBottom],
+      instruction: "초록색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+      instructionClassName: styles.previewInstructionLight,
+    },
+    stores: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate2Stores,
+      images: [
+        {
+          alt: "점포 검색 페이지 미리보기",
+          className: styles.template2StorePreviewLeft,
+          sizes: "470px",
+          src: "/images/templates/info-preview/template2-stores-preview-left.png",
+        },
+        {
+          alt: "점포 상세 페이지 미리보기",
+          className: styles.template2StorePreviewRight,
+          sizes: "462px",
+          src: "/images/templates/info-preview/template2-stores-preview-right.png",
+        },
+      ],
+    },
   },
-  stores: {
-    title: "미리보기",
-    canvasClassName: styles.previewCanvasStores,
-    images: [
-      {
-        alt: "점포 검색 페이지 미리보기",
-        className: styles.storePreviewLeft,
-        sizes: "470px",
-        src: "/images/templates/info-preview/template3-stores-preview-left.png",
-      },
-      {
-        alt: "점포 상세 페이지 미리보기",
-        className: styles.storePreviewRight,
-        sizes: "462px",
-        src: "/images/templates/info-preview/template3-stores-preview-right.png",
-      },
-    ],
+  TEMPLATE_3: {
+    intro: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate1Intro,
+      images: [
+        {
+          alt: "시장 소개 글 위치 미리보기",
+          className: styles.previewImageFill,
+          sizes: "900px",
+          src: "/images/templates/info-preview/template1-intro-preview.png",
+        },
+      ],
+      highlights: [styles.template1IntroHighlight],
+      instruction: "검정색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+      instructionClassName: styles.previewInstructionDark,
+    },
+    history: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate1History,
+      images: [
+        {
+          alt: "시장 역사 글 위치 미리보기",
+          className: styles.previewImageFill,
+          sizes: "720px",
+          src: "/images/templates/info-preview/template1-history-preview.png",
+        },
+      ],
+      highlights: [styles.template1HistoryHighlightMain, styles.template1HistoryHighlightSide],
+      instruction: "검정색 박스 안 부분에 해당하는 소개를 작성해주시면 됩니다",
+      instructionClassName: styles.previewInstructionDark,
+    },
+    stores: {
+      title: "미리보기",
+      canvasClassName: styles.previewCanvasTemplate1Stores,
+      images: [
+        {
+          alt: "점포 검색 페이지 미리보기",
+          className: styles.template1StorePreviewLeft,
+          sizes: "470px",
+          src: "/images/templates/info-preview/template1-stores-preview-left.png",
+        },
+        {
+          alt: "점포 상세 페이지 미리보기",
+          className: styles.template1StorePreviewRight,
+          sizes: "462px",
+          src: "/images/templates/info-preview/template1-stores-preview-right.png",
+        },
+      ],
+    },
   },
 };
 
@@ -126,24 +236,26 @@ function getTemplateType(value: string | null): TemplateType {
     return value;
   }
 
-  return "TEMPLATE_3";
+  return "TEMPLATE_1";
 }
 
 function getSetupDraft(): SetupDraft {
   if (typeof window === "undefined") {
     return {
-      templateType: "TEMPLATE_3",
+      templateType: "TEMPLATE_1",
       selectedSections: ["intro", "history", "directions", "stores", "tourism"],
     };
   }
 
+  const queryTemplate = new URLSearchParams(window.location.search).get("template");
+  const templateTypeFromQuery = queryTemplate ? getTemplateType(queryTemplate) : null;
   const stored = window.sessionStorage.getItem(setupStorageKey);
   if (stored) {
     try {
       const parsed = JSON.parse(stored) as Partial<SetupDraft>;
       if (parsed.templateType && parsed.selectedSections?.length) {
         return {
-          templateType: getTemplateType(parsed.templateType),
+          templateType: templateTypeFromQuery ?? getTemplateType(parsed.templateType),
           selectedSections: parsed.selectedSections,
         };
       }
@@ -153,13 +265,13 @@ function getSetupDraft(): SetupDraft {
   }
 
   return {
-    templateType: getTemplateType(new URLSearchParams(window.location.search).get("template")),
+    templateType: templateTypeFromQuery ?? "TEMPLATE_1",
     selectedSections: ["intro", "history", "directions", "stores", "tourism"],
   };
 }
 
 function getPreviewConfig(_templateType: TemplateType, target: PreviewTarget): PreviewConfig {
-  return previewConfigs[target];
+  return previewConfigs[_templateType][target];
 }
 
 function normalizeHeader(value: string): string {
@@ -394,7 +506,9 @@ export default function TemplateInfoPage() {
 
       {previewConfig && (
         <div className={styles.previewOverlay} role="dialog" aria-modal="true">
-          <div className={styles.previewModal}>
+          <div
+            className={`${styles.previewModal} ${previewConfig.modalClassName ?? ""}`}
+          >
             <button
               className={styles.closePreview}
               type="button"
@@ -405,7 +519,13 @@ export default function TemplateInfoPage() {
             <div className={`${styles.previewCanvas} ${previewConfig.canvasClassName}`}>
               {previewConfig.images.map((image) => (
                 <span className={image.className} key={image.src}>
-                  <Image alt={image.alt} fill sizes={image.sizes} src={image.src} />
+                  <Image
+                    alt={image.alt}
+                    className={image.imageClassName}
+                    fill
+                    sizes={image.sizes}
+                    src={image.src}
+                  />
                 </span>
               ))}
               {previewConfig.highlights?.map((highlightClassName) => (
@@ -417,7 +537,9 @@ export default function TemplateInfoPage() {
               ))}
             </div>
             {previewConfig.instruction && (
-              <p className={styles.previewInstructionDark}>{previewConfig.instruction}</p>
+              <p className={previewConfig.instructionClassName ?? styles.previewInstructionDark}>
+                {previewConfig.instruction}
+              </p>
             )}
           </div>
         </div>

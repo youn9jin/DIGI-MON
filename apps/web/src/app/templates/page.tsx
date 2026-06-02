@@ -10,14 +10,14 @@ import styles from "./templates.module.css";
 const backgroundImage =
   "/images/templates/selection-background.webp";
 const templateImages: Record<TemplateType, string> = {
-  TEMPLATE_3: "/images/templates/template-editorial.webp",
+  TEMPLATE_1: "/images/templates/template-editorial.webp",
   TEMPLATE_2: "/images/templates/template-modern.webp",
-  TEMPLATE_1: "/images/templates/template-classic.webp",
+  TEMPLATE_3: "/images/templates/template-classic.webp",
 };
 
 const templates = [
   {
-    id: "TEMPLATE_3" as const,
+    id: "TEMPLATE_1" as const,
     href: "/templates/editorial",
     label: "에디토리얼형",
     imageClassName: styles.editorialImage,
@@ -29,7 +29,7 @@ const templates = [
     imageClassName: styles.modernImage,
   },
   {
-    id: "TEMPLATE_1" as const,
+    id: "TEMPLATE_3" as const,
     href: "/templates/classic",
     label: "클래식 시장형",
     imageClassName: styles.classicImage,
@@ -72,7 +72,7 @@ const setupStorageKey = "market_page_setup_draft";
 
 export default function TemplateSelectionPage() {
   const router = useRouter();
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("TEMPLATE_3");
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>("TEMPLATE_1");
   const [previewTemplate, setPreviewTemplate] = useState<TemplateType | null>(null);
   const [openFeature, setOpenFeature] = useState("점포 안내");
   const [selectedFeatureOptionIds, setSelectedFeatureOptionIds] =

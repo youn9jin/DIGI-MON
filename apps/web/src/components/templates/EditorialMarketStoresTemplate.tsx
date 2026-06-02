@@ -105,7 +105,7 @@ export default function EditorialMarketStoresTemplate({
       {previewMode && (
         <TemplateGenerationActions
           previewHref="/templates/editorial"
-          templateType="TEMPLATE_3"
+          templateType="TEMPLATE_1"
         />
       )}
     </main>

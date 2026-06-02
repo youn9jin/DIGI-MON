@@ -161,7 +161,7 @@ export default function ClassicMarketTemplate({
       {previewMode && (
         <TemplateGenerationActions
           previewHref="/templates/classic"
-          templateType="TEMPLATE_1"
+          templateType="TEMPLATE_3"
         />
       )}
     </main>
