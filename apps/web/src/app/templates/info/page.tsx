@@ -503,17 +503,14 @@ export default function TemplateInfoPage() {
         }
       }
 
-      const heroImageFile = representativeFiles[0] ?? null;
-      const introImageFile = representativeFiles[1] ?? heroImageFile;
-      const [logoImageUrl, heroImageUrl, introImageUrl] = await Promise.all([
+      const [logoImageUrl, ...uploadedIntroImageUrls] = await Promise.all([
         logoFile ? uploadMarketPageImage(logoFile, "logo") : Promise.resolve(null),
-        heroImageFile
-          ? uploadMarketPageImage(heroImageFile, "hero")
-          : Promise.resolve(null),
-        introImageFile
-          ? uploadMarketPageImage(introImageFile, "intro")
-          : Promise.resolve(null),
+        ...representativeFiles.map((file) => uploadMarketPageImage(file, "intro")),
       ]);
+      const introImageUrls = uploadedIntroImageUrls.filter(
+        (url): url is string => Boolean(url),
+      );
+      const heroImageUrl = introImageUrls[0] ?? null;
 
       await saveMarketPageSetup({
         templateType: setupDraft.templateType,
@@ -521,7 +518,7 @@ export default function TemplateInfoPage() {
         marketContent,
         heroImageUrl,
         logoImageUrl,
-        introImageUrl,
+        introImageUrls,
       });
       window.sessionStorage.removeItem(generatedPageIdStorageKey);
       window.sessionStorage.setItem(generationVersionStorageKey, String(Date.now()));

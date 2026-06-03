@@ -47,7 +47,7 @@ export interface MarketPageSetupRequest {
   };
   heroImageUrl?: string | null;
   logoImageUrl?: string | null;
-  introImageUrl?: string | null;
+  introImageUrls?: string[] | null;
 }
 
 export interface MarketPageSetupResponse {
@@ -56,7 +56,7 @@ export interface MarketPageSetupResponse {
   selectedSections: MarketPageSection[];
   heroImageUrl?: string | null;
   logoImageUrl?: string | null;
-  introImageUrl?: string | null;
+  introImageUrls?: string[] | null;
 }
 
 export interface UpdateMarketPageTextRequest {
@@ -92,7 +92,7 @@ export interface MarketPageContentResponse {
   contact?: string | null;
   heroImageUrl?: string | null;
   logoImageUrl?: string | null;
-  introImageUrl?: string | null;
+  introImageUrls?: string[] | null;
   introText?: string | null;
   historyText?: string | null;
   directionsText?: string | null;
