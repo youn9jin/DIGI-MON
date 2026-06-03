@@ -32,7 +32,7 @@ export default function LoginPage() {
     try {
       const credential = await signInWithEmailAndPassword(auth, email, password);
       const me = await getMe(credential.user);
-      router.push(getWebsiteEntryPath(me));
+      router.push(await getWebsiteEntryPath(me));
     } catch (err: unknown) {
       const code = (err as { code?: string }).code;
       if (code === "auth/user-not-found" || code === "auth/wrong-password" || code === "auth/invalid-credential") {
@@ -58,7 +58,7 @@ export default function LoginPage() {
       const provider = new GoogleAuthProvider();
       const credential = await signInWithPopup(auth, provider);
       const me = await getMe(credential.user);
-      router.push(getWebsiteEntryPath(me));
+      router.push(await getWebsiteEntryPath(me));
     } catch {
       setErrorMessage("구글 로그인에 실패했습니다.");
     } finally {

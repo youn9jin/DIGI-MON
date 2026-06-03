@@ -23,7 +23,7 @@ export default function IntroPage() {
 
       try {
         const me = await getMe(user);
-        router.replace(getWebsiteEntryPath(me));
+        router.replace(await getWebsiteEntryPath(me));
       } catch {
         router.replace("/onboarding");
       }

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged } from "firebase/auth";
 import Header from "@/components/layout/Header";
-import { getMe } from "@/lib/api/me";
+import { getMe, hasGeneratedMarketPage } from "@/lib/api/me";
 import { auth } from "@/lib/firebase";
 import styles from "./dashboard.module.css";
 
@@ -40,6 +40,12 @@ export default function DashboardPage() {
         const me = await getMe(currentUser);
         if (!me.marketId) {
           router.replace("/onboarding");
+          return;
+        }
+
+        const hasPage = await hasGeneratedMarketPage(me);
+        if (!hasPage) {
+          router.replace("/templates");
           return;
         }
       } catch {

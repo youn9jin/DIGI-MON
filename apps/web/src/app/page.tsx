@@ -21,7 +21,7 @@ export default function LandingPage() {
 
       try {
         const me = await getMe(user);
-        setCtaHref(getWebsiteEntryPath(me));
+        setCtaHref(await getWebsiteEntryPath(me));
       } catch {
         setCtaHref("/onboarding");
       }
