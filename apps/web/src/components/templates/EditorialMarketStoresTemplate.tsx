@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import TemplateGenerationActions from "./TemplateGenerationActions";
 import { classicStores } from "./classicStoreData";
+import { mapStoreToTemplateStore, type TemplateStore } from "@/lib/template-store-data";
 import styles from "./EditorialMarketTemplate.module.css";
 
 const heroImage = "/images/templates/preview/editorial-store-hero.png";
@@ -13,6 +14,8 @@ interface EditorialMarketStoresTemplateProps {
   marketName?: string;
   address?: string;
   contact?: string;
+  stores?: TemplateStore[];
+  heroImageUrl?: string;
   previewMode?: boolean;
   publicBasePath?: string;
 }
@@ -23,25 +26,40 @@ export default function EditorialMarketStoresTemplate({
   marketName = "Market Name",
   address = "상세주소 text",
   contact = "TELEPHONENUM",
+  stores: storeItems,
+  heroImageUrl,
   previewMode = false,
   publicBasePath,
 }: EditorialMarketStoresTemplateProps) {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchTerm, setSearchTerm] = useState("");
 
+  const sourceStores = useMemo(
+    () => storeItems ?? classicStores.map((store, index) => mapStoreToTemplateStore(store, index)),
+    [storeItems],
+  );
   const stores = useMemo(() => {
-    return classicStores.filter((store) => {
+    return sourceStores.filter((store) => {
       const matchesCategory =
         selectedCategory === "전체" || store.category === selectedCategory;
+      const keyword = searchTerm.trim();
       const matchesSearch =
-        !searchTerm.trim() ||
-        store.name.includes(searchTerm.trim()) ||
-        store.category.includes(searchTerm.trim());
+        !keyword ||
+        store.name.includes(keyword) ||
+        store.category.includes(keyword) ||
+        store.intro.includes(keyword) ||
+        store.menu.includes(keyword);
 
       return matchesCategory && matchesSearch;
     });
-  }, [searchTerm, selectedCategory]);
+  }, [searchTerm, selectedCategory, sourceStores]);
   const previewSuffix = publicBasePath ? "?preview=design" : "";
+  const getStoreHref = (storeId: string) => {
+    if (publicBasePath?.startsWith("/markets/")) {
+      return `${publicBasePath}/stores/${encodeURIComponent(storeId)}`;
+    }
+    return `/templates/editorial/stores/${encodeURIComponent(storeId)}${previewSuffix}`;
+  };
 
   return (
     <main className={styles.page}>
@@ -51,14 +69,22 @@ export default function EditorialMarketStoresTemplate({
       />
 
       <section className={styles.storeHero} aria-label="점포 찾기">
-        <Image
-          alt=""
-          className={styles.heroImage}
-          fill
-          priority
-          sizes="100vw"
-          src={heroImage}
-        />
+        {heroImageUrl ? (
+          <span
+            className={styles.dynamicHeroImage}
+            style={{ backgroundImage: `url(${heroImageUrl})` }}
+            aria-hidden="true"
+          />
+        ) : (
+          <Image
+            alt=""
+            className={styles.heroImage}
+            fill
+            priority
+            sizes="100vw"
+            src={heroImage}
+          />
+        )}
         <div className={styles.heroOverlay} />
         <div className={styles.storeHeroTitle}>
           <h1>점포 찾기</h1>
@@ -96,7 +122,7 @@ export default function EditorialMarketStoresTemplate({
         {stores.map((store) => (
           <Link
             className={styles.editorialStoreCard}
-            href={`/templates/editorial/stores/${store.id}${previewSuffix}`}
+            href={getStoreHref(store.id)}
             key={store.id}
           >
             <strong>{store.category}</strong>
@@ -145,7 +171,11 @@ export function EditorialHeaderWithBasePath({
 }) {
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
-    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    if (href.includes("/stores")) {
+      return publicBasePath.startsWith("/markets/")
+        ? `${publicBasePath}/stores`
+        : `/templates/editorial/stores?preview=design`;
+    }
     const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
     return `${publicBasePath}${hash}`;
   };
@@ -182,7 +212,11 @@ export function EditorialFooter({
 }) {
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
-    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    if (href.includes("/stores")) {
+      return publicBasePath.startsWith("/markets/")
+        ? `${publicBasePath}/stores`
+        : `/templates/editorial/stores?preview=design`;
+    }
     const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
     return `${publicBasePath}${hash}`;
   };

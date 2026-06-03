@@ -112,6 +112,19 @@ export interface MarketPageContentResponse {
     storeName?: string;
     highlight?: string;
   }[] | null;
+  stores?: {
+    storeId?: string | number | null;
+    id?: string | number | null;
+    name?: string | null;
+    storeName?: string | null;
+    category?: string | null;
+    items?: string | null;
+    operatingHours?: string | null;
+    yearsOfOperation?: string | null;
+    contact?: string | null;
+    description?: string | null;
+    highlight?: string | null;
+  }[] | null;
   cta?: {
     text?: string;
   } | null;

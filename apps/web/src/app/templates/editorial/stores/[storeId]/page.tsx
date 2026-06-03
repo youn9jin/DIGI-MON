@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import EditorialMarketStoreDetailTemplate from "@/components/templates/EditorialMarketStoreDetailTemplate";
 import { getClassicStore } from "@/components/templates/classicStoreData";
 import { auth } from "@/lib/firebase";
+import { mapStoreToTemplateStore } from "@/lib/template-store-data";
 import { useIsDesignPreview } from "@/lib/use-design-preview";
 
 interface PreviewData {
@@ -17,7 +18,7 @@ export default function EditorialTemplateStoreDetailPage() {
   const params = useParams<{ storeId: string }>();
   const isDesignPreview = useIsDesignPreview();
   const [previewData, setPreviewData] = useState<PreviewData>({});
-  const store = getClassicStore(params.storeId);
+  const store = mapStoreToTemplateStore(getClassicStore(params.storeId));
 
   useEffect(() => {
     if (isDesignPreview) return;
