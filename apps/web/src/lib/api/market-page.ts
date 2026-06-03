@@ -84,6 +84,12 @@ export interface MarketPageContentResponse {
   marketName?: string | null;
   address?: string | null;
   contact?: string | null;
+  heroImageUrl?: string | null;
+  logoImageUrl?: string | null;
+  introImageUrl?: string | null;
+  introText?: string | null;
+  historyText?: string | null;
+  directionsText?: string | null;
   hero?: {
     title?: string;
     subtitle?: string;
