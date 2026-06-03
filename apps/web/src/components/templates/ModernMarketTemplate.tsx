@@ -16,6 +16,9 @@ export interface ModernMarketTemplateData {
   featureBody: string;
   secondFeatureTitle: string;
   secondFeatureBody: string;
+  heroImageUrl?: string;
+  logoImageUrl?: string;
+  introImageUrl?: string;
 }
 
 const DEFAULT_DATA: ModernMarketTemplateData = {
@@ -92,10 +95,16 @@ export default function ModernMarketTemplate({
         </div>
 
         <div className={styles.photoStrip}>
-          <div />
-          <div />
-          <div />
-          <div />
+          {[0, 1, 2, 3].map((index) => (
+            <div
+              key={index}
+              style={
+                content.introImageUrl
+                  ? { backgroundImage: `url(${content.introImageUrl})` }
+                  : undefined
+              }
+            />
+          ))}
         </div>
 
         <div className={styles.introText}>
@@ -106,7 +115,14 @@ export default function ModernMarketTemplate({
 
       <section className={styles.featureRows} id="stores" aria-label="점포 안내">
         <div className={styles.featureRow}>
-          <div className={styles.featurePhoto} />
+          <div
+            className={styles.featurePhoto}
+            style={
+              content.heroImageUrl
+                ? { backgroundImage: `url(${content.heroImageUrl})` }
+                : undefined
+            }
+          />
           <article>
             <h2>{content.featureTitle}</h2>
             <p>{content.featureBody}</p>
@@ -118,7 +134,14 @@ export default function ModernMarketTemplate({
             <h2>{content.secondFeatureTitle}</h2>
             <p>{content.secondFeatureBody}</p>
           </article>
-          <div className={styles.featurePhoto} />
+          <div
+            className={styles.featurePhoto}
+            style={
+              content.introImageUrl
+                ? { backgroundImage: `url(${content.introImageUrl})` }
+                : undefined
+            }
+          />
         </div>
       </section>
 

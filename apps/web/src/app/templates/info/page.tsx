@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { type DragEvent, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import Header from "@/components/layout/Header";
 import {
@@ -12,6 +12,7 @@ import {
   type TemplateType,
 } from "@/lib/api/market-page";
 import { createStores, type StoreCreateItem } from "@/lib/api/stores";
+import { uploadMarketPageImage } from "@/lib/firebase-storage";
 import styles from "./template-info.module.css";
 
 const backgroundImage = "/images/onboarding/market-illustration.png";
@@ -19,21 +20,21 @@ const backgroundImage = "/images/onboarding/market-illustration.png";
 const textFields = [
   {
     id: "intro" as const,
-    title: "시장 소개 작성하기",
+    title: "시장 한 줄 소개 작성하기(50자 이내)",
     placeholder: "시장 소개를 작성해주세요.",
     rows: 4,
   },
   {
     id: "history" as const,
-    title: "시장 역사 작성하기",
-    placeholder: "시장 역사를 작성해주세요.",
+    title: "시장 대표 소개글 작성하기(1000자 이내)",
+    placeholder: "시장의 자랑거리, 역사 등 시장에 관련된 내용을 작성해주세요.",
     rows: 4,
   },
   {
     id: "directions" as const,
-    title: "시장 찾아오는 길 작성하기",
+    title: "시장 찾아오는 길 및 주차 안내 작성하기(300자 이내)",
     placeholder:
-      "지도에서 제공하는 내용보다 더 쉬운 길찾기 방법이 있다면 알려주세요. 예) 충무로역 6번 출구에서 직진한 후 메가커피 골목으로 들어오면 시장 주 출입구가 있습니다.",
+      "지도에서 제공하는 내용보다 더 쉬운 길찾기 방법이 있다면 알려주세요. 예) 충무로역 6번 출구에서 직진한 후 메가커피 골목으로 들어오면 시장 주 출입구가 있습니다, 주차장은 충무로역 공영주차장 이용이 가능합니다.",
     rows: 4,
   },
 ];
@@ -41,6 +42,7 @@ const textFields = [
 const setupStorageKey = "market_page_setup_draft";
 const generatedPageIdStorageKey = "generated_market_page_id";
 const generationVersionStorageKey = "market_page_generation_version";
+const generationInProgressStorageKey = "market_page_generation_in_progress";
 
 type PreviewTarget = "intro" | "history" | "stores";
 
@@ -73,6 +75,26 @@ const storeHeaderMap: Record<keyof StoreCreateItem, string[]> = {
   yearsOfOperation: ["years_of_operation", "yearsOfOperation", "운영연수", "운영 연수"],
   contact: ["contact", "연락처", "전화번호", "대표 연락처"],
   description: ["description", "점포소개", "점포 소개", "소개"],
+};
+
+const storeTemplateHeaders: Array<keyof StoreCreateItem> = [
+  "name",
+  "category",
+  "items",
+  "operatingHours",
+  "yearsOfOperation",
+  "contact",
+  "description",
+];
+
+const storeTemplateHeaderLabels: Record<keyof StoreCreateItem, string> = {
+  name: "점포명",
+  category: "category",
+  items: "대표메뉴/취급품목",
+  operatingHours: "영업시간",
+  yearsOfOperation: "운영연수",
+  contact: "연락처",
+  description: "점포 소개",
 };
 
 const previewConfigs: Record<TemplateType, Record<PreviewTarget, PreviewConfig>> = {
@@ -279,11 +301,25 @@ function normalizeHeader(value: string): string {
 }
 
 function normalizeCategory(value: string): string {
-  const trimmed = value.trim();
-  if (trimmed === "농/수산물" || trimmed === "농수산" || trimmed === "농수산물") {
+  const normalized = value.trim().replace(/[\s/]/g, "");
+
+  if (["농수산물", "농수산", "농산물", "수산물"].includes(normalized)) {
     return "농수산물";
   }
-  return trimmed;
+  if (["먹거리", "먹을거리", "음식", "식품"].includes(normalized)) {
+    return "먹거리";
+  }
+  if (["의류", "옷", "패션"].includes(normalized)) {
+    return "의류";
+  }
+  if (normalized === "생활용품") {
+    return "생활용품";
+  }
+  if (normalized === "기타") {
+    return "기타";
+  }
+
+  return "기타";
 }
 
 function getCell(row: Record<string, unknown>, field: keyof StoreCreateItem): string {
@@ -302,19 +338,49 @@ async function parseStoreSheet(file: File): Promise<StoreCreateItem[]> {
 
   const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, {
     defval: "",
+    range: 0,
+    raw: false,
   });
 
-  return rows
-    .map((row) => ({
+  return rows.flatMap((row) => {
+    const store: StoreCreateItem = {
       name: getCell(row, "name"),
-      category: normalizeCategory(getCell(row, "category")),
+      category: getCell(row, "category"),
       items: getCell(row, "items"),
       operatingHours: getCell(row, "operatingHours"),
       yearsOfOperation: getCell(row, "yearsOfOperation"),
       contact: getCell(row, "contact"),
       description: getCell(row, "description"),
-    }))
-    .filter((store) => store.name.length > 0 || store.category.length > 0);
+    };
+
+    const hasContent = Object.values(store).some((value) => value.length > 0);
+    if (!hasContent) return [];
+
+    return [
+      {
+        ...store,
+        category: normalizeCategory(store.category),
+      },
+    ];
+  });
+}
+
+function downloadStoreTemplate() {
+  const worksheet = XLSX.utils.aoa_to_sheet([
+    storeTemplateHeaders.map((header) => storeTemplateHeaderLabels[header]),
+    [
+      "예시상회",
+      "먹거리",
+      "떡볶이, 김밥",
+      "09:00-18:00",
+      "10년",
+      "010-0000-0000",
+      "시장 입구에 있는 분식 점포입니다.",
+    ],
+  ]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "점포등록");
+  XLSX.writeFile(workbook, "DIGI-MON_점포등록_양식.xlsx");
 }
 
 export default function TemplateInfoPage() {
@@ -327,6 +393,10 @@ export default function TemplateInfoPage() {
   });
   const [previewTarget, setPreviewTarget] = useState<PreviewTarget | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoFileName, setLogoFileName] = useState("");
+  const [representativeFiles, setRepresentativeFiles] = useState<File[]>([]);
+  const [representativeFileMessage, setRepresentativeFileMessage] = useState("");
   const [storeFileName, setStoreFileName] = useState("");
   const [storeUploadMessage, setStoreUploadMessage] = useState("");
   const [stores, setStores] = useState<StoreCreateItem[]>([]);
@@ -338,6 +408,8 @@ export default function TemplateInfoPage() {
     marketContent.introText.trim().length > 0 &&
     marketContent.historyText.trim().length > 0 &&
     marketContent.directionsText.trim().length > 0 &&
+    logoFile != null &&
+    representativeFiles.length > 0 &&
     (!needsStoreFile || stores.length > 0);
 
   useEffect(() => {
@@ -377,6 +449,43 @@ export default function TemplateInfoPage() {
     }
   }
 
+  function handleLogoFileChange(file: File | undefined) {
+    if (!file) {
+      setLogoFile(null);
+      setLogoFileName("");
+      return;
+    }
+
+    setLogoFile(file);
+    setLogoFileName(file.name);
+  }
+
+  function handleRepresentativeFilesChange(fileList: FileList | null) {
+    const files = Array.from(fileList ?? []).filter((file) =>
+      file.type.startsWith("image/"),
+    );
+    setRepresentativeFiles(files);
+
+    if (files.length === 0) {
+      setRepresentativeFileMessage("");
+      return;
+    }
+
+    setRepresentativeFileMessage(
+      `${files.length}개 사진을 선택했어요. 템플릿에는 앞의 사진부터 우선 표시됩니다.`,
+    );
+  }
+
+  function handleLogoDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    handleLogoFileChange(event.dataTransfer.files[0]);
+  }
+
+  function handleRepresentativeDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    handleRepresentativeFilesChange(event.dataTransfer.files);
+  }
+
   async function handleInfoComplete() {
     if (isSaving || !isInfoComplete) return;
 
@@ -394,13 +503,29 @@ export default function TemplateInfoPage() {
         }
       }
 
+      const heroImageFile = representativeFiles[0] ?? null;
+      const introImageFile = representativeFiles[1] ?? heroImageFile;
+      const [logoImageUrl, heroImageUrl, introImageUrl] = await Promise.all([
+        logoFile ? uploadMarketPageImage(logoFile, "logo") : Promise.resolve(null),
+        heroImageFile
+          ? uploadMarketPageImage(heroImageFile, "hero")
+          : Promise.resolve(null),
+        introImageFile
+          ? uploadMarketPageImage(introImageFile, "intro")
+          : Promise.resolve(null),
+      ]);
+
       await saveMarketPageSetup({
         templateType: setupDraft.templateType,
         selectedSections: setupDraft.selectedSections,
         marketContent,
+        heroImageUrl,
+        logoImageUrl,
+        introImageUrl,
       });
       window.sessionStorage.removeItem(generatedPageIdStorageKey);
       window.sessionStorage.setItem(generationVersionStorageKey, String(Date.now()));
+      window.sessionStorage.setItem(generationInProgressStorageKey, "true");
       router.push("/templates/generating");
     } catch (error) {
       const apiError = error as MarketPageApiError;
@@ -465,6 +590,64 @@ export default function TemplateInfoPage() {
               <button className={styles.aiButton} type="button">
                 AI 도움받기
               </button>
+              {field.id === "intro" && (
+                <section className={styles.inlineUploadGroup}>
+                  <div className={styles.inlineUploadTitle}>
+                    <h3>1-1. 시장 로고 등록하기</h3>
+                    <p>시장 로고를 png 파일로 업로드해주세요.</p>
+                  </div>
+                  <div
+                    className={styles.imageDropZone}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={handleLogoDrop}
+                  >
+                    <span>{logoFileName || "시장 로고를 마우스로 끌어와주세요"}</span>
+                  </div>
+                  <label className={styles.imageFileButton}>
+                    파일 추가하기
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={(event) => handleLogoFileChange(event.target.files?.[0])}
+                    />
+                  </label>
+                </section>
+              )}
+              {field.id === "history" && (
+                <section className={styles.inlineUploadGroup}>
+                  <div className={styles.inlineUploadTitle}>
+                    <h3>2-1. 시장 대표 사진 등록하기</h3>
+                    <p>시장 사진을 png 파일로 업로드해주세요. 4개 이상의 사진이 필요해요.</p>
+                  </div>
+                  <div
+                    className={styles.imageDropZone}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={handleRepresentativeDrop}
+                  >
+                    <span>
+                      {representativeFiles.length > 0
+                        ? `${representativeFiles.length}개 사진 선택됨`
+                        : "시장 대표 사진을 마우스로 끌어와주세요"}
+                    </span>
+                  </div>
+                  <label className={styles.imageFileButton}>
+                    파일 추가하기
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={(event) =>
+                        handleRepresentativeFilesChange(event.target.files)
+                      }
+                    />
+                  </label>
+                  {representativeFileMessage && (
+                    <p className={styles.imageUploadMessage}>
+                      {representativeFileMessage}
+                    </p>
+                  )}
+                </section>
+              )}
             </section>
           ))}
 
@@ -475,9 +658,18 @@ export default function TemplateInfoPage() {
                 글 위치 확인하기
               </button>
             </div>
-            <p className={styles.uploadHint}>
-              시장 점포의 정보(영업시간, 연락처, 대표메뉴 등)가 담긴 파일을 업로드해주세요.
-            </p>
+            <div className={styles.uploadGuide}>
+              <p className={styles.uploadHint}>
+                DIGI-MON 공식 양식 파일을 사용해주세요. category는 농수산물/먹거리/의류/생활용품/기타 중 하나로 입력해야 하며, 해당하지 않는 경우 자동으로 기타로 분류됩니다.
+              </p>
+              <button
+                className={styles.templateDownloadButton}
+                type="button"
+                onClick={downloadStoreTemplate}
+              >
+                양식 파일 다운로드
+              </button>
+            </div>
             <label className={styles.fileUpload}>
               <input
                 type="file"

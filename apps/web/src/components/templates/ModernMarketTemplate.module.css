@@ -116,6 +116,9 @@
 .photoStrip div {
   min-height: clamp(300px, 24.79vw, 476px);
   background: #d9d9d9;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .introText {
@@ -153,6 +156,9 @@
   width: 100%;
   min-height: clamp(240px, 18.23vw, 350px);
   background: #d9d9d9;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .featureRow article {

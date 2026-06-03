@@ -47,6 +47,9 @@ export function mapClassicMarketPageContent(
 
   return {
     ...commonMarketFields(content, me),
+    heroImageUrl: content.heroImageUrl ?? undefined,
+    logoImageUrl: content.logoImageUrl ?? undefined,
+    introImageUrl: content.introImageUrl ?? undefined,
     intro: firstText(content.intro?.content, content.hero?.description),
     heroTitle: firstText(content.hero?.title, content.marketName, me?.marketName),
     heroSubtitle: firstText(content.hero?.subtitle, firstFeature.title),
@@ -66,6 +69,9 @@ export function mapModernMarketPageContent(
 
   return {
     ...commonMarketFields(content, me),
+    heroImageUrl: content.heroImageUrl ?? undefined,
+    logoImageUrl: content.logoImageUrl ?? undefined,
+    introImageUrl: content.introImageUrl ?? undefined,
     intro: firstText(content.intro?.content, content.hero?.description),
     heroTitle: firstText(content.hero?.title, content.marketName, me?.marketName),
     heroSubtitle: firstText(content.hero?.subtitle, content.hero?.description),
@@ -86,6 +92,9 @@ export function mapEditorialMarketPageContent(
 
   return {
     ...commonMarketFields(content, me),
+    heroImageUrl: content.heroImageUrl ?? undefined,
+    logoImageUrl: content.logoImageUrl ?? undefined,
+    introImageUrl: content.introImageUrl ?? undefined,
     intro: firstText(content.intro?.content, content.hero?.description),
     foodText: firstText(firstStore.highlight, firstFeature.description, content.hero?.subtitle),
     cultureText: firstText(secondFeature.description, firstFeature.title),

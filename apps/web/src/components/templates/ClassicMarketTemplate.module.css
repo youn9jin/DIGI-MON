@@ -77,6 +77,13 @@
   align-items: center;
   justify-content: center;
   background: #e7e6e6;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.logoBoxImage {
+  background-color: transparent;
 }
 
 .logoBox strong {
@@ -111,6 +118,9 @@
   width: 100%;
   min-height: clamp(280px, 25.47vw, 489px);
   background: #e9e9e9;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .textBlock {

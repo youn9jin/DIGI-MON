@@ -21,6 +21,9 @@ export interface EditorialMarketTemplateData {
   cultureText: string;
   address: string;
   contact: string;
+  heroImageUrl?: string;
+  logoImageUrl?: string;
+  introImageUrl?: string;
 }
 
 const DEFAULT_DATA: EditorialMarketTemplateData = {
@@ -56,21 +59,37 @@ export default function EditorialMarketTemplate({
       />
 
       <section className={styles.hero} id="intro" aria-label="시장 정보 안내">
-        <Image
-          alt=""
-          className={styles.heroImage}
-          fill
-          priority
-          sizes="100vw"
-          src={heroImage}
-        />
+        {content.heroImageUrl ? (
+          <span
+            className={styles.dynamicHeroImage}
+            style={{ backgroundImage: `url(${content.heroImageUrl})` }}
+            aria-hidden="true"
+          />
+        ) : (
+          <Image
+            alt=""
+            className={styles.heroImage}
+            fill
+            priority
+            sizes="100vw"
+            src={heroImage}
+          />
+        )}
         <div className={styles.heroOverlay} />
         <p>{content.intro}</p>
       </section>
 
       <section className={styles.editorialSection} id="food" aria-label="점포 안내">
         <div className={styles.fullImageBlock}>
-          <Image alt="" fill sizes="100vw" src={foodImage} />
+          {content.introImageUrl ? (
+            <span
+              className={styles.dynamicBlockImage}
+              style={{ backgroundImage: `url(${content.introImageUrl})` }}
+              aria-hidden="true"
+            />
+          ) : (
+            <Image alt="" fill sizes="100vw" src={foodImage} />
+          )}
           <div className={styles.tint} />
           <strong className={styles.foodWord}>FOOD</strong>
         </div>
@@ -79,7 +98,15 @@ export default function EditorialMarketTemplate({
 
       <section className={styles.splitSection} id="culture" aria-label="관광 정보">
         <div className={styles.splitImage}>
-          <Image alt="" fill sizes="(max-width: 900px) 100vw, 62vw" src={cultureImage} />
+          {content.heroImageUrl ? (
+            <span
+              className={styles.dynamicBlockImage}
+              style={{ backgroundImage: `url(${content.heroImageUrl})` }}
+              aria-hidden="true"
+            />
+          ) : (
+            <Image alt="" fill sizes="(max-width: 900px) 100vw, 62vw" src={cultureImage} />
+          )}
           <div className={styles.tint} />
         </div>
         <p>{content.cultureText}</p>
