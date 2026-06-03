@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { getMe, getWebsiteEntryPath } from "@/lib/api/me";
+import { getMe, hasGeneratedMarketPage } from "@/lib/api/me";
 import styles from "./Header.module.css";
 
 interface HeaderProps {
@@ -17,7 +17,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
   const [ready, setReady] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [websiteHref, setWebsiteHref] =
-    useState<"/intro" | "/onboarding" | "/dashboard">("/intro");
+    useState<"/intro" | "/onboarding" | "/templates" | "/dashboard">("/intro");
   const [websiteCheckHref, setWebsiteCheckHref] = useState("/intro");
 
   useEffect(() => {
@@ -33,11 +33,17 @@ export default function Header({ variant = "default" }: HeaderProps) {
 
       try {
         const me = await getMe(currentUser);
-        setWebsiteHref(getWebsiteEntryPath(me));
+        const hasPage = await hasGeneratedMarketPage(me);
+        const entryPath = !me.marketId
+          ? "/onboarding"
+          : hasPage
+            ? "/dashboard"
+            : "/templates";
+        setWebsiteHref(entryPath);
         setWebsiteCheckHref(
-          me.marketId != null
+          hasPage && me.marketId != null
             ? `/markets/${encodeURIComponent(String(me.marketId))}`
-            : "/onboarding",
+            : entryPath,
         );
       } catch {
         setWebsiteHref("/onboarding");

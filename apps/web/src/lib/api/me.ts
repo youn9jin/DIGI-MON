@@ -1,4 +1,5 @@
 import type { User } from "firebase/auth";
+import { getPublicMarketPageContent } from "@/lib/api/market-page";
 
 interface ApiEnvelope<T> {
   success?: boolean;
@@ -20,6 +21,8 @@ export interface MeResponse {
   address?: string;
   missing?: string[];
 }
+
+export type WebsiteEntryPath = "/dashboard" | "/onboarding" | "/templates";
 
 function unwrapMeResponse(body: unknown): MeResponse {
   if (
@@ -55,6 +58,18 @@ export async function getMe(user: User): Promise<MeResponse> {
   return unwrapMeResponse(body);
 }
 
-export function getWebsiteEntryPath(me: MeResponse): "/dashboard" | "/onboarding" {
-  return me.marketId ? "/dashboard" : "/onboarding";
+export async function hasGeneratedMarketPage(me: MeResponse): Promise<boolean> {
+  if (!me.marketId) return false;
+
+  try {
+    await getPublicMarketPageContent(me.marketId);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function getWebsiteEntryPath(me: MeResponse): Promise<WebsiteEntryPath> {
+  if (!me.marketId) return "/onboarding";
+  return (await hasGeneratedMarketPage(me)) ? "/dashboard" : "/templates";
 }
