@@ -23,7 +23,7 @@ export interface EditorialMarketTemplateData {
   contact: string;
   heroImageUrl?: string;
   logoImageUrl?: string;
-  introImageUrl?: string;
+  introImageUrls?: string[];
 }
 
 const DEFAULT_DATA: EditorialMarketTemplateData = {
@@ -50,6 +50,8 @@ export default function EditorialMarketTemplate({
   publicBasePath,
 }: EditorialMarketTemplateProps) {
   const content = { ...DEFAULT_DATA, ...data };
+  const introImageUrls = content.introImageUrls ?? [];
+  const firstIntroImageUrl = introImageUrls[0];
 
   return (
     <main className={styles.page}>
@@ -81,10 +83,10 @@ export default function EditorialMarketTemplate({
 
       <section className={styles.editorialSection} id="food" aria-label="점포 안내">
         <div className={styles.fullImageBlock}>
-          {content.introImageUrl ? (
+          {firstIntroImageUrl ? (
             <span
               className={styles.dynamicBlockImage}
-              style={{ backgroundImage: `url(${content.introImageUrl})` }}
+              style={{ backgroundImage: `url(${firstIntroImageUrl})` }}
               aria-hidden="true"
             />
           ) : (

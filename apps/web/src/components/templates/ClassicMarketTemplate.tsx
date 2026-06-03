@@ -21,7 +21,7 @@ export interface ClassicMarketTemplateData {
   secondBody: string;
   heroImageUrl?: string;
   logoImageUrl?: string;
-  introImageUrl?: string;
+  introImageUrls?: string[];
 }
 
 const DEFAULT_DATA: ClassicMarketTemplateData = {
@@ -79,6 +79,8 @@ export default function ClassicMarketTemplate({
   publicBasePath,
 }: ClassicMarketTemplateProps) {
   const content = { ...DEFAULT_DATA, ...data };
+  const introImageUrls = content.introImageUrls ?? [];
+  const secondIntroImageUrl = introImageUrls[1] ?? introImageUrls[0];
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
     if (href.includes("/stores")) return `${publicBasePath}#stores`;
@@ -145,8 +147,8 @@ export default function ClassicMarketTemplate({
         <div
           className={styles.photoBlock}
           style={
-            content.introImageUrl
-              ? { backgroundImage: `url(${content.introImageUrl})` }
+            secondIntroImageUrl
+              ? { backgroundImage: `url(${secondIntroImageUrl})` }
               : undefined
           }
           aria-label="시장 상세 이미지"

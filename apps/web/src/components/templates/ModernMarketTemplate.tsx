@@ -18,7 +18,7 @@ export interface ModernMarketTemplateData {
   secondFeatureBody: string;
   heroImageUrl?: string;
   logoImageUrl?: string;
-  introImageUrl?: string;
+  introImageUrls?: string[];
 }
 
 const DEFAULT_DATA: ModernMarketTemplateData = {
@@ -57,6 +57,8 @@ export default function ModernMarketTemplate({
   publicBasePath,
 }: ModernMarketTemplateProps) {
   const content = { ...DEFAULT_DATA, ...data };
+  const introImageUrls = content.introImageUrls ?? [];
+  const getIntroImageUrl = (index: number) => introImageUrls[index] ?? introImageUrls[0];
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
     if (href.includes("/stores")) return `${publicBasePath}#stores`;
@@ -99,8 +101,8 @@ export default function ModernMarketTemplate({
             <div
               key={index}
               style={
-                content.introImageUrl
-                  ? { backgroundImage: `url(${content.introImageUrl})` }
+                getIntroImageUrl(index)
+                  ? { backgroundImage: `url(${getIntroImageUrl(index)})` }
                   : undefined
               }
             />
@@ -137,8 +139,8 @@ export default function ModernMarketTemplate({
           <div
             className={styles.featurePhoto}
             style={
-              content.introImageUrl
-                ? { backgroundImage: `url(${content.introImageUrl})` }
+              getIntroImageUrl(1)
+                ? { backgroundImage: `url(${getIntroImageUrl(1)})` }
                 : undefined
             }
           />

@@ -26,6 +26,11 @@ function optionalText(value: string): string | undefined {
   return value.trim().length > 0 ? value : undefined;
 }
 
+function optionalImageUrls(values: string[] | null | undefined): string[] | undefined {
+  const urls = values?.filter((value) => value && value.trim().length > 0) ?? [];
+  return urls.length > 0 ? urls : undefined;
+}
+
 function commonMarketFields(content: MarketPageContentResponse, me?: MeResponse) {
   const marketName = optionalText(firstText(content.marketName, me?.marketName));
   const address = optionalText(firstText(content.address, me?.address));
@@ -49,7 +54,7 @@ export function mapClassicMarketPageContent(
     ...commonMarketFields(content, me),
     heroImageUrl: content.heroImageUrl ?? undefined,
     logoImageUrl: content.logoImageUrl ?? undefined,
-    introImageUrl: content.introImageUrl ?? undefined,
+    introImageUrls: optionalImageUrls(content.introImageUrls),
     intro: firstText(content.intro?.content, content.hero?.description),
     heroTitle: firstText(content.hero?.title, content.marketName, me?.marketName),
     heroSubtitle: firstText(content.hero?.subtitle, firstFeature.title),
@@ -71,7 +76,7 @@ export function mapModernMarketPageContent(
     ...commonMarketFields(content, me),
     heroImageUrl: content.heroImageUrl ?? undefined,
     logoImageUrl: content.logoImageUrl ?? undefined,
-    introImageUrl: content.introImageUrl ?? undefined,
+    introImageUrls: optionalImageUrls(content.introImageUrls),
     intro: firstText(content.intro?.content, content.hero?.description),
     heroTitle: firstText(content.hero?.title, content.marketName, me?.marketName),
     heroSubtitle: firstText(content.hero?.subtitle, content.hero?.description),
@@ -94,7 +99,7 @@ export function mapEditorialMarketPageContent(
     ...commonMarketFields(content, me),
     heroImageUrl: content.heroImageUrl ?? undefined,
     logoImageUrl: content.logoImageUrl ?? undefined,
-    introImageUrl: content.introImageUrl ?? undefined,
+    introImageUrls: optionalImageUrls(content.introImageUrls),
     intro: firstText(content.intro?.content, content.hero?.description),
     foodText: firstText(firstStore.highlight, firstFeature.description, content.hero?.subtitle),
     cultureText: firstText(secondFeature.description, firstFeature.title),
