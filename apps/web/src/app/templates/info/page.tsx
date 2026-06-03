@@ -7,7 +7,6 @@ import * as XLSX from "xlsx";
 import Header from "@/components/layout/Header";
 import {
   saveMarketPageSetup,
-  type MarketPageApiError,
   type MarketPageSection,
   type TemplateType,
 } from "@/lib/api/market-page";
@@ -322,6 +321,23 @@ function normalizeCategory(value: string): string {
   return "기타";
 }
 
+function normalizeContact(value: string): string {
+  return value.replace(/[^\d+\-()\s]/g, "").trim();
+}
+
+function getSaveErrorMessage(error: unknown): string {
+  const message = error instanceof Error ? error.message : "";
+  if (
+    message.includes("storage") ||
+    message.includes("Firebase") ||
+    message.includes("CORS")
+  ) {
+    return "이미지 업로드에 실패했습니다. Firebase Storage CORS 설정을 확인해주세요.";
+  }
+
+  return message || "웹페이지 생성 설정 저장에 실패했습니다.";
+}
+
 function getCell(row: Record<string, unknown>, field: keyof StoreCreateItem): string {
   const aliases = storeHeaderMap[field].map(normalizeHeader);
   const entry = Object.entries(row).find(([key]) => aliases.includes(normalizeHeader(key)));
@@ -349,7 +365,7 @@ async function parseStoreSheet(file: File): Promise<StoreCreateItem[]> {
       items: getCell(row, "items"),
       operatingHours: getCell(row, "operatingHours"),
       yearsOfOperation: getCell(row, "yearsOfOperation"),
-      contact: getCell(row, "contact"),
+      contact: normalizeContact(getCell(row, "contact")),
       description: getCell(row, "description"),
     };
 
@@ -525,8 +541,7 @@ export default function TemplateInfoPage() {
       window.sessionStorage.setItem(generationInProgressStorageKey, "true");
       router.push("/templates/generating");
     } catch (error) {
-      const apiError = error as MarketPageApiError;
-      window.alert(apiError.message ?? "웹페이지 생성 설정 저장에 실패했습니다.");
+      window.alert(getSaveErrorMessage(error));
       setIsSaving(false);
     }
   }

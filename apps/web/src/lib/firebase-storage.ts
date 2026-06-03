@@ -2,6 +2,8 @@ import { onAuthStateChanged, type User } from "firebase/auth";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { auth, storage } from "@/lib/firebase";
 
+const imageUploadTimeoutMs = 15000;
+
 async function getAuthenticatedUser(): Promise<User> {
   const currentUser = auth.currentUser;
   if (currentUser) return currentUser;
@@ -24,6 +26,19 @@ function getSafeFileName(fileName: string): string {
   return fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
 }
 
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timeoutId = window.setTimeout(() => {
+      reject(new Error("Firebase Storage 이미지 업로드 시간이 초과되었습니다."));
+    }, timeoutMs);
+
+    promise
+      .then(resolve)
+      .catch(reject)
+      .finally(() => window.clearTimeout(timeoutId));
+  });
+}
+
 export async function uploadMarketPageImage(
   file: File,
   slot: "hero" | "logo" | "intro",
@@ -37,13 +52,16 @@ export async function uploadMarketPageImage(
   const path = `market-page/${user.uid}/${slot}/${Date.now()}-${uniqueId}-${safeName}`;
   const imageRef = ref(storage, path);
 
-  await uploadBytes(imageRef, file, {
-    contentType: file.type || "image/png",
-    customMetadata: {
-      originalName: file.name,
-      slot,
-    },
-  });
+  await withTimeout(
+    uploadBytes(imageRef, file, {
+      contentType: file.type || "image/png",
+      customMetadata: {
+        originalName: file.name,
+        slot,
+      },
+    }),
+    imageUploadTimeoutMs,
+  );
 
-  return getDownloadURL(imageRef);
+  return withTimeout(getDownloadURL(imageRef), imageUploadTimeoutMs);
 }
