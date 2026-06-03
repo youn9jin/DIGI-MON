@@ -74,7 +74,7 @@ public class PublicMarketPageService {
                 .orElse(page.getTemplateType());
         String heroImageUrl = configOpt.map(MarketPageConfig::getHeroImageUrl).orElse(null);
         String logoImageUrl = configOpt.map(MarketPageConfig::getLogoImageUrl).orElse(null);
-        String introImageUrl = configOpt.map(MarketPageConfig::getIntroImageUrl).orElse(null);
+        List<String> introImageUrls = configOpt.map(MarketPageConfig::getIntroImageUrls).orElse(null);
         String introText = configOpt.map(MarketPageConfig::getIntroText).orElse(null);
         String historyText = configOpt.map(MarketPageConfig::getHistoryText).orElse(null);
         String directionsText = configOpt.map(MarketPageConfig::getDirectionsText).orElse(null);
@@ -90,7 +90,7 @@ public class PublicMarketPageService {
                 .contact(market.getContact())
                 .heroImageUrl(heroImageUrl)
                 .logoImageUrl(logoImageUrl)
-                .introImageUrl(introImageUrl)
+                .introImageUrls(introImageUrls)
                 .introText(introText)
                 .historyText(historyText)
                 .directionsText(directionsText)

@@ -30,6 +30,6 @@ public class SaveMarketPageSetupRequest {
     /** 공개 페이지 logo 이미지 URL. null 이면 DB 에 null 로 저장. */
     private String logoImageUrl;
 
-    /** 공개 페이지 intro 이미지 URL. null 이면 DB 에 null 로 저장. */
-    private String introImageUrl;
+    /** 공개 페이지 intro 이미지 URL 배열. null 이면 DB 에 null 로 저장. */
+    private List<String> introImageUrls;
 }
