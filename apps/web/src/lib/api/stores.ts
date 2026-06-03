@@ -1,3 +1,4 @@
+import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
 interface ApiEnvelope<T> {
@@ -23,20 +24,57 @@ export interface StoreCreateItem {
 export interface CreateStoresResponse {
   requestedCount: number;
   successCount: number;
+  failedCount?: number;
   successStoreIds: Array<string | number>;
   failedItems: {
     index: number;
     name?: string;
     reason: string;
   }[];
+  message?: string;
 }
 
-async function getAuthorizationHeader(): Promise<HeadersInit> {
-  const user = auth.currentUser;
+export interface StoreSummary {
+  storeId: string | number;
+  name: string;
+  category: string;
+  items?: string | null;
+  operatingHours?: string | null;
+  yearsOfOperation?: string | null;
+  contact?: string | null;
+  description?: string | null;
+}
+
+export interface StoreDetail extends StoreSummary {
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
+export interface StoreListResponse {
+  total: number;
+  stores: StoreSummary[];
+}
+
+async function getAuthenticatedUser(): Promise<User> {
+  const currentUser = auth.currentUser;
+  if (currentUser) return currentUser;
+
+  const user = await new Promise<User | null>((resolve) => {
+    const unsubscribe = onAuthStateChanged(auth, (changedUser) => {
+      unsubscribe();
+      resolve(changedUser);
+    });
+  });
+
   if (!user) {
     throw new Error("로그인이 필요합니다.");
   }
 
+  return user;
+}
+
+async function getAuthorizationHeader(): Promise<HeadersInit> {
+  const user = await getAuthenticatedUser();
   const idToken = await user.getIdToken();
   return { Authorization: `Bearer ${idToken}` };
 }
@@ -68,4 +106,24 @@ export async function createStores(
   });
 
   return parseEnvelope<CreateStoresResponse>(response);
+}
+
+export async function getStores(): Promise<StoreListResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const authHeader = await getAuthorizationHeader();
+  const response = await fetch(`${baseUrl}/api/stores`, {
+    headers: authHeader,
+  });
+
+  return parseEnvelope<StoreListResponse>(response);
+}
+
+export async function getStore(storeId: string | number): Promise<StoreDetail> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const authHeader = await getAuthorizationHeader();
+  const response = await fetch(`${baseUrl}/api/stores/${encodeURIComponent(String(storeId))}`, {
+    headers: authHeader,
+  });
+
+  return parseEnvelope<StoreDetail>(response);
 }

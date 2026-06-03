@@ -15,6 +15,7 @@ import {
   updateMarketPageText,
 } from "@/lib/api/market-page";
 import { getMe } from "@/lib/api/me";
+import { getStore, getStores, type StoreDetail, type StoreSummary } from "@/lib/api/stores";
 import styles from "../manage.module.css";
 
 const setupStorageKey = "market_page_setup_draft";
@@ -265,6 +266,11 @@ export default function InfoEditPage() {
   const [marketValues, setMarketValues] = useState<Partial<Record<MarketTextFieldId, string>>>({});
   const [isLoadingContent, setIsLoadingContent] = useState(true);
   const [contentError, setContentError] = useState("");
+  const [stores, setStores] = useState<StoreSummary[]>([]);
+  const [selectedStore, setSelectedStore] = useState<StoreDetail | null>(null);
+  const [isLoadingStores, setIsLoadingStores] = useState(false);
+  const [isLoadingStoreDetail, setIsLoadingStoreDetail] = useState(false);
+  const [storeError, setStoreError] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [saveError, setSaveError] = useState("");
@@ -306,6 +312,53 @@ export default function InfoEditPage() {
       isMounted = false;
     };
   }, [templateType]);
+
+  useEffect(() => {
+    if (tab !== "store") return;
+
+    let isMounted = true;
+
+    async function loadStores() {
+      setIsLoadingStores(true);
+      setStoreError("");
+
+      try {
+        const result = await getStores();
+        if (!isMounted) return;
+        setStores(result.stores);
+        setSelectedStore(null);
+      } catch (error) {
+        if (!isMounted) return;
+        const apiError = error as Partial<MarketPageApiError>;
+        setStoreError(apiError.message ?? "점포 목록을 불러오지 못했습니다.");
+      } finally {
+        if (isMounted) {
+          setIsLoadingStores(false);
+        }
+      }
+    }
+
+    loadStores();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [tab]);
+
+  async function handleSelectStore(storeId: string | number) {
+    setIsLoadingStoreDetail(true);
+    setStoreError("");
+
+    try {
+      const detail = await getStore(storeId);
+      setSelectedStore(detail);
+    } catch (error) {
+      const apiError = error as Partial<MarketPageApiError>;
+      setStoreError(apiError.message ?? "점포 상세 정보를 불러오지 못했습니다.");
+    } finally {
+      setIsLoadingStoreDetail(false);
+    }
+  }
 
   function updateFieldValue(fieldId: MarketTextFieldId, value: string) {
     setMarketValues((current) => ({
@@ -427,7 +480,68 @@ export default function InfoEditPage() {
             </button>
           </form>
         ) : (
-          <div className={styles.storePlaceholder}>가게 정보 수정 화면은 준비 중입니다.</div>
+          <section className={styles.storeEditor} aria-label="가게 정보 수정">
+            {isLoadingStores ? <p className={styles.formMessage}>점포 목록을 불러오는 중입니다.</p> : null}
+            {storeError ? <p className={styles.formError}>{storeError}</p> : null}
+            {!isLoadingStores && stores.length === 0 ? (
+              <div className={styles.storePlaceholder}>등록된 점포가 없습니다.</div>
+            ) : (
+              <div className={styles.storeEditorGrid}>
+                <div className={styles.storeList} aria-label="점포 목록">
+                  {stores.map((store) => (
+                    <button
+                      className={`${styles.storeListItem} ${
+                        selectedStore?.storeId === store.storeId ? styles.activeStoreItem : ""
+                      }`}
+                      key={store.storeId}
+                      type="button"
+                      onClick={() => handleSelectStore(store.storeId)}
+                    >
+                      <strong>{store.name}</strong>
+                      <span>{store.category}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className={styles.storeDetail} aria-label="점포 상세 정보">
+                  {isLoadingStoreDetail ? (
+                    <p className={styles.formMessage}>점포 상세 정보를 불러오는 중입니다.</p>
+                  ) : selectedStore ? (
+                    <>
+                      <h3>{selectedStore.name}</h3>
+                      <dl>
+                        <div>
+                          <dt>카테고리</dt>
+                          <dd>{selectedStore.category}</dd>
+                        </div>
+                        <div>
+                          <dt>취급 품목</dt>
+                          <dd>{selectedStore.items || "-"}</dd>
+                        </div>
+                        <div>
+                          <dt>영업시간</dt>
+                          <dd>{selectedStore.operatingHours || "-"}</dd>
+                        </div>
+                        <div>
+                          <dt>운영연수</dt>
+                          <dd>{selectedStore.yearsOfOperation || "-"}</dd>
+                        </div>
+                        <div>
+                          <dt>연락처</dt>
+                          <dd>{selectedStore.contact || "-"}</dd>
+                        </div>
+                        <div>
+                          <dt>소개</dt>
+                          <dd>{selectedStore.description || "-"}</dd>
+                        </div>
+                      </dl>
+                    </>
+                  ) : (
+                    <p className={styles.storeDetailEmpty}>왼쪽에서 점포를 선택해주세요.</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </section>
         )}
       </section>
     </main>
