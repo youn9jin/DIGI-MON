@@ -30,7 +30,7 @@ public class PublicMarketPageResponse {
 
     private String heroImageUrl;
     private String logoImageUrl;
-    private String introImageUrl;
+    private List<String> introImageUrls;
 
     private String introText;
     private String historyText;

@@ -104,7 +104,7 @@ public class MarketPageSetupService {
             // 요청 이미지 URL 은 null 을 포함해 그대로 덮어쓴다.
             config.setHeroImageUrl(request.getHeroImageUrl());
             config.setLogoImageUrl(request.getLogoImageUrl());
-            config.setIntroImageUrl(request.getIntroImageUrl());
+            config.setIntroImageUrls(request.getIntroImageUrls());
         } else {
             config = MarketPageConfig.builder()
                     .market(market)
@@ -116,7 +116,7 @@ public class MarketPageSetupService {
                     // 요청 이미지 URL 은 null 을 포함해 그대로 저장한다.
                     .heroImageUrl(request.getHeroImageUrl())
                     .logoImageUrl(request.getLogoImageUrl())
-                    .introImageUrl(request.getIntroImageUrl())
+                    .introImageUrls(request.getIntroImageUrls())
                     .build();
         }
 
@@ -128,7 +128,7 @@ public class MarketPageSetupService {
                 sectionsToSave,
                 config.getHeroImageUrl(),
                 config.getLogoImageUrl(),
-                config.getIntroImageUrl());
+                config.getIntroImageUrls());
     }
 
     /** saveSetup 결과 컨테이너. 컨트롤러에서 LinkedHashMap 응답 구성에 사용. */
@@ -138,20 +138,20 @@ public class MarketPageSetupService {
         private final List<String> selectedSections;
         private final String heroImageUrl;
         private final String logoImageUrl;
-        private final String introImageUrl;
+        private final List<String> introImageUrls;
 
         public Result(Long marketId,
                       String templateType,
                       List<String> selectedSections,
                       String heroImageUrl,
                       String logoImageUrl,
-                      String introImageUrl) {
+                      List<String> introImageUrls) {
             this.marketId = marketId;
             this.templateType = templateType;
             this.selectedSections = selectedSections;
             this.heroImageUrl = heroImageUrl;
             this.logoImageUrl = logoImageUrl;
-            this.introImageUrl = introImageUrl;
+            this.introImageUrls = introImageUrls;
         }
 
         public Long getMarketId() {
@@ -174,8 +174,8 @@ public class MarketPageSetupService {
             return logoImageUrl;
         }
 
-        public String getIntroImageUrl() {
-            return introImageUrl;
+        public List<String> getIntroImageUrls() {
+            return introImageUrls;
         }
     }
 }

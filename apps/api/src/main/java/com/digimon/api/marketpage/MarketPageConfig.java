@@ -22,7 +22,7 @@ import java.util.List;
  * - selected_sections 는 jsonb NOT NULL. Hibernate 6 네이티브 @JdbcTypeCode(SqlTypes.JSON) 로 매핑.
  * - created_at 컬럼은 존재하지 않는다 (updated_at 만 존재). ddl-auto=validate 이므로 created_at 매핑 금지.
  * - 콘텐츠 텍스트 컬럼은 intro/history/directions 3개뿐. stores/tourism 섹션은 selected_sections 토글로만 존재.
- * - hero_image_url / logo_image_url / intro_image_url 은 공개 페이지(GET /api/market/{marketId}) 노출용.
+ * - hero_image_url / logo_image_url / intro_image_urls 은 공개 페이지(GET /api/market/{marketId}) 노출용.
  */
 @Entity
 @Table(name = "market_page_configs")
@@ -64,8 +64,10 @@ public class MarketPageConfig {
     @Column(name = "logo_image_url", length = 500)
     private String logoImageUrl;
 
-    @Column(name = "intro_image_url", length = 500)
-    private String introImageUrl;
+    /** 공개 페이지 intro 이미지 URL 배열. selected_sections 와 같은 jsonb 방식으로 매핑한다. */
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "intro_image_urls", columnDefinition = "jsonb")
+    private List<String> introImageUrls;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)

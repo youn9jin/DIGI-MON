@@ -56,7 +56,7 @@ public class MarketPageSetupController {
             data.put("selectedSections", result.getSelectedSections());
             data.put("heroImageUrl", result.getHeroImageUrl());
             data.put("logoImageUrl", result.getLogoImageUrl());
-            data.put("introImageUrl", result.getIntroImageUrl());
+            data.put("introImageUrls", result.getIntroImageUrls());
             return ResponseEntity.ok(ResponseWrapper.success(data));
         });
     }
