@@ -1,0 +1,76 @@
+.alert {
+  position: fixed;
+  top: 88px;
+  right: 24px;
+  z-index: 90;
+  width: min(calc(100vw - 32px), 360px);
+  min-height: 72px;
+  border-radius: 14px 14px 14px 0;
+  background: #fce6d5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  color: #000;
+  font-family: Pretendard, "Noto Sans KR", Inter, Arial, sans-serif;
+  padding: 18px 18px 16px 58px;
+  animation: alertSlideIn 220ms ease-out;
+}
+
+.logo {
+  position: absolute;
+  top: 22px;
+  left: 18px;
+  display: block;
+  width: 28px;
+  height: 20px;
+  overflow: hidden;
+}
+
+.logoImage {
+  position: absolute;
+  top: -206.43%;
+  left: -26.64%;
+  width: 513.93%;
+  height: 733.33%;
+  max-width: none;
+}
+
+.alert strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.alert a,
+.alert p {
+  margin: 0;
+  color: #000;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.alert a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@keyframes alertSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 767px) {
+  .alert {
+    top: 64px;
+    right: 12px;
+    width: min(calc(100vw - 24px), 340px);
+  }
+}

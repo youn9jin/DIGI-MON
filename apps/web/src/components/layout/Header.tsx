@@ -16,7 +16,9 @@ export default function Header({ variant = "default" }: HeaderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [websiteHref, setWebsiteHref] = useState<"/intro" | "/onboarding" | "/dashboard">("/intro");
+  const [websiteHref, setWebsiteHref] =
+    useState<"/intro" | "/onboarding" | "/dashboard">("/intro");
+  const [websiteCheckHref, setWebsiteCheckHref] = useState("/intro");
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -24,6 +26,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
 
       if (!currentUser) {
         setWebsiteHref("/intro");
+        setWebsiteCheckHref("/intro");
         setReady(true);
         return;
       }
@@ -31,8 +34,14 @@ export default function Header({ variant = "default" }: HeaderProps) {
       try {
         const me = await getMe(currentUser);
         setWebsiteHref(getWebsiteEntryPath(me));
+        setWebsiteCheckHref(
+          me.marketId != null
+            ? `/markets/${encodeURIComponent(String(me.marketId))}`
+            : "/onboarding",
+        );
       } catch {
         setWebsiteHref("/onboarding");
+        setWebsiteCheckHref("/onboarding");
       }
 
       setReady(true);
@@ -77,6 +86,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
               <a href="#">사용방법</a>
               <a href="#">커뮤니티</a>
               <Link href={websiteHref}>웹사이트 관리</Link>
+              <Link href={websiteCheckHref}>웹사이트 확인</Link>
             </nav>
           </div>
 
@@ -125,6 +135,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
               <a href="#">사용방법</a>
               <a href="#">커뮤니티</a>
               <Link href={websiteHref}>웹사이트 관리</Link>
+              <Link href={websiteCheckHref}>웹사이트 확인</Link>
             </nav>
           </div>
 

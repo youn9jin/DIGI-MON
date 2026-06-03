@@ -41,6 +41,7 @@ const textFields = [
 const setupStorageKey = "market_page_setup_draft";
 const generatedPageIdStorageKey = "generated_market_page_id";
 const generationVersionStorageKey = "market_page_generation_version";
+const generationInProgressStorageKey = "market_page_generation_in_progress";
 
 type PreviewTarget = "intro" | "history" | "stores";
 
@@ -73,6 +74,26 @@ const storeHeaderMap: Record<keyof StoreCreateItem, string[]> = {
   yearsOfOperation: ["years_of_operation", "yearsOfOperation", "운영연수", "운영 연수"],
   contact: ["contact", "연락처", "전화번호", "대표 연락처"],
   description: ["description", "점포소개", "점포 소개", "소개"],
+};
+
+const storeTemplateHeaders: Array<keyof StoreCreateItem> = [
+  "name",
+  "category",
+  "items",
+  "operatingHours",
+  "yearsOfOperation",
+  "contact",
+  "description",
+];
+
+const storeTemplateHeaderLabels: Record<keyof StoreCreateItem, string> = {
+  name: "점포명",
+  category: "category",
+  items: "대표메뉴/취급품목",
+  operatingHours: "영업시간",
+  yearsOfOperation: "운영연수",
+  contact: "연락처",
+  description: "점포 소개",
 };
 
 const previewConfigs: Record<TemplateType, Record<PreviewTarget, PreviewConfig>> = {
@@ -279,11 +300,25 @@ function normalizeHeader(value: string): string {
 }
 
 function normalizeCategory(value: string): string {
-  const trimmed = value.trim();
-  if (trimmed === "농/수산물" || trimmed === "농수산" || trimmed === "농수산물") {
+  const normalized = value.trim().replace(/[\s/]/g, "");
+
+  if (["농수산물", "농수산", "농산물", "수산물"].includes(normalized)) {
     return "농수산물";
   }
-  return trimmed;
+  if (["먹거리", "먹을거리", "음식", "식품"].includes(normalized)) {
+    return "먹거리";
+  }
+  if (["의류", "옷", "패션"].includes(normalized)) {
+    return "의류";
+  }
+  if (normalized === "생활용품") {
+    return "생활용품";
+  }
+  if (normalized === "기타") {
+    return "기타";
+  }
+
+  return "기타";
 }
 
 function getCell(row: Record<string, unknown>, field: keyof StoreCreateItem): string {
@@ -302,19 +337,49 @@ async function parseStoreSheet(file: File): Promise<StoreCreateItem[]> {
 
   const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, {
     defval: "",
+    range: 0,
+    raw: false,
   });
 
-  return rows
-    .map((row) => ({
+  return rows.flatMap((row) => {
+    const store: StoreCreateItem = {
       name: getCell(row, "name"),
-      category: normalizeCategory(getCell(row, "category")),
+      category: getCell(row, "category"),
       items: getCell(row, "items"),
       operatingHours: getCell(row, "operatingHours"),
       yearsOfOperation: getCell(row, "yearsOfOperation"),
       contact: getCell(row, "contact"),
       description: getCell(row, "description"),
-    }))
-    .filter((store) => store.name.length > 0 || store.category.length > 0);
+    };
+
+    const hasContent = Object.values(store).some((value) => value.length > 0);
+    if (!hasContent) return [];
+
+    return [
+      {
+        ...store,
+        category: normalizeCategory(store.category),
+      },
+    ];
+  });
+}
+
+function downloadStoreTemplate() {
+  const worksheet = XLSX.utils.aoa_to_sheet([
+    storeTemplateHeaders.map((header) => storeTemplateHeaderLabels[header]),
+    [
+      "예시상회",
+      "먹거리",
+      "떡볶이, 김밥",
+      "09:00-18:00",
+      "10년",
+      "010-0000-0000",
+      "시장 입구에 있는 분식 점포입니다.",
+    ],
+  ]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "점포등록");
+  XLSX.writeFile(workbook, "DIGI-MON_점포등록_양식.xlsx");
 }
 
 export default function TemplateInfoPage() {
@@ -401,6 +466,7 @@ export default function TemplateInfoPage() {
       });
       window.sessionStorage.removeItem(generatedPageIdStorageKey);
       window.sessionStorage.setItem(generationVersionStorageKey, String(Date.now()));
+      window.sessionStorage.setItem(generationInProgressStorageKey, "true");
       router.push("/templates/generating");
     } catch (error) {
       const apiError = error as MarketPageApiError;
@@ -475,9 +541,18 @@ export default function TemplateInfoPage() {
                 글 위치 확인하기
               </button>
             </div>
-            <p className={styles.uploadHint}>
-              시장 점포의 정보(영업시간, 연락처, 대표메뉴 등)가 담긴 파일을 업로드해주세요.
-            </p>
+            <div className={styles.uploadGuide}>
+              <p className={styles.uploadHint}>
+                DIGI-MON 공식 양식 파일을 사용해주세요. category는 농수산물/먹거리/의류/생활용품/기타 중 하나로 입력해야 하며, 해당하지 않는 경우 자동으로 기타로 분류됩니다.
+              </p>
+              <button
+                className={styles.templateDownloadButton}
+                type="button"
+                onClick={downloadStoreTemplate}
+              >
+                양식 파일 다운로드
+              </button>
+            </div>
             <label className={styles.fileUpload}>
               <input
                 type="file"

@@ -17,6 +17,8 @@ const logoImage =
   "/images/onboarding/generating-background.png";
 const heroLogoImage = "/images/onboarding/generating-hero-logo.png";
 const generatedPageIdStorageKey = "generated_market_page_id";
+const generatedPublicMarketIdStorageKey = "generated_market_public_market_id";
+const generationInProgressStorageKey = "market_page_generation_in_progress";
 const setupStorageKey = "market_page_setup_draft";
 const generationVersionStorageKey = "market_page_generation_version";
 let createMarketPagePromise: ReturnType<typeof createMarketPage> | null = null;
@@ -62,12 +64,19 @@ export default function TemplateGeneratingPage() {
             generatedPageIdStorageKey,
             String(generatedId),
           );
+          window.sessionStorage.setItem(
+            generatedPublicMarketIdStorageKey,
+            String(publicId),
+          );
+          window.sessionStorage.removeItem(generationInProgressStorageKey);
         },
         onFailed: (result) => {
           if (!isMounted) return;
           createMarketPagePromise = null;
           createMarketPagePromiseKey = null;
           window.sessionStorage.removeItem(generatedPageIdStorageKey);
+          window.sessionStorage.removeItem(generatedPublicMarketIdStorageKey);
+          window.sessionStorage.removeItem(generationInProgressStorageKey);
           setStatus("FAILED");
           setShowCompletionAlert(false);
           setErrorMessage(
@@ -80,6 +89,8 @@ export default function TemplateGeneratingPage() {
           createMarketPagePromise = null;
           createMarketPagePromiseKey = null;
           window.sessionStorage.removeItem(generatedPageIdStorageKey);
+          window.sessionStorage.removeItem(generatedPublicMarketIdStorageKey);
+          window.sessionStorage.removeItem(generationInProgressStorageKey);
           setStatus("FAILED");
           setShowCompletionAlert(false);
           setErrorMessage(error.message);
@@ -92,10 +103,17 @@ export default function TemplateGeneratingPage() {
         setStatus("PENDING");
         setErrorMessage("");
         setShowCompletionAlert(false);
+        window.sessionStorage.setItem(generationInProgressStorageKey, "true");
 
         const storedPageId = window.sessionStorage.getItem(generatedPageIdStorageKey);
         if (storedPageId) {
           setPageId(storedPageId);
+          const storedPublicId = window.sessionStorage.getItem(
+            generatedPublicMarketIdStorageKey,
+          );
+          if (storedPublicId) {
+            setPublicMarketId(storedPublicId);
+          }
           await subscribeStatus(storedPageId);
           return;
         }
@@ -113,6 +131,10 @@ export default function TemplateGeneratingPage() {
         setPageId(created.pageId);
         setPublicMarketId(created.marketId ?? created.pageId);
         window.sessionStorage.setItem(generatedPageIdStorageKey, String(created.pageId));
+        window.sessionStorage.setItem(
+          generatedPublicMarketIdStorageKey,
+          String(created.marketId ?? created.pageId),
+        );
 
         await subscribeStatus(created.pageId);
       } catch (error) {
@@ -121,6 +143,8 @@ export default function TemplateGeneratingPage() {
         if (!isMounted) return;
         const apiError = error as MarketPageApiError;
         window.sessionStorage.removeItem(generatedPageIdStorageKey);
+        window.sessionStorage.removeItem(generatedPublicMarketIdStorageKey);
+        window.sessionStorage.removeItem(generationInProgressStorageKey);
         setStatus("FAILED");
         setShowCompletionAlert(false);
         setErrorMessage(apiError.message ?? "웹페이지 생성 요청에 실패했습니다.");
@@ -142,6 +166,8 @@ export default function TemplateGeneratingPage() {
     createMarketPagePromise = null;
     createMarketPagePromiseKey = null;
     window.sessionStorage.removeItem(generatedPageIdStorageKey);
+    window.sessionStorage.removeItem(generatedPublicMarketIdStorageKey);
+    window.sessionStorage.removeItem(generationInProgressStorageKey);
     window.location.reload();
   }
 
