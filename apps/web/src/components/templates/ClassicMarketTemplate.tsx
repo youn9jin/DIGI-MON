@@ -19,6 +19,9 @@ export interface ClassicMarketTemplateData {
   secondTitle: string;
   secondSubtitle: string;
   secondBody: string;
+  heroImageUrl?: string;
+  logoImageUrl?: string;
+  introImageUrl?: string;
 }
 
 const DEFAULT_DATA: ClassicMarketTemplateData = {
@@ -103,14 +106,29 @@ export default function ClassicMarketTemplate({
       </header>
 
       <section className={styles.logoIntro} id="intro" aria-label="시장 소개">
-        <div className={styles.logoBox}>
-          <strong>{content.marketName}</strong>
+        <div
+          className={`${styles.logoBox} ${content.logoImageUrl ? styles.logoBoxImage : ""}`}
+          style={
+            content.logoImageUrl
+              ? { backgroundImage: `url(${content.logoImageUrl})` }
+              : undefined
+          }
+        >
+          {!content.logoImageUrl && <strong>{content.marketName}</strong>}
         </div>
         <p>{content.intro}</p>
       </section>
 
       <section className={styles.featureRow}>
-        <div className={styles.photoBlock} aria-label="시장 대표 이미지" />
+        <div
+          className={styles.photoBlock}
+          style={
+            content.heroImageUrl
+              ? { backgroundImage: `url(${content.heroImageUrl})` }
+              : undefined
+          }
+          aria-label="시장 대표 이미지"
+        />
         <article className={styles.textBlock}>
           <h1>{content.heroTitle}</h1>
           <h2>{content.heroSubtitle}</h2>
@@ -124,7 +142,15 @@ export default function ClassicMarketTemplate({
           <h2>{content.secondSubtitle}</h2>
           <p>{content.secondBody}</p>
         </article>
-        <div className={styles.photoBlock} aria-label="시장 상세 이미지" />
+        <div
+          className={styles.photoBlock}
+          style={
+            content.introImageUrl
+              ? { backgroundImage: `url(${content.introImageUrl})` }
+              : undefined
+          }
+          aria-label="시장 상세 이미지"
+        />
       </section>
 
       <section className={styles.mapSection} id="map" aria-label="찾아오시는 길">

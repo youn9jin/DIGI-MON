@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { type DragEvent, useEffect, useState } from "react";
 import * as XLSX from "xlsx";
 import Header from "@/components/layout/Header";
 import {
@@ -12,6 +12,7 @@ import {
   type TemplateType,
 } from "@/lib/api/market-page";
 import { createStores, type StoreCreateItem } from "@/lib/api/stores";
+import { uploadMarketPageImage } from "@/lib/firebase-storage";
 import styles from "./template-info.module.css";
 
 const backgroundImage = "/images/onboarding/market-illustration.png";
@@ -19,21 +20,21 @@ const backgroundImage = "/images/onboarding/market-illustration.png";
 const textFields = [
   {
     id: "intro" as const,
-    title: "시장 소개 작성하기",
+    title: "시장 한 줄 소개 작성하기(50자 이내)",
     placeholder: "시장 소개를 작성해주세요.",
     rows: 4,
   },
   {
     id: "history" as const,
-    title: "시장 역사 작성하기",
-    placeholder: "시장 역사를 작성해주세요.",
+    title: "시장 대표 소개글 작성하기(1000자 이내)",
+    placeholder: "시장의 자랑거리, 역사 등 시장에 관련된 내용을 작성해주세요.",
     rows: 4,
   },
   {
     id: "directions" as const,
-    title: "시장 찾아오는 길 작성하기",
+    title: "시장 찾아오는 길 및 주차 안내 작성하기(300자 이내)",
     placeholder:
-      "지도에서 제공하는 내용보다 더 쉬운 길찾기 방법이 있다면 알려주세요. 예) 충무로역 6번 출구에서 직진한 후 메가커피 골목으로 들어오면 시장 주 출입구가 있습니다.",
+      "지도에서 제공하는 내용보다 더 쉬운 길찾기 방법이 있다면 알려주세요. 예) 충무로역 6번 출구에서 직진한 후 메가커피 골목으로 들어오면 시장 주 출입구가 있습니다, 주차장은 충무로역 공영주차장 이용이 가능합니다.",
     rows: 4,
   },
 ];
@@ -392,6 +393,10 @@ export default function TemplateInfoPage() {
   });
   const [previewTarget, setPreviewTarget] = useState<PreviewTarget | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoFileName, setLogoFileName] = useState("");
+  const [representativeFiles, setRepresentativeFiles] = useState<File[]>([]);
+  const [representativeFileMessage, setRepresentativeFileMessage] = useState("");
   const [storeFileName, setStoreFileName] = useState("");
   const [storeUploadMessage, setStoreUploadMessage] = useState("");
   const [stores, setStores] = useState<StoreCreateItem[]>([]);
@@ -403,6 +408,8 @@ export default function TemplateInfoPage() {
     marketContent.introText.trim().length > 0 &&
     marketContent.historyText.trim().length > 0 &&
     marketContent.directionsText.trim().length > 0 &&
+    logoFile != null &&
+    representativeFiles.length > 0 &&
     (!needsStoreFile || stores.length > 0);
 
   useEffect(() => {
@@ -442,6 +449,43 @@ export default function TemplateInfoPage() {
     }
   }
 
+  function handleLogoFileChange(file: File | undefined) {
+    if (!file) {
+      setLogoFile(null);
+      setLogoFileName("");
+      return;
+    }
+
+    setLogoFile(file);
+    setLogoFileName(file.name);
+  }
+
+  function handleRepresentativeFilesChange(fileList: FileList | null) {
+    const files = Array.from(fileList ?? []).filter((file) =>
+      file.type.startsWith("image/"),
+    );
+    setRepresentativeFiles(files);
+
+    if (files.length === 0) {
+      setRepresentativeFileMessage("");
+      return;
+    }
+
+    setRepresentativeFileMessage(
+      `${files.length}개 사진을 선택했어요. 템플릿에는 앞의 사진부터 우선 표시됩니다.`,
+    );
+  }
+
+  function handleLogoDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    handleLogoFileChange(event.dataTransfer.files[0]);
+  }
+
+  function handleRepresentativeDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    handleRepresentativeFilesChange(event.dataTransfer.files);
+  }
+
   async function handleInfoComplete() {
     if (isSaving || !isInfoComplete) return;
 
@@ -459,10 +503,25 @@ export default function TemplateInfoPage() {
         }
       }
 
+      const heroImageFile = representativeFiles[0] ?? null;
+      const introImageFile = representativeFiles[1] ?? heroImageFile;
+      const [logoImageUrl, heroImageUrl, introImageUrl] = await Promise.all([
+        logoFile ? uploadMarketPageImage(logoFile, "logo") : Promise.resolve(null),
+        heroImageFile
+          ? uploadMarketPageImage(heroImageFile, "hero")
+          : Promise.resolve(null),
+        introImageFile
+          ? uploadMarketPageImage(introImageFile, "intro")
+          : Promise.resolve(null),
+      ]);
+
       await saveMarketPageSetup({
         templateType: setupDraft.templateType,
         selectedSections: setupDraft.selectedSections,
         marketContent,
+        heroImageUrl,
+        logoImageUrl,
+        introImageUrl,
       });
       window.sessionStorage.removeItem(generatedPageIdStorageKey);
       window.sessionStorage.setItem(generationVersionStorageKey, String(Date.now()));
@@ -531,6 +590,64 @@ export default function TemplateInfoPage() {
               <button className={styles.aiButton} type="button">
                 AI 도움받기
               </button>
+              {field.id === "intro" && (
+                <section className={styles.inlineUploadGroup}>
+                  <div className={styles.inlineUploadTitle}>
+                    <h3>1-1. 시장 로고 등록하기</h3>
+                    <p>시장 로고를 png 파일로 업로드해주세요.</p>
+                  </div>
+                  <div
+                    className={styles.imageDropZone}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={handleLogoDrop}
+                  >
+                    <span>{logoFileName || "시장 로고를 마우스로 끌어와주세요"}</span>
+                  </div>
+                  <label className={styles.imageFileButton}>
+                    파일 추가하기
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={(event) => handleLogoFileChange(event.target.files?.[0])}
+                    />
+                  </label>
+                </section>
+              )}
+              {field.id === "history" && (
+                <section className={styles.inlineUploadGroup}>
+                  <div className={styles.inlineUploadTitle}>
+                    <h3>2-1. 시장 대표 사진 등록하기</h3>
+                    <p>시장 사진을 png 파일로 업로드해주세요. 4개 이상의 사진이 필요해요.</p>
+                  </div>
+                  <div
+                    className={styles.imageDropZone}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={handleRepresentativeDrop}
+                  >
+                    <span>
+                      {representativeFiles.length > 0
+                        ? `${representativeFiles.length}개 사진 선택됨`
+                        : "시장 대표 사진을 마우스로 끌어와주세요"}
+                    </span>
+                  </div>
+                  <label className={styles.imageFileButton}>
+                    파일 추가하기
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={(event) =>
+                        handleRepresentativeFilesChange(event.target.files)
+                      }
+                    />
+                  </label>
+                  {representativeFileMessage && (
+                    <p className={styles.imageUploadMessage}>
+                      {representativeFileMessage}
+                    </p>
+                  )}
+                </section>
+              )}
             </section>
           ))}
 

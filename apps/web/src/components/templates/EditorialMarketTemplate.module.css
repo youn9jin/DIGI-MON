@@ -60,11 +60,23 @@
 }
 
 .heroImage,
+.dynamicHeroImage,
+.dynamicBlockImage,
 .fullImageBlock img,
 .splitImage img,
 .routeBand img {
   object-fit: cover;
   object-position: center;
+}
+
+.dynamicHeroImage,
+.dynamicBlockImage {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .heroOverlay {

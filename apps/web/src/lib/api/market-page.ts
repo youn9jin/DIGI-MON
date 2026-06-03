@@ -45,12 +45,18 @@ export interface MarketPageSetupRequest {
     historyText?: string;
     directionsText?: string;
   };
+  heroImageUrl?: string | null;
+  logoImageUrl?: string | null;
+  introImageUrl?: string | null;
 }
 
 export interface MarketPageSetupResponse {
   marketId: string | number;
   templateType: TemplateType;
   selectedSections: MarketPageSection[];
+  heroImageUrl?: string | null;
+  logoImageUrl?: string | null;
+  introImageUrl?: string | null;
 }
 
 export interface UpdateMarketPageTextRequest {
