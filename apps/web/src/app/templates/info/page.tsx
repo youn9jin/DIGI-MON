@@ -328,11 +328,22 @@ function normalizeContact(value: string): string {
 function getSaveErrorMessage(error: unknown): string {
   const message = error instanceof Error ? error.message : "";
   if (
-    message.includes("storage") ||
-    message.includes("Firebase") ||
+    message.includes("storage/unauthorized") ||
+    message.includes("403") ||
+    message.includes("permission") ||
+    message.includes("Permission")
+  ) {
+    return "이미지 업로드 권한이 없습니다. Firebase Storage Rules에서 로그인 사용자의 market-page 경로 쓰기 권한을 확인해주세요.";
+  }
+
+  if (
     message.includes("CORS")
   ) {
     return "이미지 업로드에 실패했습니다. Firebase Storage CORS 설정을 확인해주세요.";
+  }
+
+  if (message.includes("storage") || message.includes("Firebase")) {
+    return "이미지 업로드에 실패했습니다. Firebase Storage 설정을 확인해주세요.";
   }
 
   return message || "웹페이지 생성 설정 저장에 실패했습니다.";
