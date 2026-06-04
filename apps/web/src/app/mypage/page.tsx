@@ -11,7 +11,7 @@ import {
   getPublicMarketPageContent,
   type MarketPageContentResponse,
 } from "@/lib/api/market-page";
-import { getMe, type MeResponse } from "@/lib/api/me";
+import { deleteMe, getMe, type MeResponse } from "@/lib/api/me";
 import { auth } from "@/lib/firebase";
 import styles from "./mypage.module.css";
 
@@ -103,10 +103,19 @@ export default function MyPage() {
     router.push("/login");
   }
 
-  function handleDeleteAccountConfirm() {
-    setIsDeleteModalOpen(false);
-    setDeleteMessage("회원 탈퇴 API가 준비되면 이 버튼에 연결됩니다.");
-    window.setTimeout(() => setDeleteMessage(""), 2500);
+  async function handleDeleteAccountConfirm() {
+    setDeleteMessage("");
+
+    try {
+      await deleteMe(user);
+      setIsDeleteModalOpen(false);
+      await signOut(auth).catch(() => undefined);
+      router.replace("/login");
+    } catch (error) {
+      setIsDeleteModalOpen(false);
+      setDeleteMessage(error instanceof Error ? error.message : "회원 탈퇴에 실패했습니다.");
+      window.setTimeout(() => setDeleteMessage(""), 3000);
+    }
   }
 
   async function handleCopy() {

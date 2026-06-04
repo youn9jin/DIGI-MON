@@ -1,4 +1,5 @@
 import type { User } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { getPublicMarketPageContent } from "@/lib/api/market-page";
 
 interface ApiEnvelope<T> {
@@ -56,6 +57,26 @@ export async function getMe(user: User): Promise<MeResponse> {
   }
 
   return unwrapMeResponse(body);
+}
+
+export async function deleteMe(user = auth.currentUser): Promise<void> {
+  if (!user) {
+    throw new Error("로그인이 필요합니다.");
+  }
+
+  const idToken = await user.getIdToken();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const response = await fetch(`${baseUrl}/api/me`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  const body = (await response.json().catch(() => ({}))) as ApiEnvelope<unknown> & {
+    message?: string;
+  };
+
+  if (!response.ok || body.success === false) {
+    throw new Error(body.error?.message ?? body.message ?? "회원 탈퇴에 실패했습니다.");
+  }
 }
 
 export async function hasGeneratedMarketPage(me: MeResponse): Promise<boolean> {

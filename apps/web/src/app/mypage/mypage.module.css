@@ -1099,6 +1099,11 @@
   line-height: 45px;
 }
 
+.editFigmaSaveButton:disabled {
+  color: #8f8f8f;
+  cursor: not-allowed;
+}
+
 .editFigmaSaveMessage {
   position: absolute;
   z-index: 1;

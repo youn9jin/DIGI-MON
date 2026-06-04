@@ -9,8 +9,10 @@ import DeleteAccountModal from "@/components/ui/DeleteAccountModal";
 import {
   getPublicMarketPageContent,
   type MarketPageContentResponse,
+  type UpdateMarketInfoRequest,
+  updateMarketInfo,
 } from "@/lib/api/market-page";
-import { getMe, type MeResponse } from "@/lib/api/me";
+import { deleteMe, getMe, type MeResponse } from "@/lib/api/me";
 import { auth } from "@/lib/firebase";
 import styles from "../mypage.module.css";
 
@@ -71,6 +73,7 @@ export default function MarketInfoEditPage() {
   const [me, setMe] = useState<MeResponse | null>(null);
   const [form, setForm] = useState<FormState>(() => createInitialForm(null, null));
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [scale, setScale] = useState(1);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -127,14 +130,55 @@ export default function MarketInfoEditPage() {
     router.push("/login");
   }
 
-  function handleDeleteAccountConfirm() {
-    setIsDeleteModalOpen(false);
-    setSaveMessage("회원 탈퇴 API가 준비되면 이 버튼에 연결됩니다.");
+  async function handleDeleteAccountConfirm() {
+    setSaveMessage("");
+
+    try {
+      await deleteMe();
+      setIsDeleteModalOpen(false);
+      await signOut(auth).catch(() => undefined);
+      router.replace("/login");
+    } catch (error) {
+      setIsDeleteModalOpen(false);
+      setSaveMessage(error instanceof Error ? error.message : "회원 탈퇴에 실패했습니다.");
+    }
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSaveMessage("시장 기본 정보 수정 API가 준비되면 이 값으로 저장됩니다.");
+    setSaveMessage("");
+
+    const contact = form.contact.trim();
+    if (contact && !/^[0-9+\-()\s]{5,20}$/.test(contact)) {
+      setSaveMessage("연락처는 숫자, +, -, (, ), 공백으로 구성된 5~20자여야 합니다.");
+      return;
+    }
+
+    const address = [form.roadAddress.trim(), form.detailAddress.trim()]
+      .filter(Boolean)
+      .join(" ");
+    const payload: UpdateMarketInfoRequest = {
+      name: form.marketName.trim() || null,
+      address: address || null,
+      marketType: form.marketType || null,
+      totalStores: form.storeRange || null,
+      operatingHours: {
+        weekday: form.weekdayHours.trim() || null,
+        weekend: form.sundayClosed ? null : form.weekendHours.trim() || null,
+      },
+      contact: contact || null,
+    };
+
+    setIsSaving(true);
+
+    try {
+      await updateMarketInfo(payload);
+      setSaveMessage("시장 정보를 수정했어요.");
+    } catch (error) {
+      setSaveMessage(error instanceof Error ? error.message : "시장 정보 수정에 실패했습니다.");
+    } finally {
+      setIsSaving(false);
+    }
   }
 
   const canvasStyle = { "--mypage-edit-scale": scale } as CSSProperties;
@@ -368,8 +412,8 @@ export default function MarketInfoEditPage() {
           />
 
           {saveMessage && <p className={styles.editFigmaSaveMessage}>{saveMessage}</p>}
-          <button className={styles.editFigmaSaveButton} type="submit">
-            저장하기
+          <button className={styles.editFigmaSaveButton} type="submit" disabled={isSaving}>
+            {isSaving ? "저장 중" : "저장하기"}
           </button>
         </form>
       </div>
