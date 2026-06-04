@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import styles from "./ClassicMarketTemplate.module.css";
-import OpenStreetMapEmbed from "./OpenStreetMapEmbed";
+import GoogleMapEmbed from "./GoogleMapEmbed";
 import TemplateGenerationActions from "./TemplateGenerationActions";
 
 export interface ClassicMarketTemplateData {
@@ -162,7 +162,7 @@ export default function ClassicMarketTemplate({
 
       <section className={styles.mapSection} id="map" aria-label="찾아오시는 길">
         <h2>찾아오시는 길</h2>
-        <OpenStreetMapEmbed address={content.address} label={content.marketName} />
+        <GoogleMapEmbed address={content.address} label={content.marketName} />
       </section>
 
       <footer className={styles.footer}>
