@@ -16,6 +16,7 @@ import { auth } from "@/lib/firebase";
 import styles from "./mypage.module.css";
 
 type CopyState = "idle" | "copied";
+type MyPageView = "all" | "profile" | "website";
 
 function getMarketImage(content: MarketPageContentResponse | null) {
   return (
@@ -41,6 +42,7 @@ export default function MyPage() {
   const [copyState, setCopyState] = useState<CopyState>("idle");
   const [isLoading, setIsLoading] = useState(true);
   const [scale, setScale] = useState(1);
+  const [activeView, setActiveView] = useState<MyPageView>("all");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState("");
 
@@ -48,7 +50,7 @@ export default function MyPage() {
     setOrigin(window.location.origin);
 
     function updateScale() {
-      setScale(Math.min(1, window.innerWidth / 1920));
+      setScale(Math.min(1, (window.innerWidth - 24) / 1920));
     }
 
     updateScale();
@@ -96,7 +98,18 @@ export default function MyPage() {
   const marketAddress = formatEmpty(content?.address ?? me?.address, "주소 정보 없음");
   const marketContact = formatEmpty(content?.contact ?? me?.phone, "연락처 정보 없음");
   const marketImage = getMarketImage(content);
-  const canvasStyle = { "--mypage-scale": scale } as CSSProperties;
+  const canvasHeight = activeView === "website" ? "780px" : activeView === "profile" ? "870px" : "1370px";
+  const canvasStyle = {
+    "--mypage-scale": scale,
+    "--mypage-height": canvasHeight,
+  } as CSSProperties;
+  const canvasClassName = [
+    styles.figmaCanvas,
+    activeView === "profile" ? styles.figmaCanvasProfileOnly : "",
+    activeView === "website" ? styles.figmaCanvasWebsiteOnly : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   async function handleLogout() {
     await signOut(auth);
@@ -139,19 +152,37 @@ export default function MyPage() {
       <Header variant="builder" />
 
       <div className={styles.figmaViewport} style={canvasStyle}>
-        <div className={styles.figmaCanvas}>
+        <div className={canvasClassName}>
           <h1 className={styles.figmaPageTitle}>마이페이지</h1>
 
           <aside className={styles.figmaSidebar} aria-label="마이페이지 메뉴">
-            <Link className={`${styles.figmaSideButton} ${styles.figmaSideActive}`} href="/mypage">
+            <button
+              className={`${styles.figmaSideButton} ${
+                activeView === "all" ? styles.figmaSideActive : ""
+              }`}
+              type="button"
+              onClick={() => setActiveView("all")}
+            >
               전체 보기
-            </Link>
-            <a className={styles.figmaSideButton} href="#profile">
+            </button>
+            <button
+              className={`${styles.figmaSideButton} ${
+                activeView === "profile" ? styles.figmaSideActive : ""
+              }`}
+              type="button"
+              onClick={() => setActiveView("profile")}
+            >
               내 정보
-            </a>
-            <Link className={styles.figmaSideButton} href={me?.marketId ? `/markets/${me.marketId}` : "/templates"}>
+            </button>
+            <button
+              className={`${styles.figmaSideButton} ${
+                activeView === "website" ? styles.figmaSideActive : ""
+              }`}
+              type="button"
+              onClick={() => setActiveView("website")}
+            >
               웹사이트 확인
-            </Link>
+            </button>
             <button className={`${styles.figmaSideButton} ${styles.figmaLogout}`} onClick={handleLogout}>
               로그아웃
             </button>
@@ -164,7 +195,12 @@ export default function MyPage() {
             </button>
           </aside>
 
-          <section id="profile" aria-labelledby="profile-title">
+          {(activeView === "all" || activeView === "profile") && (
+          <section
+            id="profile"
+            className={styles.figmaProfileSection}
+            aria-labelledby="profile-title"
+          >
             <h2 id="profile-title" className={styles.figmaSectionTitle}>
               내 정보
             </h2>
@@ -201,8 +237,10 @@ export default function MyPage() {
               </Link>
             </article>
           </section>
+          )}
 
-          <section aria-labelledby="website-title">
+          {(activeView === "all" || activeView === "website") && (
+          <section className={styles.figmaWebsiteSection} aria-labelledby="website-title">
             <h2 id="website-title" className={styles.figmaWebsiteTitle}>
               웹사이트 확인
             </h2>
@@ -222,6 +260,7 @@ export default function MyPage() {
               웹사이트 관리 바로가기
             </Link>
           </section>
+          )}
           {deleteMessage && <p className={styles.figmaDeleteMessage}>{deleteMessage}</p>}
         </div>
       </div>

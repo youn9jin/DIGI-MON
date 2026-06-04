@@ -17,14 +17,14 @@
 
 .figmaViewport {
   width: 100%;
-  height: calc(1370px * var(--mypage-scale));
+  height: calc(var(--mypage-height, 1370px) * var(--mypage-scale));
   overflow: hidden;
 }
 
 .figmaCanvas {
   position: relative;
   width: 1920px;
-  height: 1370px;
+  height: var(--mypage-height, 1370px);
   transform: scale(var(--mypage-scale));
   transform-origin: left top;
 }
@@ -69,6 +69,7 @@
 
 .figmaSideActive {
   background: rgba(255, 242, 197, 0.77);
+  font-weight: 700;
 }
 
 .figmaLogout {
@@ -288,6 +289,48 @@
   font-size: 32px;
   font-weight: 700;
   line-height: 40px;
+}
+
+.figmaCanvasWebsiteOnly .figmaWebsiteTitle {
+  top: 217px;
+}
+
+.figmaCanvasWebsiteOnly .figmaLinkTitle {
+  top: 345px;
+}
+
+.figmaCanvasWebsiteOnly .figmaLinkBox {
+  top: 406px;
+}
+
+.figmaCanvasWebsiteOnly .figmaManageTitle {
+  top: 575px;
+}
+
+.figmaCanvasWebsiteOnly .figmaManageDescription {
+  top: 625px;
+}
+
+.figmaCanvasWebsiteOnly .figmaManageButton {
+  top: 599px;
+}
+
+.figmaCanvasProfileOnly .figmaSectionTitle {
+  top: 217px;
+}
+
+.figmaCanvasProfileOnly .figmaDescription {
+  top: 263px;
+}
+
+.figmaCanvasProfileOnly .figmaProfileTitle,
+.figmaCanvasProfileOnly .figmaMarketTitle {
+  top: 345px;
+}
+
+.figmaCanvasProfileOnly .figmaProfileCard,
+.figmaCanvasProfileOnly .figmaMarketCard {
+  top: 406px;
 }
 
 .figmaLinkTitle {
