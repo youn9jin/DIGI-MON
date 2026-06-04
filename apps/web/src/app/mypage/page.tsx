@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import Header from "@/components/layout/Header";
+import DeleteAccountModal from "@/components/ui/DeleteAccountModal";
 import {
   getPublicMarketPageContent,
   type MarketPageContentResponse,
@@ -39,9 +40,19 @@ export default function MyPage() {
   const [origin, setOrigin] = useState("");
   const [copyState, setCopyState] = useState<CopyState>("idle");
   const [isLoading, setIsLoading] = useState(true);
+  const [scale, setScale] = useState(1);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState("");
 
   useEffect(() => {
     setOrigin(window.location.origin);
+
+    function updateScale() {
+      setScale(Math.min(1, window.innerWidth / 1920));
+    }
+
+    updateScale();
+    window.addEventListener("resize", updateScale);
 
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
@@ -68,7 +79,10 @@ export default function MyPage() {
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      window.removeEventListener("resize", updateScale);
+    };
   }, [router]);
 
   const websiteUrl = useMemo(() => {
@@ -82,10 +96,17 @@ export default function MyPage() {
   const marketAddress = formatEmpty(content?.address ?? me?.address, "주소 정보 없음");
   const marketContact = formatEmpty(content?.contact ?? me?.phone, "연락처 정보 없음");
   const marketImage = getMarketImage(content);
+  const canvasStyle = { "--mypage-scale": scale } as CSSProperties;
 
   async function handleLogout() {
     await signOut(auth);
     router.push("/login");
+  }
+
+  function handleDeleteAccountConfirm() {
+    setIsDeleteModalOpen(false);
+    setDeleteMessage("회원 탈퇴 API가 준비되면 이 버튼에 연결됩니다.");
+    window.setTimeout(() => setDeleteMessage(""), 2500);
   }
 
   async function handleCopy() {
@@ -108,119 +129,99 @@ export default function MyPage() {
     <main className={styles.page}>
       <Header variant="builder" />
 
-      <div className={styles.layout}>
-        <aside className={styles.sidebar} aria-label="마이페이지 메뉴">
-          <Link className={`${styles.sidebarButton} ${styles.active}`} href="/mypage">
-            전체 보기
-          </Link>
-          <a className={styles.sidebarButton} href="#profile">
-            내 정보
-          </a>
-          <Link
-            className={styles.sidebarButton}
-            href={me?.marketId ? `/markets/${me.marketId}` : "/templates"}
-          >
-            웹사이트 확인
-          </Link>
-          <button className={`${styles.sidebarButton} ${styles.logout}`} onClick={handleLogout}>
-            로그아웃
-          </button>
-        </aside>
+      <div className={styles.figmaViewport} style={canvasStyle}>
+        <div className={styles.figmaCanvas}>
+          <h1 className={styles.figmaPageTitle}>마이페이지</h1>
 
-        <section className={styles.content} aria-labelledby="mypage-title">
-          <h1 id="mypage-title" className={styles.pageTitle}>
-            마이페이지
-          </h1>
+          <aside className={styles.figmaSidebar} aria-label="마이페이지 메뉴">
+            <Link className={`${styles.figmaSideButton} ${styles.figmaSideActive}`} href="/mypage">
+              전체 보기
+            </Link>
+            <a className={styles.figmaSideButton} href="#profile">
+              내 정보
+            </a>
+            <Link className={styles.figmaSideButton} href={me?.marketId ? `/markets/${me.marketId}` : "/templates"}>
+              웹사이트 확인
+            </Link>
+            <button className={`${styles.figmaSideButton} ${styles.figmaLogout}`} onClick={handleLogout}>
+              로그아웃
+            </button>
+            <button
+              className={`${styles.figmaSideButton} ${styles.figmaWithdraw}`}
+              type="button"
+              onClick={() => setIsDeleteModalOpen(true)}
+            >
+              회원 탈퇴
+            </button>
+          </aside>
 
-          <section id="profile" className={styles.infoSection} aria-labelledby="profile-title">
-            <h2 id="profile-title">내 정보</h2>
-            <p>상인회 계정 정보와 연결된 시장 정보를 확인할 수 있어요</p>
+          <section id="profile" aria-labelledby="profile-title">
+            <h2 id="profile-title" className={styles.figmaSectionTitle}>
+              내 정보
+            </h2>
+            <p className={styles.figmaDescription}>
+              상인회 프로필, 시장 정보 수정하기 버튼을 누르시면 관련 정보를 수정하실 수 있습니다.
+            </p>
 
-            <div className={styles.cardGrid}>
-              <article className={styles.profileCard}>
-                <h3>상인회 프로필</h3>
-                <div className={styles.avatar} aria-hidden="true">
-                  {displayName.slice(0, 1)}
-                </div>
-                <dl className={styles.profileList}>
-                  <div>
-                    <dt>이름</dt>
-                    <dd>{displayName}</dd>
-                  </div>
-                  <div>
-                    <dt>아이디</dt>
-                    <dd>{formatEmpty(me?.uid ?? user?.uid, "아이디 정보 없음")}</dd>
-                  </div>
-                  <div>
-                    <dt>이메일</dt>
-                    <dd>{displayEmail}</dd>
-                  </div>
-                </dl>
-                <button className={styles.secondaryButton} type="button">
-                  상인회 정보 수정하기
-                </button>
-              </article>
+            <h3 className={styles.figmaProfileTitle}>상인회 프로필</h3>
+            <article className={styles.figmaProfileCard}>
+              <div className={styles.figmaAvatar} aria-hidden="true" />
+              <strong>{displayName} 님</strong>
+              <p>이메일 : {displayEmail}</p>
+              <button className={styles.figmaProfileButton} type="button">
+                상인회 정보 수정하기
+              </button>
+            </article>
 
-              <article className={styles.marketCard}>
-                <h3>시장 정보</h3>
-                <div className={styles.marketBody}>
-                  <div className={styles.marketImage}>
-                    {marketImage ? (
-                      <Image alt={`${marketName} 대표 이미지`} fill sizes="301px" src={marketImage} />
-                    ) : (
-                      <span>대표 이미지</span>
-                    )}
-                  </div>
-
-                  <dl className={styles.marketList}>
-                    <div>
-                      <dt>시장 이름</dt>
-                      <dd>{marketName}</dd>
-                    </div>
-                    <div>
-                      <dt>시장 상세 주소</dt>
-                      <dd>{marketAddress}</dd>
-                    </div>
-                    <div>
-                      <dt>시장 대표 연락처</dt>
-                      <dd>{marketContact}</dd>
-                    </div>
-                    <div>
-                      <dt>시장 운영 시간</dt>
-                      <dd>운영 시간 정보 없음</dd>
-                    </div>
-                  </dl>
-                </div>
-                <Link className={styles.secondaryButton} href="/mypage/market-info-edit">
-                  시장 상세 정보 수정하기
-                </Link>
-              </article>
-            </div>
+            <h3 className={styles.figmaMarketTitle}>시장 정보</h3>
+            <article className={styles.figmaMarketCard}>
+              <div className={styles.figmaMarketImage}>
+                {marketImage ? (
+                  <Image alt={`${marketName} 대표 이미지`} fill sizes="301px" src={marketImage} />
+                ) : null}
+              </div>
+              <div className={styles.figmaMarketText}>
+                <strong>대표 정보</strong>
+                <b>{marketName}</b>
+                <p>주소 | {marketAddress}</p>
+                <p>연락처 | {marketContact}</p>
+                <p>영업시간 | 운영 시간 정보 없음</p>
+              </div>
+              <Link className={styles.figmaMarketButton} href="/mypage/market-info-edit">
+                시장 상세 정보 수정하기
+              </Link>
+            </article>
           </section>
 
-          <section className={styles.websiteSection} aria-labelledby="website-title">
-            <h2 id="website-title">웹사이트 확인</h2>
-
-            <div className={styles.linkBlock}>
-              <h3>웹사이트 링크</h3>
-              <div className={styles.linkRow}>
-                <span>{websiteUrl || "웹사이트 링크"}</span>
-                <button type="button" onClick={handleCopy} disabled={!websiteUrl}>
-                  {copyState === "copied" ? "복사 완료" : "복사하기"}
-                </button>
-              </div>
+          <section aria-labelledby="website-title">
+            <h2 id="website-title" className={styles.figmaWebsiteTitle}>
+              웹사이트 확인
+            </h2>
+            <h3 className={styles.figmaLinkTitle}>우리 시장 웹사이트 링크</h3>
+            <div className={styles.figmaLinkBox}>
+              <span>{websiteUrl || "웹사이트 링크"}</span>
+              <button type="button" onClick={handleCopy} disabled={!websiteUrl}>
+                {copyState === "copied" ? "복사 완료" : "복사하기"}
+              </button>
             </div>
 
-            <div className={styles.manageShortcut}>
-              <div>
-                <h3>웹사이트 관리 바로가기</h3>
-                <p>웹사이트 상세 정보와 템플릿을 수정할 수 있어요</p>
-              </div>
-              <Link href="/dashboard">웹사이트 관리 바로가기</Link>
-            </div>
+            <h3 className={styles.figmaManageTitle}>웹사이트 관리 바로가기</h3>
+            <p className={styles.figmaManageDescription}>
+              웹사이트에 등록된 내용을 언제든지 확인하고 수정할 수 있어요. 템플릿 교체도 가능해요.
+            </p>
+            <Link className={styles.figmaManageButton} href="/dashboard">
+              웹사이트 관리 바로가기
+            </Link>
           </section>
-        </section>
+          {deleteMessage && <p className={styles.figmaDeleteMessage}>{deleteMessage}</p>}
+        </div>
       </div>
+      {isDeleteModalOpen && (
+        <DeleteAccountModal
+          onConfirm={handleDeleteAccountConfirm}
+          onClose={() => setIsDeleteModalOpen(false)}
+        />
+      )}
     </main>
   );
 }
