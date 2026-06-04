@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import DashboardOperationToast from "@/components/dashboard/DashboardOperationToast";
 import GenerationCompletionWatcher from "@/components/templates/GenerationCompletionWatcher";
 
 const geistSans = Geist({
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
         <GenerationCompletionWatcher />
+        <DashboardOperationToast />
       </body>
     </html>
   );
