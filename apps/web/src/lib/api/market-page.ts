@@ -82,6 +82,32 @@ export interface UpdateMarketPageTemplateResponse {
   templateType: TemplateType;
 }
 
+export interface UpdateMarketInfoRequest {
+  name?: string | null;
+  address?: string | null;
+  marketType?: string | null;
+  totalStores?: string | null;
+  operatingHours?: {
+    weekday?: string | null;
+    weekend?: string | null;
+  } | null;
+  contact?: string | null;
+}
+
+export interface UpdateMarketInfoResponse {
+  marketId?: string | number;
+  name?: string;
+  address?: string;
+  marketType?: string;
+  totalStores?: string;
+  operatingHours?: {
+    weekday?: string | null;
+    weekend?: string | null;
+  } | null;
+  contact?: string | null;
+  message?: string;
+}
+
 export interface MarketPageContentResponse {
   pageId: string | number;
   marketId?: string | number;
@@ -252,6 +278,23 @@ export async function updateMarketPageTemplate(
   });
 
   return parseEnvelope<UpdateMarketPageTemplateResponse>(response);
+}
+
+export async function updateMarketInfo(
+  market: UpdateMarketInfoRequest,
+): Promise<UpdateMarketInfoResponse> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const authHeader = await getAuthorizationHeader();
+  const response = await fetch(`${baseUrl}/api/market`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeader,
+    },
+    body: JSON.stringify(market),
+  });
+
+  return parseEnvelope<UpdateMarketInfoResponse>(response);
 }
 
 export async function createMarketPage(
