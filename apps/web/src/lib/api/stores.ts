@@ -50,6 +50,16 @@ export interface StoreDetail extends StoreSummary {
   updatedAt?: string | null;
 }
 
+export type StoreUpdateRequest = {
+  name?: string;
+  category?: string;
+  items?: string | null;
+  operatingHours?: string | null;
+  yearsOfOperation?: string | null;
+  contact?: string | null;
+  description?: string | null;
+};
+
 export interface StoreListResponse {
   total: number;
   stores: StoreSummary[];
@@ -123,6 +133,24 @@ export async function getStore(storeId: string | number): Promise<StoreDetail> {
   const authHeader = await getAuthorizationHeader();
   const response = await fetch(`${baseUrl}/api/stores/${encodeURIComponent(String(storeId))}`, {
     headers: authHeader,
+  });
+
+  return parseEnvelope<StoreDetail>(response);
+}
+
+export async function updateStore(
+  storeId: string | number,
+  store: StoreUpdateRequest,
+): Promise<StoreDetail> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const authHeader = await getAuthorizationHeader();
+  const response = await fetch(`${baseUrl}/api/stores/${encodeURIComponent(String(storeId))}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeader,
+    },
+    body: JSON.stringify(store),
   });
 
   return parseEnvelope<StoreDetail>(response);

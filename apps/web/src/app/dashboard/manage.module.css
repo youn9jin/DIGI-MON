@@ -279,14 +279,62 @@
 }
 
 .storeEditor {
-  padding: 22px 12px 0;
+  padding: 20px 18px 0;
 }
 
-.storeEditorGrid {
+.storeSearch {
+  display: block;
+  width: min(100%, 330px);
+  margin: 0 auto 18px;
+}
+
+.storeSearch input {
+  width: 100%;
+  height: 35px;
+  border: 0.8px solid #686868;
+  border-radius: 10px;
+  padding: 0 38px 0 16px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #131313;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.storeCategoryFilter {
   display: grid;
-  grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+  grid-template-columns: repeat(6, minmax(92px, 1fr));
   gap: 18px;
-  min-height: 360px;
+  width: min(100%, 840px);
+  margin: 0 auto 18px;
+}
+
+.categoryChip {
+  height: 35px;
+  border: 0;
+  border-radius: 10px;
+  background: #fff5d2;
+  color: #000;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.activeCategoryChip {
+  box-shadow: inset 0 0 0 1.2px #131313;
+  font-weight: 700;
+}
+
+.storeCardGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 11px 18px;
+  width: min(100%, 820px);
+  max-height: 318px;
+  margin: 0 auto;
+  overflow-y: auto;
+  padding: 0 4px 10px;
 }
 
 .storeList {
@@ -301,27 +349,30 @@
 .storeListItem {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   align-items: flex-start;
   width: 100%;
-  border: 1.5px solid #d6d6d6;
-  border-radius: 16px;
-  padding: 13px 15px;
-  background: rgba(255, 255, 255, 0.65);
+  min-height: 54px;
+  border: 0.8px solid #131313;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #f3f3f3;
   color: #131313;
   cursor: pointer;
   text-align: left;
 }
 
 .storeListItem strong {
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 700;
+  line-height: 13px;
 }
 
 .storeListItem span {
-  color: #777;
-  font-size: 13px;
+  color: #131313;
+  font-size: 10px;
   font-weight: 500;
+  line-height: 13px;
 }
 
 .activeStoreItem {
@@ -373,11 +424,116 @@
 
 .storeDetailEmpty {
   display: grid;
-  min-height: 300px;
+  min-height: 160px;
+  grid-column: 1 / -1;
   place-items: center;
   margin: 0;
   color: #777;
   font-size: 15px;
+}
+
+.storeForm {
+  position: relative;
+  width: min(100%, 820px);
+  margin: 0 auto;
+  padding-top: 28px;
+}
+
+.storeBackButton {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 20px;
+  height: 22px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.storeBackButton::before,
+.storeBackButton::after {
+  position: absolute;
+  left: 8px;
+  width: 12px;
+  height: 1.2px;
+  background: #000;
+  content: "";
+}
+
+.storeBackButton::before {
+  top: 7px;
+  transform: rotate(-45deg);
+}
+
+.storeBackButton::after {
+  top: 15px;
+  transform: rotate(45deg);
+}
+
+.storeFormTitle {
+  margin: 0 0 24px;
+  color: #000;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  text-align: center;
+}
+
+.storeFormFields {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.storeFormField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.storeFormField span {
+  color: #000;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+}
+
+.storeFormField input,
+.storeFormField select,
+.storeFormField textarea {
+  width: 100%;
+  border: 1.2px solid #a1a1a1;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #131313;
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+}
+
+.storeFormField input,
+.storeFormField select {
+  height: 45px;
+  padding: 0 18px;
+}
+
+.storeFormField textarea {
+  min-height: 86px;
+  padding: 14px 18px;
+  resize: vertical;
+}
+
+.storeFormField input::placeholder,
+.storeFormField textarea::placeholder {
+  color: #9f9f9f;
+}
+
+.storeFormTemplateOne .storeFormFields {
+  gap: 11px;
+}
+
+.storeFormTextareaField textarea {
+  min-height: 106px;
 }
 
 .previewOverlay {
@@ -486,8 +642,17 @@
     width: min(100%, 360px);
   }
 
-  .storeEditorGrid {
-    grid-template-columns: 1fr;
+  .storeCategoryFilter {
+    grid-template-columns: repeat(3, minmax(92px, 1fr));
+    gap: 10px;
+  }
+
+  .storeCardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .storeForm {
+    width: 100%;
   }
 }
 
@@ -550,5 +715,19 @@
 
   .largePreview {
     width: 100%;
+  }
+
+  .storeCategoryFilter,
+  .storeCardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .storeCardGrid {
+    max-height: 360px;
+  }
+
+  .storeFormField input,
+  .storeFormField select {
+    height: 44px;
   }
 }
