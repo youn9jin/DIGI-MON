@@ -4,6 +4,9 @@ import com.digimon.api.associations.AlreadyOnboardedException;
 import com.digimon.api.auth.AuthAccountConflictException;
 import com.digimon.api.auth.ForbiddenException;
 import com.digimon.api.auth.UnauthorizedException;
+import com.digimon.api.market.InvalidContactFormatException; // PATCH /api/market contact 형식 오류 예외를 가져온다.
+import com.digimon.api.market.InvalidMarketTypeException; // PATCH /api/market marketType 허용값 오류 예외를 가져온다.
+import com.digimon.api.market.InvalidTotalStoresException; // PATCH /api/market totalStores 허용값 오류 예외를 가져온다.
 import com.digimon.api.marketpage.AlreadyInProgressException;
 import com.digimon.api.marketpage.ContentParseErrorException;
 import com.digimon.api.marketpage.InvalidSectionValueException;
@@ -96,6 +99,33 @@ public class GlobalExceptionHandler {
                 ex.getMessage() != null ? ex.getMessage() : "수정할 필드가 없습니다.",
                 null);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
+    @ExceptionHandler(InvalidMarketTypeException.class) // marketType 허용값 오류 예외를 처리한다.
+    public ResponseEntity<ResponseWrapper<Void>> handleInvalidMarketType(InvalidMarketTypeException ex) { // INVALID_MARKET_TYPE 응답을 만든다.
+        ResponseWrapper<Void> body = ResponseWrapper.error( // 공통 에러 응답 본문을 생성한다.
+                "INVALID_MARKET_TYPE", // 명세의 오류 코드를 설정한다.
+                ex.getMessage() != null ? ex.getMessage() : "허용되지 않는 marketType 값입니다.", // 예외 메시지가 있으면 사용하고 없으면 기본 메시지를 쓴다.
+                null); // 상세 오류 목록은 없으므로 null 로 둔다.
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body); // 400 상태와 ResponseWrapper 본문을 반환한다.
+    }
+
+    @ExceptionHandler(InvalidTotalStoresException.class) // totalStores 허용값 오류 예외를 처리한다.
+    public ResponseEntity<ResponseWrapper<Void>> handleInvalidTotalStores(InvalidTotalStoresException ex) { // INVALID_TOTAL_STORES 응답을 만든다.
+        ResponseWrapper<Void> body = ResponseWrapper.error( // 공통 에러 응답 본문을 생성한다.
+                "INVALID_TOTAL_STORES", // 명세의 오류 코드를 설정한다.
+                ex.getMessage() != null ? ex.getMessage() : "허용되지 않는 totalStores 값입니다.", // 예외 메시지가 있으면 사용하고 없으면 기본 메시지를 쓴다.
+                null); // 상세 오류 목록은 없으므로 null 로 둔다.
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body); // 400 상태와 ResponseWrapper 본문을 반환한다.
+    }
+
+    @ExceptionHandler(InvalidContactFormatException.class) // contact 형식 오류 예외를 처리한다.
+    public ResponseEntity<ResponseWrapper<Void>> handleInvalidContactFormat(InvalidContactFormatException ex) { // INVALID_CONTACT_FORMAT 응답을 만든다.
+        ResponseWrapper<Void> body = ResponseWrapper.error( // 공통 에러 응답 본문을 생성한다.
+                "INVALID_CONTACT_FORMAT", // 명세의 오류 코드를 설정한다.
+                ex.getMessage() != null ? ex.getMessage() : "contact 형식이 올바르지 않습니다.", // 예외 메시지가 있으면 사용하고 없으면 기본 메시지를 쓴다.
+                null); // 상세 오류 목록은 없으므로 null 로 둔다.
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body); // 400 상태와 ResponseWrapper 본문을 반환한다.
     }
 
     @ExceptionHandler(FieldTooLongException.class)
