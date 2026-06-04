@@ -1,93 +1,226 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { onAuthStateChanged, User, signOut } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import Header from "@/components/layout/Header";
+import {
+  getPublicMarketPageContent,
+  type MarketPageContentResponse,
+} from "@/lib/api/market-page";
+import { getMe, type MeResponse } from "@/lib/api/me";
+import { auth } from "@/lib/firebase";
+import styles from "./mypage.module.css";
+
+type CopyState = "idle" | "copied";
+
+function getMarketImage(content: MarketPageContentResponse | null) {
+  return (
+    content?.heroImageUrl ??
+    content?.introImageUrls?.find((url) => Boolean(url)) ??
+    content?.logoImageUrl ??
+    null
+  );
+}
+
+function formatEmpty(value: string | number | null | undefined, fallback = "정보 없음") {
+  if (value == null) return fallback;
+  const text = String(value).trim();
+  return text.length > 0 ? text : fallback;
+}
 
 export default function MyPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [me, setMe] = useState<MeResponse | null>(null);
+  const [content, setContent] = useState<MarketPageContentResponse | null>(null);
+  const [origin, setOrigin] = useState("");
+  const [copyState, setCopyState] = useState<CopyState>("idle");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    setOrigin(window.location.origin);
+
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (!currentUser) {
         router.replace("/login");
         return;
       }
+
       setUser(currentUser);
-      setLoading(false);
+
+      try {
+        const nextMe = await getMe(currentUser);
+        setMe(nextMe);
+
+        if (nextMe.marketId) {
+          try {
+            const pageContent = await getPublicMarketPageContent(nextMe.marketId);
+            setContent(pageContent);
+          } catch {
+            setContent(null);
+          }
+        }
+      } finally {
+        setIsLoading(false);
+      }
     });
+
     return () => unsubscribe();
   }, [router]);
 
-  if (loading) {
+  const websiteUrl = useMemo(() => {
+    if (!origin || !me?.marketId) return "";
+    return `${origin}/markets/${me.marketId}`;
+  }, [me?.marketId, origin]);
+
+  const displayName = formatEmpty(me?.name ?? user?.displayName, "상인회");
+  const displayEmail = formatEmpty(me?.email ?? user?.email, "이메일 정보 없음");
+  const marketName = formatEmpty(content?.marketName ?? me?.marketName, "시장 이름");
+  const marketAddress = formatEmpty(content?.address ?? me?.address, "주소 정보 없음");
+  const marketContact = formatEmpty(content?.contact ?? me?.phone, "연락처 정보 없음");
+  const marketImage = getMarketImage(content);
+
+  async function handleLogout() {
+    await signOut(auth);
+    router.push("/login");
+  }
+
+  async function handleCopy() {
+    if (!websiteUrl) return;
+    await navigator.clipboard.writeText(websiteUrl);
+    setCopyState("copied");
+    window.setTimeout(() => setCopyState("idle"), 1600);
+  }
+
+  if (isLoading) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100svh" }}>
-        <p style={{ color: "#6b6b6b", fontFamily: "Pretendard, sans-serif" }}>불러오는 중...</p>
-      </div>
+      <main className={styles.page}>
+        <Header variant="builder" />
+        <div className={styles.loading}>불러오는 중...</div>
+      </main>
     );
   }
 
   return (
-    <div style={{ minHeight: "100svh", background: "#fff", fontFamily: "Pretendard, 'Noto Sans KR', sans-serif" }}>
-      <Header />
-      <main style={{
-        paddingTop: "clamp(88px, 15svh, 140px)",
-        paddingLeft: "clamp(20px, 8.333vw, 160px)",
-        paddingRight: "clamp(20px, 8.333vw, 160px)",
-      }}>
-        <h1 style={{ fontSize: "clamp(20px, 2.083vw, 40px)", fontWeight: 700, color: "#000", marginBottom: 32 }}>
-          마이페이지
-        </h1>
+    <main className={styles.page}>
+      <Header variant="builder" />
 
-        <div style={{
-          width: "100%",
-          maxWidth: 480,
-          background: "#fafafa",
-          borderRadius: "clamp(12px, 1.25vw, 24px)",
-          padding: "clamp(24px, 2.5vw, 48px)",
-          boxShadow: "0 2px 12px rgba(0,0,0,0.07)",
-        }}>
-          <div style={{ marginBottom: 24 }}>
-            <p style={{ color: "#a0a0a0", fontSize: "clamp(11px, 0.938vw, 18px)", marginBottom: 4 }}>이름</p>
-            <p style={{ color: "#000", fontSize: "clamp(14px, 1.25vw, 24px)", fontWeight: 600 }}>
-              {user?.displayName ?? "—"}
-            </p>
-          </div>
-
-          <div style={{ marginBottom: 32 }}>
-            <p style={{ color: "#a0a0a0", fontSize: "clamp(11px, 0.938vw, 18px)", marginBottom: 4 }}>이메일 (아이디)</p>
-            <p style={{ color: "#000", fontSize: "clamp(14px, 1.25vw, 24px)", fontWeight: 600 }}>
-              {user?.email ?? "—"}
-            </p>
-          </div>
-
-          <button
-            onClick={() => signOut(auth).then(() => router.push("/login"))}
-            style={{
-              width: "100%",
-              height: "clamp(44px, 6.759svh, 73px)",
-              border: "1.5px solid #d0d0d0",
-              borderRadius: "clamp(10px, 1.042vw, 20px)",
-              background: "#fff",
-              color: "#3b3b3b",
-              fontFamily: "inherit",
-              fontSize: "clamp(13px, 1.042vw, 20px)",
-              fontWeight: 500,
-              cursor: "pointer",
-            }}
+      <div className={styles.layout}>
+        <aside className={styles.sidebar} aria-label="마이페이지 메뉴">
+          <Link className={`${styles.sidebarButton} ${styles.active}`} href="/mypage">
+            전체 보기
+          </Link>
+          <a className={styles.sidebarButton} href="#profile">
+            내 정보
+          </a>
+          <Link
+            className={styles.sidebarButton}
+            href={me?.marketId ? `/markets/${me.marketId}` : "/templates"}
           >
+            웹사이트 확인
+          </Link>
+          <button className={`${styles.sidebarButton} ${styles.logout}`} onClick={handleLogout}>
             로그아웃
           </button>
-        </div>
+        </aside>
 
-        <p style={{ marginTop: 24, color: "#a0a0a0", fontSize: "clamp(11px, 0.938vw, 18px)" }}>
-          * 추가 기능(정보 수정, 탈퇴 등)은 준비 중입니다.
-        </p>
-      </main>
-    </div>
+        <section className={styles.content} aria-labelledby="mypage-title">
+          <h1 id="mypage-title" className={styles.pageTitle}>
+            마이페이지
+          </h1>
+
+          <section id="profile" className={styles.infoSection} aria-labelledby="profile-title">
+            <h2 id="profile-title">내 정보</h2>
+            <p>상인회 계정 정보와 연결된 시장 정보를 확인할 수 있어요</p>
+
+            <div className={styles.cardGrid}>
+              <article className={styles.profileCard}>
+                <h3>상인회 프로필</h3>
+                <div className={styles.avatar} aria-hidden="true">
+                  {displayName.slice(0, 1)}
+                </div>
+                <dl className={styles.profileList}>
+                  <div>
+                    <dt>이름</dt>
+                    <dd>{displayName}</dd>
+                  </div>
+                  <div>
+                    <dt>아이디</dt>
+                    <dd>{formatEmpty(me?.uid ?? user?.uid, "아이디 정보 없음")}</dd>
+                  </div>
+                  <div>
+                    <dt>이메일</dt>
+                    <dd>{displayEmail}</dd>
+                  </div>
+                </dl>
+                <button className={styles.secondaryButton} type="button">
+                  상인회 정보 수정하기
+                </button>
+              </article>
+
+              <article className={styles.marketCard}>
+                <h3>시장 정보</h3>
+                <div className={styles.marketBody}>
+                  <div className={styles.marketImage}>
+                    {marketImage ? (
+                      <Image alt={`${marketName} 대표 이미지`} fill sizes="301px" src={marketImage} />
+                    ) : (
+                      <span>대표 이미지</span>
+                    )}
+                  </div>
+
+                  <dl className={styles.marketList}>
+                    <div>
+                      <dt>시장 이름</dt>
+                      <dd>{marketName}</dd>
+                    </div>
+                    <div>
+                      <dt>시장 상세 주소</dt>
+                      <dd>{marketAddress}</dd>
+                    </div>
+                    <div>
+                      <dt>시장 대표 연락처</dt>
+                      <dd>{marketContact}</dd>
+                    </div>
+                    <div>
+                      <dt>시장 운영 시간</dt>
+                      <dd>운영 시간 정보 없음</dd>
+                    </div>
+                  </dl>
+                </div>
+                <Link className={styles.secondaryButton} href="/mypage/market-info-edit">
+                  시장 상세 정보 수정하기
+                </Link>
+              </article>
+            </div>
+          </section>
+
+          <section className={styles.websiteSection} aria-labelledby="website-title">
+            <h2 id="website-title">웹사이트 확인</h2>
+
+            <div className={styles.linkBlock}>
+              <h3>웹사이트 링크</h3>
+              <div className={styles.linkRow}>
+                <span>{websiteUrl || "웹사이트 링크"}</span>
+                <button type="button" onClick={handleCopy} disabled={!websiteUrl}>
+                  {copyState === "copied" ? "복사 완료" : "복사하기"}
+                </button>
+              </div>
+            </div>
+
+            <div className={styles.manageShortcut}>
+              <div>
+                <h3>웹사이트 관리 바로가기</h3>
+                <p>웹사이트 상세 정보와 템플릿을 수정할 수 있어요</p>
+              </div>
+              <Link href="/dashboard">웹사이트 관리 바로가기</Link>
+            </div>
+          </section>
+        </section>
+      </div>
+    </main>
   );
 }
