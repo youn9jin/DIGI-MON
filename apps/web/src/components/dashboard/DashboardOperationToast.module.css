@@ -1,0 +1,86 @@
+.toast {
+  position: fixed;
+  top: 86px;
+  right: 24px;
+  z-index: 95;
+  display: flex;
+  width: min(520px, calc(100vw - 32px));
+  min-height: 88px;
+  gap: 16px;
+  align-items: center;
+  border-radius: 20px 20px 20px 0;
+  padding: 16px 20px 15px 18px;
+  background: #fce6d5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.13);
+  color: #000;
+  font-family: Pretendard, "Noto Sans KR", Inter, Arial, sans-serif;
+  animation: toastSlideIn 220ms ease-out;
+}
+
+.logo {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 26px;
+  overflow: hidden;
+}
+
+.logoImage {
+  position: absolute;
+  top: -206.43%;
+  left: -26.64%;
+  width: 513.93%;
+  height: 733.33%;
+  max-width: none;
+}
+
+.copy {
+  min-width: 0;
+}
+
+.copy strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.copy p {
+  margin: 0;
+  color: #131313;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 767px) {
+  .toast {
+    top: 68px;
+    right: 12px;
+    width: min(360px, calc(100vw - 24px));
+    min-height: 76px;
+    padding: 14px 16px;
+  }
+
+  .copy strong {
+    font-size: 14px;
+  }
+
+  .copy p {
+    font-size: 12px;
+  }
+}

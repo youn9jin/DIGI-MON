@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { type FormEvent, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import DashboardOperationPending from "@/components/dashboard/DashboardOperationPending";
 import Header from "@/components/layout/Header";
 import { auth } from "@/lib/firebase";
 import {
@@ -23,6 +24,7 @@ import {
   type StoreSummary,
   type StoreUpdateRequest,
 } from "@/lib/api/stores";
+import { publishDashboardOperationToast } from "@/lib/dashboard-operation-toast";
 import styles from "../manage.module.css";
 
 const setupStorageKey = "market_page_setup_draft";
@@ -524,6 +526,7 @@ export default function InfoEditPage() {
           store.storeId === updatedStore.storeId ? { ...store, ...updatedStore } : store,
         ),
       );
+      publishDashboardOperationToast("detail");
       setStoreSaveMessage("가게 정보를 저장했어요.");
     } catch (error) {
       setStoreError(error instanceof Error ? error.message : "가게 정보 저장에 실패했습니다.");
@@ -558,6 +561,7 @@ export default function InfoEditPage() {
 
     try {
       await updateMarketPageText(payload);
+      publishDashboardOperationToast("detail");
       setSaveMessage("수정한 문구를 저장했어요.");
     } catch (error) {
       const apiError = error as Partial<MarketPageApiError>;
@@ -565,6 +569,10 @@ export default function InfoEditPage() {
     } finally {
       setIsSaving(false);
     }
+  }
+
+  if (isSaving || isSavingStore) {
+    return <DashboardOperationPending type="detail" />;
   }
 
   return (
