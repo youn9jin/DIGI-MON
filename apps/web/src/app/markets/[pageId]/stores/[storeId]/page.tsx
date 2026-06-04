@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
+import ClassicMarketStoreDetailTemplate from "@/components/templates/ClassicMarketStoreDetailTemplate";
 import EditorialMarketStoreDetailTemplate from "@/components/templates/EditorialMarketStoreDetailTemplate";
+import ModernMarketStoreDetailTemplate from "@/components/templates/ModernMarketStoreDetailTemplate";
 import TemplatePreviewStatus from "@/components/templates/TemplatePreviewStatus";
 import {
   getPublicMarketPageContent,
@@ -14,6 +16,7 @@ import {
   mapStoreToTemplateStore,
   type TemplateStore,
 } from "@/lib/template-store-data";
+import { getTemplateRouteSlug } from "@/lib/market-page-template-data";
 
 function findPublicStore(content: MarketPageContentResponse, storeId: string) {
   const publicStores = content.stores ?? [];
@@ -108,13 +111,33 @@ export default function PublicEditorialStoreDetailPage() {
   }
 
   return (
-    <EditorialMarketStoreDetailTemplate
-      store={store}
-      marketName={content.marketName ?? "Market Name"}
-      address={content.address ?? "상세주소 text"}
-      contact={content.contact ?? "TELEPHONENUM"}
-      heroImageUrl={content.heroImageUrl ?? content.introImageUrls?.[0] ?? undefined}
-      publicBasePath={publicBasePath}
-    />
+    (() => {
+      const commonProps = {
+        store,
+        marketName: content.marketName ?? "Market Name",
+        address: content.address ?? "상세주소 text",
+        contact: content.contact ?? "TELEPHONENUM",
+        heroImageUrl: content.heroImageUrl ?? content.introImageUrls?.[0] ?? undefined,
+        publicBasePath,
+      };
+      const templateSlug = getTemplateRouteSlug(content.templateType);
+
+      if (templateSlug === "classic") {
+        return (
+          <ClassicMarketStoreDetailTemplate
+            store={store}
+            address={commonProps.address}
+            contact={commonProps.contact}
+            publicBasePath={publicBasePath}
+          />
+        );
+      }
+
+      if (templateSlug === "modern") {
+        return <ModernMarketStoreDetailTemplate {...commonProps} />;
+      }
+
+      return <EditorialMarketStoreDetailTemplate {...commonProps} />;
+    })()
   );
 }
