@@ -266,6 +266,14 @@
   object-position: center;
 }
 
+.storeGuideHeroImageDynamic {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background-position: center;
+  background-size: cover;
+}
+
 .storeGuideHero > div {
   background: rgba(54, 54, 54, 0.85);
 }

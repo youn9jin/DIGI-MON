@@ -3,16 +3,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import TemplateGenerationActions from "./TemplateGenerationActions";
-import type { ClassicStore } from "./classicStoreData";
 import styles from "./ModernMarketTemplate.module.css";
+import type { TemplateStore } from "@/lib/template-store-data";
 
 const imgMarketMainPhoto = "/images/templates/preview/modern-store-detail-hero.png";
 
 interface ModernMarketStoreDetailTemplateProps {
-  store: ClassicStore;
+  store: TemplateStore;
   marketName?: string;
   address?: string;
   contact?: string;
+  heroImageUrl?: string;
   previewMode?: boolean;
   publicBasePath?: string;
 }
@@ -28,12 +29,18 @@ export default function ModernMarketStoreDetailTemplate({
   marketName = "Market Name",
   address = "상세주소 text",
   contact = "TELEPHONENUM",
+  heroImageUrl,
   previewMode = false,
   publicBasePath,
 }: ModernMarketStoreDetailTemplateProps) {
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
-    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const isPublicMarketPage = publicBasePath.startsWith("/markets/");
+    if (href.includes("/stores")) {
+      return isPublicMarketPage
+        ? `${publicBasePath}/stores`
+        : "/templates/modern/stores?preview=design";
+    }
     const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
     return `${publicBasePath}${hash}`;
   };
@@ -55,14 +62,21 @@ export default function ModernMarketStoreDetailTemplate({
       </header>
 
       <section className={styles.modernStoreDetailHero} aria-label="가게 상세">
-        <Image
-          alt=""
-          src={imgMarketMainPhoto}
-          width={1920}
-          height={603}
-          className={styles.storeGuideHeroImage}
-          priority
-        />
+        {heroImageUrl ? (
+          <span
+            className={styles.storeGuideHeroImageDynamic}
+            style={{ backgroundImage: `url(${heroImageUrl})` }}
+          />
+        ) : (
+          <Image
+            alt=""
+            src={imgMarketMainPhoto}
+            width={1920}
+            height={603}
+            className={styles.storeGuideHeroImage}
+            priority
+          />
+        )}
         <div />
         <article>
           <h1>{store.name}</h1>
@@ -70,7 +84,7 @@ export default function ModernMarketStoreDetailTemplate({
           <ul>
             <li>영업 시간 : {store.hours}</li>
             <li>가게 전화번호 : {store.phone}</li>
-            <li>가게 위치 : </li>
+            <li>주요 메뉴 : {store.menu}</li>
           </ul>
         </article>
         <div className={styles.modernDetailActions}>

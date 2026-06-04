@@ -2,10 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import TemplateGenerationActions from "./TemplateGenerationActions";
 import { classicStores } from "./classicStoreData";
 import styles from "./ModernMarketTemplate.module.css";
+import {
+  mapStoreToTemplateStore,
+  type TemplateStore,
+} from "@/lib/template-store-data";
 
 const imgMarketMainPhoto = "/images/templates/preview/editorial-hero.png";
 
@@ -13,6 +17,8 @@ interface ModernMarketStoresTemplateProps {
   marketName?: string;
   address?: string;
   contact?: string;
+  stores?: TemplateStore[];
+  heroImageUrl?: string;
   previewMode?: boolean;
   publicBasePath?: string;
 }
@@ -29,21 +35,36 @@ export default function ModernMarketStoresTemplate({
   marketName = "Market Name",
   address = "상세주소 text",
   contact = "TELEPHONENUM",
+  stores,
+  heroImageUrl,
   previewMode = false,
   publicBasePath,
 }: ModernMarketStoresTemplateProps) {
   const [selectedCategory, setSelectedCategory] = useState("전체");
-  const stores =
+  const sourceStores = useMemo(
+    () => stores ?? classicStores.map((store, index) => mapStoreToTemplateStore(store, index)),
+    [stores],
+  );
+  const visibleStores =
     selectedCategory === "전체"
-      ? classicStores
-      : classicStores.filter((store) => store.category === selectedCategory);
+      ? sourceStores
+      : sourceStores.filter((store) => store.category === selectedCategory);
   const previewSuffix = publicBasePath ? "?preview=design" : "";
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
-    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const isPublicMarketPage = publicBasePath.startsWith("/markets/");
+    if (href.includes("/stores")) {
+      return isPublicMarketPage
+        ? `${publicBasePath}/stores`
+        : "/templates/modern/stores?preview=design";
+    }
     const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
     return `${publicBasePath}${hash}`;
   };
+  const getStoreHref = (storeId: string) =>
+    publicBasePath?.startsWith("/markets/")
+      ? `${publicBasePath}/stores/${encodeURIComponent(storeId)}`
+      : `/templates/modern/stores/${storeId}${previewSuffix}`;
 
   return (
     <main className={`${styles.page} ${styles.storeGuidePage}`}>
@@ -62,14 +83,21 @@ export default function ModernMarketStoresTemplate({
       </header>
 
       <section className={styles.storeGuideHero} aria-label="점포 안내">
-        <Image
-          alt=""
-          src={imgMarketMainPhoto}
-          width={1920}
-          height={603}
-          className={styles.storeGuideHeroImage}
-          priority
-        />
+        {heroImageUrl ? (
+          <span
+            className={styles.storeGuideHeroImageDynamic}
+            style={{ backgroundImage: `url(${heroImageUrl})` }}
+          />
+        ) : (
+          <Image
+            alt=""
+            src={imgMarketMainPhoto}
+            width={1920}
+            height={603}
+            className={styles.storeGuideHeroImage}
+            priority
+          />
+        )}
         <div />
         <article>
           <h1>가게 찾기</h1>
@@ -94,10 +122,10 @@ export default function ModernMarketStoresTemplate({
       </section>
 
       <section className={styles.modernStoreGrid} aria-label="점포 목록">
-        {stores.map((store, index) => (
+        {visibleStores.map((store, index) => (
           <Link
             className={styles.modernStoreCard}
-            href={`/templates/modern/stores/${store.id}${previewSuffix}`}
+            href={getStoreHref(store.id)}
             key={`${store.id}-${index}`}
           >
             <span>{store.category}</span>

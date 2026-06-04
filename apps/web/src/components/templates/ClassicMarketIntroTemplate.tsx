@@ -1,10 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import styles from "./ClassicMarketTemplate.module.css";
 import { classicStores } from "./classicStoreData";
 import TemplateGenerationActions from "./TemplateGenerationActions";
+import {
+  mapStoreToTemplateStore,
+  type TemplateStore,
+} from "@/lib/template-store-data";
 
 interface ClassicMarketIntroTemplateProps {
   marketName?: string;
@@ -14,6 +18,8 @@ interface ClassicMarketIntroTemplateProps {
   fax?: string;
   emailPrimary?: string;
   emailSecondary?: string;
+  stores?: TemplateStore[];
+  publicBasePath?: string;
   previewMode?: boolean;
 }
 
@@ -52,13 +58,46 @@ export default function ClassicMarketIntroTemplate({
   fax = "FAXNUM",
   emailPrimary = "이메일1",
   emailSecondary = "이메일2",
+  stores,
+  publicBasePath,
   previewMode = false,
 }: ClassicMarketIntroTemplateProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>("전체");
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const sourceStores = useMemo(
+    () => stores ?? classicStores.map((store, index) => mapStoreToTemplateStore(store, index)),
+    [stores],
+  );
   const visibleStores =
-    selectedCategory === "전체"
-      ? classicStores
-      : classicStores.filter((store) => store.category === selectedCategory);
+    (selectedCategory === "전체"
+      ? sourceStores
+      : sourceStores.filter((store) => store.category === selectedCategory)
+    ).filter((store) => {
+      const keyword = searchKeyword.trim().toLowerCase();
+      if (!keyword) return true;
+      return [store.name, store.category, store.intro, store.menu]
+        .join(" ")
+        .toLowerCase()
+        .includes(keyword);
+    });
+  const displayTotalStores = totalStores === "NN" && sourceStores.length > 0
+    ? String(sourceStores.length)
+    : totalStores;
+  const getHref = (href: string) => {
+    if (!publicBasePath) return href;
+    const isPublicMarketPage = publicBasePath.startsWith("/markets/");
+    if (href.includes("/stores")) {
+      return isPublicMarketPage
+        ? `${publicBasePath}/stores`
+        : "/templates/classic/stores?preview=design";
+    }
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
+    return `${publicBasePath}${hash}`;
+  };
+  const getStoreHref = (storeId: string) =>
+    publicBasePath?.startsWith("/markets/")
+      ? `${publicBasePath}/stores/${encodeURIComponent(storeId)}`
+      : `/templates/classic/stores/${storeId}`;
 
   return (
     <main className={`${styles.page} ${styles.storePage}`}>
@@ -69,7 +108,7 @@ export default function ClassicMarketIntroTemplate({
             key={`${item.color}-${index}`}
           >
             {item.label && item.href ? (
-              <Link className={styles.bannerLabel} href={item.href}>
+              <Link className={styles.bannerLabel} href={getHref(item.href)}>
                 {item.label}
               </Link>
             ) : item.label ? (
@@ -83,7 +122,7 @@ export default function ClassicMarketIntroTemplate({
         <div className={styles.storeLogoBox}>
           <strong>{marketName}</strong>
         </div>
-        <p>우리 시장에서는 {totalStores}개의 다양한 가게들을 만나볼 수 있습니다!</p>
+        <p>우리 시장에서는 {displayTotalStores}개의 다양한 가게들을 만나볼 수 있습니다!</p>
       </section>
 
       <section className={styles.storeSearchSection} aria-label="가게 검색">
@@ -101,7 +140,12 @@ export default function ClassicMarketIntroTemplate({
           ))}
         </div>
         <label className={styles.searchBox}>
-          <input type="search" placeholder="원하는 매장을 검색해보세요" />
+          <input
+            type="search"
+            placeholder="원하는 매장을 검색해보세요"
+            value={searchKeyword}
+            onChange={(event) => setSearchKeyword(event.target.value)}
+          />
           <span aria-hidden="true" />
         </label>
       </section>
@@ -110,7 +154,7 @@ export default function ClassicMarketIntroTemplate({
         {visibleStores.map((store, index) => (
           <Link
             className={styles.storeCard}
-            href={`/templates/classic/stores/${store.id}`}
+            href={getStoreHref(store.id)}
             key={`${store.category}-${index}`}
           >
             <h2>{store.category}</h2>
@@ -121,10 +165,10 @@ export default function ClassicMarketIntroTemplate({
 
       <footer className={styles.footer}>
         <nav className={styles.footerNav} aria-label="하단 메뉴">
-          <Link href="/templates/classic#intro">시장소개</Link>
-          <Link href="/templates/classic/stores#stores">가게안내</Link>
-          <Link href="/templates/classic#tour">관광정보</Link>
-          <Link href="/templates/classic#map">찾아오시는 길</Link>
+          <Link href={getHref("/templates/classic#intro")}>시장소개</Link>
+          <Link href={getHref("/templates/classic/stores")}>가게안내</Link>
+          <Link href={getHref("/templates/classic#tour")}>관광정보</Link>
+          <Link href={getHref("/templates/classic#map")}>찾아오시는 길</Link>
         </nav>
 
         <div className={styles.footerInfo}>

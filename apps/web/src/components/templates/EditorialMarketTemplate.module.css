@@ -208,6 +208,30 @@
   min-height: clamp(360px, 34.01vw, 653px);
 }
 
+.directionsInfo {
+  display: grid;
+  width: min(calc(100% - 88px), 1722px);
+  gap: 18px;
+  margin: clamp(40px, 3.13vw, 60px) auto 0;
+  color: #000;
+  font-size: clamp(18px, 1.46vw, 28px);
+  line-height: 1.55;
+}
+
+.directionsInfo div {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 12px;
+}
+
+.directionsInfo dt {
+  font-weight: 800;
+}
+
+.directionsInfo dd {
+  margin: 0;
+}
+
 .footer {
   display: flex;
   flex-direction: column;
@@ -668,5 +692,14 @@
 
   .storeInfoList {
     font-size: 18px;
+  }
+
+  .directionsInfo {
+    width: min(calc(100% - 40px), 720px);
+  }
+
+  .directionsInfo div {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 }

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import TemplateGenerationActions from "./TemplateGenerationActions";
-import type { ClassicStore } from "./classicStoreData";
+import type { TemplateStore } from "@/lib/template-store-data";
 import {
   EditorialFooter,
   EditorialHeader,
@@ -14,10 +14,11 @@ const menuImage1 = "/images/templates/preview/editorial-menu-1.png";
 const menuImage2 = "/images/templates/preview/editorial-menu-2.png";
 
 interface EditorialMarketStoreDetailTemplateProps {
-  store: ClassicStore;
+  store: TemplateStore;
   marketName?: string;
   address?: string;
   contact?: string;
+  heroImageUrl?: string;
   previewMode?: boolean;
   publicBasePath?: string;
 }
@@ -27,6 +28,7 @@ export default function EditorialMarketStoreDetailTemplate({
   marketName = "Market Name",
   address = "상세주소 text",
   contact = "TELEPHONENUM",
+  heroImageUrl,
   previewMode = false,
   publicBasePath,
 }: EditorialMarketStoreDetailTemplateProps) {
@@ -35,14 +37,22 @@ export default function EditorialMarketStoreDetailTemplate({
       <EditorialHeader marketName={marketName} publicBasePath={publicBasePath} />
 
       <section className={styles.detailHero} aria-label="가게 상세">
-        <Image
-          alt=""
-          className={styles.heroImage}
-          fill
-          priority
-          sizes="100vw"
-          src={heroImage}
-        />
+        {heroImageUrl ? (
+          <span
+            className={styles.dynamicHeroImage}
+            style={{ backgroundImage: `url(${heroImageUrl})` }}
+            aria-hidden="true"
+          />
+        ) : (
+          <Image
+            alt=""
+            className={styles.heroImage}
+            fill
+            priority
+            sizes="100vw"
+            src={heroImage}
+          />
+        )}
         <div className={styles.heroOverlay} />
         <div className={styles.detailHeroTitle}>
           <span>{store.category}</span>
@@ -70,12 +80,8 @@ export default function EditorialMarketStoreDetailTemplate({
         <div className={styles.signatureGrid}>
           <div className={styles.signaturePhoto} />
           <article>
-            <h3>{store.menu} 이름</h3>
-            <p>
-              대통령은 헌법과 법률이 정하는 바에 의하여 공무원을 임면한다. 근로조건의
-              기준은 인간의 존엄성을 보장하도록 법률로 정한다. 국무총리는 국회의 동의를
-              얻어 대통령이 임명한다.
-            </p>
+            <h3>{store.menu}</h3>
+            <p>{store.description}</p>
           </article>
         </div>
         <ul className={styles.storeInfoList}>

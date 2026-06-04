@@ -83,7 +83,12 @@ export default function ClassicMarketTemplate({
   const secondIntroImageUrl = introImageUrls[1] ?? introImageUrls[0];
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
-    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const isPublicMarketPage = publicBasePath.startsWith("/markets/");
+    if (href.includes("/stores")) {
+      return isPublicMarketPage
+        ? `${publicBasePath}/stores`
+        : "/templates/classic/stores?preview=design";
+    }
     const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
     return `${publicBasePath}${hash}`;
   };

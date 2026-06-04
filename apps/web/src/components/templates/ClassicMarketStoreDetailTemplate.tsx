@@ -2,16 +2,17 @@
 
 import Link from "next/link";
 import styles from "./ClassicMarketTemplate.module.css";
-import type { ClassicStore } from "./classicStoreData";
 import TemplateGenerationActions from "./TemplateGenerationActions";
+import type { TemplateStore } from "@/lib/template-store-data";
 
 interface ClassicMarketStoreDetailTemplateProps {
-  store: ClassicStore;
+  store: TemplateStore;
   address?: string;
   contact?: string;
   fax?: string;
   emailPrimary?: string;
   emailSecondary?: string;
+  publicBasePath?: string;
   previewMode?: boolean;
 }
 
@@ -47,8 +48,21 @@ export default function ClassicMarketStoreDetailTemplate({
   fax = "FAXNUM",
   emailPrimary = "이메일1",
   emailSecondary = "이메일2",
+  publicBasePath,
   previewMode = false,
 }: ClassicMarketStoreDetailTemplateProps) {
+  const getHref = (href: string) => {
+    if (!publicBasePath) return href;
+    const isPublicMarketPage = publicBasePath.startsWith("/markets/");
+    if (href.includes("/stores")) {
+      return isPublicMarketPage
+        ? `${publicBasePath}/stores`
+        : "/templates/classic/stores?preview=design";
+    }
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
+    return `${publicBasePath}${hash}`;
+  };
+
   return (
     <main className={`${styles.page} ${styles.storeDetailPage}`}>
       <header className={styles.topBanner} aria-label="템플릿 메뉴">
@@ -58,7 +72,7 @@ export default function ClassicMarketStoreDetailTemplate({
             key={`${item.color}-${index}`}
           >
             {item.label && item.href ? (
-              <Link className={styles.bannerLabel} href={item.href}>
+              <Link className={styles.bannerLabel} href={getHref(item.href)}>
                 {item.label}
               </Link>
             ) : item.label ? (
@@ -109,10 +123,10 @@ export default function ClassicMarketStoreDetailTemplate({
 
       <footer className={styles.footer}>
         <nav className={styles.footerNav} aria-label="하단 메뉴">
-          <Link href="/templates/classic#intro">시장소개</Link>
-          <Link href="/templates/classic/stores#stores">가게안내</Link>
-          <Link href="/templates/classic#tour">관광정보</Link>
-          <Link href="/templates/classic#map">찾아오시는 길</Link>
+          <Link href={getHref("/templates/classic#intro")}>시장소개</Link>
+          <Link href={getHref("/templates/classic/stores")}>가게안내</Link>
+          <Link href={getHref("/templates/classic#tour")}>관광정보</Link>
+          <Link href={getHref("/templates/classic#map")}>찾아오시는 길</Link>
         </nav>
 
         <div className={styles.footerInfo}>

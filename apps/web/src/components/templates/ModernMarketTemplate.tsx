@@ -61,7 +61,12 @@ export default function ModernMarketTemplate({
   const getIntroImageUrl = (index: number) => introImageUrls[index] ?? introImageUrls[0];
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
-    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const isPublicMarketPage = publicBasePath.startsWith("/markets/");
+    if (href.includes("/stores")) {
+      return isPublicMarketPage
+        ? `${publicBasePath}/stores`
+        : "/templates/modern/stores?preview=design";
+    }
     if (href.startsWith("#")) return `${publicBasePath}${href}`;
     const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
     return `${publicBasePath}${hash}`;
