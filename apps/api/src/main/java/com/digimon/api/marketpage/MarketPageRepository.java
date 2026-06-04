@@ -12,6 +12,9 @@ public interface MarketPageRepository extends JpaRepository<MarketPage, Long> {
 
     Optional<MarketPage> findByMarketId(Long marketId);
 
+    /** 회원 탈퇴 시 market 기준 생성 페이지를 삭제한다. */
+    long deleteByMarketId(Long marketId);
+
     /** 텍스트 수정 API 가 market_id 와 생성 상태를 함께 확인할 때 사용. */
     Optional<MarketPage> findByMarketIdAndStatus(Long marketId, MarketPageStatus status);
 
