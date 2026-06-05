@@ -53,6 +53,11 @@ type StoreFormValues = {
   items: string;
 };
 
+type StoreUploadField = {
+  label: string;
+  placeholder: string;
+};
+
 const storeCategories = ["전체보기", "농수산물", "먹거리", "의류", "생활용품", "기타"] as const;
 
 const emptyStoreFormValues: StoreFormValues = {
@@ -63,6 +68,43 @@ const emptyStoreFormValues: StoreFormValues = {
   contact: "",
   yearsOfOperation: "",
   items: "",
+};
+
+const storeUploadFieldsByTemplate: Record<TemplateType, StoreUploadField[]> = {
+  TEMPLATE_1: [
+    {
+      label: "6. 가게 사진 등록하기(최대 3개)",
+      placeholder: "대표 사진을 마우스로 끌어와주세요",
+    },
+    {
+      label: "7. 가게 대표 사진 등록하기",
+      placeholder: "메뉴판 사진을 마우스로 끌어와주세요",
+    },
+  ],
+  TEMPLATE_2: [
+    {
+      label: "6. 가게 대표 음식 사진 등록하기(최대 4개)",
+      placeholder: "대표 메뉴 사진을 마우스로 끌어와주세요",
+    },
+    {
+      label: "7. 가게 메뉴판 사진 등록하기(최대 2개)",
+      placeholder: "메뉴판 사진을 마우스로 끌어와주세요",
+    },
+    {
+      label: "8. 가게 대표 사진 등록하기",
+      placeholder: "가게 대표 사진을 마우스로 끌어와주세요",
+    },
+  ],
+  TEMPLATE_3: [
+    {
+      label: "6. 가게 대표 음식 사진 등록하기",
+      placeholder: "대표 메뉴 사진을 마우스로 끌어와주세요",
+    },
+    {
+      label: "7. 가게 대표 사진 등록하기",
+      placeholder: "가게 대표 사진을 마우스로 끌어와주세요",
+    },
+  ],
 };
 
 const marketFieldsByTemplate: Record<TemplateType, MarketField[]> = {
@@ -353,6 +395,7 @@ export default function InfoEditPage() {
 
   const marketFields = marketFieldsByTemplate[templateType];
   const apiFieldByFieldId = useMemo(() => textApiFieldByTemplate[templateType], [templateType]);
+  const storeUploadFields = storeUploadFieldsByTemplate[templateType];
   const filteredStores = useMemo(() => {
     const normalizedSearch = storeSearch.trim().toLowerCase();
 
@@ -672,33 +715,9 @@ export default function InfoEditPage() {
                 <h2 className={styles.storeFormTitle}>{selectedStore.name}</h2>
                 <div className={styles.storeFormFields}>
                   <label className={styles.storeFormField}>
-                    <span>가게 이름 수정하기</span>
-                    <input
-                      maxLength={100}
-                      placeholder="(기존 가게 이름)"
-                      value={storeValues.name}
-                      onChange={(event) => updateStoreField("name", event.target.value)}
-                    />
-                  </label>
-                  <label className={styles.storeFormField}>
-                    <span>가게 카테고리 수정하기</span>
-                    <select
-                      value={storeValues.category}
-                      onChange={(event) => updateStoreField("category", event.target.value)}
-                    >
-                      {storeCategories
-                        .filter((category) => category !== "전체보기")
-                        .map((category) => (
-                          <option key={category} value={category}>
-                            {category === "농수산물" ? "농/수산물" : category}
-                          </option>
-                        ))}
-                    </select>
-                  </label>
-                  <label className={styles.storeFormField}>
                     <span>1. 가게 한 줄 소개 수정하기(50자 이내)</span>
                     <input
-                      maxLength={200}
+                      maxLength={50}
                       placeholder="(기존 한 줄 소개 내용)"
                       value={storeValues.description}
                       onChange={(event) => updateStoreField("description", event.target.value)}
@@ -741,8 +760,10 @@ export default function InfoEditPage() {
                     />
                   </label>
                   {templateType === "TEMPLATE_1" ? (
+                    null
+                  ) : templateType === "TEMPLATE_3" ? (
                     <label className={`${styles.storeFormField} ${styles.storeFormTextareaField}`}>
-                      <span>6. 가게 대표 음식 소개 수정하기(200자 이내)</span>
+                      <span>5. 가게 대표 음식 소개 수정하기(200자 이내)</span>
                       <textarea
                         maxLength={200}
                         placeholder="(기존 대표 음식 소개 내용)"
@@ -751,6 +772,16 @@ export default function InfoEditPage() {
                       />
                     </label>
                   ) : null}
+                  {storeUploadFields.map((field) => (
+                    <label className={styles.storeFormField} key={field.label}>
+                      <span>{field.label}</span>
+                      <input
+                        className={styles.storeFilePlaceholder}
+                        type="button"
+                        value={field.placeholder}
+                      />
+                    </label>
+                  ))}
                 </div>
                 {storeSaveMessage ? <p className={styles.formMessage}>{storeSaveMessage}</p> : null}
                 <button className={styles.saveButton} type="submit" disabled={isSavingStore}>

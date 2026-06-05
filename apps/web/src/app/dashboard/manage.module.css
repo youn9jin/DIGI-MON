@@ -548,7 +548,7 @@
 .storeFormFields {
   display: flex;
   flex-direction: column;
-  gap: 13px;
+  gap: 12px;
 }
 
 .storeFormField {
@@ -581,6 +581,12 @@
 .storeFormField select {
   height: 45px;
   padding: 0 18px;
+}
+
+.storeFilePlaceholder {
+  color: #9f9f9f !important;
+  cursor: default;
+  text-align: center;
 }
 
 .storeFormField textarea {
