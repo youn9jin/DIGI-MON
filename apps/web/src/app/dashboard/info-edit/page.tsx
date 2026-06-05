@@ -70,6 +70,25 @@ const emptyStoreFormValues: StoreFormValues = {
   items: "",
 };
 
+function getUniqueStores(stores: StoreSummary[]): StoreSummary[] {
+  const seen = new Set<string>();
+
+  return stores.filter((store) => {
+    const contentKey = [
+      store.category?.trim() ?? "",
+      store.name?.trim() ?? "",
+      store.contact?.trim() ?? "",
+    ]
+      .filter(Boolean)
+      .join("|");
+    const uniqueKey = contentKey || String(store.storeId ?? "");
+
+    if (seen.has(uniqueKey)) return false;
+    seen.add(uniqueKey);
+    return true;
+  });
+}
+
 const storeUploadFieldsByTemplate: Record<TemplateType, StoreUploadField[]> = {
   TEMPLATE_1: [
     {
@@ -384,6 +403,7 @@ export default function InfoEditPage() {
   const [isSavingStore, setIsSavingStore] = useState(false);
   const [storeError, setStoreError] = useState("");
   const [storeSaveMessage, setStoreSaveMessage] = useState("");
+  const [storeFileNames, setStoreFileNames] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [saveError, setSaveError] = useState("");
@@ -450,9 +470,10 @@ export default function InfoEditPage() {
       try {
         const result = await getStores();
         if (!isMounted) return;
-        setStores(result.stores);
+        setStores(getUniqueStores(result.stores));
         setSelectedStore(null);
         setStoreValues(emptyStoreFormValues);
+        setStoreFileNames({});
         setStoreSaveMessage("");
       } catch (error) {
         if (!isMounted) return;
@@ -480,6 +501,7 @@ export default function InfoEditPage() {
       const detail = await getStore(storeId);
       setSelectedStore(detail);
       setStoreValues(getStoreValues(detail));
+      setStoreFileNames({});
       setStoreSaveMessage("");
     } catch (error) {
       const apiError = error as Partial<MarketPageApiError>;
@@ -510,6 +532,20 @@ export default function InfoEditPage() {
   function handleBackToStoreList() {
     setSelectedStore(null);
     setStoreValues(emptyStoreFormValues);
+    setStoreFileNames({});
+    setStoreSaveMessage("");
+    setStoreError("");
+  }
+
+  function handleStoreFileChange(fieldLabel: string, files: FileList | null) {
+    const selectedFiles = Array.from(files ?? []);
+    setStoreFileNames((current) => ({
+      ...current,
+      [fieldLabel]:
+        selectedFiles.length > 0
+          ? selectedFiles.map((file) => file.name).join(", ")
+          : "",
+    }));
     setStoreSaveMessage("");
     setStoreError("");
   }
@@ -565,8 +601,10 @@ export default function InfoEditPage() {
       setSelectedStore(updatedStore);
       setStoreValues(getStoreValues(updatedStore));
       setStores((currentStores) =>
-        currentStores.map((store) =>
-          store.storeId === updatedStore.storeId ? { ...store, ...updatedStore } : store,
+        getUniqueStores(
+          currentStores.map((store) =>
+            store.storeId === updatedStore.storeId ? { ...store, ...updatedStore } : store,
+          ),
         ),
       );
       publishDashboardOperationToast("detail");
@@ -775,11 +813,20 @@ export default function InfoEditPage() {
                   {storeUploadFields.map((field) => (
                     <label className={styles.storeFormField} key={field.label}>
                       <span>{field.label}</span>
-                      <input
-                        className={styles.storeFilePlaceholder}
-                        type="button"
-                        value={field.placeholder}
-                      />
+                      <span className={styles.storeFilePicker}>
+                        <input
+                          className={styles.storeFileInput}
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          multiple={field.label.includes("최대")}
+                          onChange={(event) =>
+                            handleStoreFileChange(field.label, event.currentTarget.files)
+                          }
+                        />
+                        <span className={styles.storeFilePlaceholder}>
+                          {storeFileNames[field.label] || field.placeholder}
+                        </span>
+                      </span>
                     </label>
                   ))}
                 </div>
