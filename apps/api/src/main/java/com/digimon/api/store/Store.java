@@ -8,9 +8,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "stores")
@@ -58,4 +62,16 @@ public class Store {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "store_image_urls", columnDefinition = "jsonb", nullable = false)
+    private List<String> storeImageUrls = new ArrayList<>();
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "menu_image_urls", columnDefinition = "jsonb", nullable = false)
+    private List<String> menuImageUrls = new ArrayList<>();
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "product_image_urls", columnDefinition = "jsonb", nullable = false)
+    private List<String> productImageUrls = new ArrayList<>();
 }

@@ -1,6 +1,11 @@
 package com.digimon.api.user;
 
 import com.digimon.api.auth.AuthAccountConflictException;
+import com.digimon.api.market.Market;
+import com.digimon.api.market.MarketRepository;
+import com.digimon.api.store.MarketNotFoundException;
+import com.digimon.api.user.dto.AssociationInfoResponse;
+import com.digimon.api.user.dto.UpdateAssociationRequest;
 import com.digimon.api.user.dto.UpdateMeRequest;
 import com.google.firebase.auth.FirebaseToken;
 import org.slf4j.Logger;
@@ -16,8 +21,12 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    private final MarketRepository marketRepository;
+
+    public UserService(UserRepository userRepository,
+                       MarketRepository marketRepository) {
         this.userRepository = userRepository;
+        this.marketRepository = marketRepository;
     }
 
     /**
@@ -93,6 +102,43 @@ public class UserService {
             user.setPhone(request.getPhone().trim());
         }
         return userRepository.save(user);
+    }
+
+    @Transactional
+    public AssociationInfoResponse updateAssociation(Long userId, UpdateAssociationRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalStateException("User not found: " + userId));
+
+        Market market = marketRepository.findByUserId(userId)
+                .orElseThrow(() -> new MarketNotFoundException("등록된 시장이 없습니다."));
+
+        if (request.getManagerName() != null) {
+            user.setName(request.getManagerName().trim());
+        }
+        if (request.getEmail() != null) {
+            user.setEmail(request.getEmail().trim());
+        }
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone().trim());
+        }
+
+        if (request.getFax() != null) {
+            market.setFax(request.getFax().trim());
+        }
+        if (request.getManagerTitle() != null) {
+            market.setManagerTitle(request.getManagerTitle().trim());
+        }
+
+        userRepository.save(user);
+        marketRepository.save(market);
+
+        return AssociationInfoResponse.builder()
+                .managerName(user.getName())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .fax(market.getFax())
+                .managerTitle(market.getManagerTitle())
+                .build();
     }
 
     private static boolean isBlank(String s) {

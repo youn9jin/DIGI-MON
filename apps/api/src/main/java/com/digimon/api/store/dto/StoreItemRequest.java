@@ -1,9 +1,13 @@
 package com.digimon.api.store.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * POST /api/stores 의 stores 배열 원소.
@@ -25,4 +29,13 @@ public class StoreItemRequest {
     private String yearsOfOperation;
     private String contact;
     private String description;
+
+    @Size(max = 4, message = "storeImageUrls는 최대 4개까지 등록 가능합니다.")
+    private List<String> storeImageUrls = new ArrayList<>();
+
+    @Size(max = 2, message = "menuImageUrls는 최대 2개까지 등록 가능합니다.")
+    private List<String> menuImageUrls = new ArrayList<>();
+
+    @Size(max = 4, message = "productImageUrls는 최대 4개까지 등록 가능합니다.")
+    private List<String> productImageUrls = new ArrayList<>();
 }

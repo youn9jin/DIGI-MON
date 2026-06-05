@@ -1,0 +1,2 @@
+ALTER TABLE markets
+  ADD COLUMN fax VARCHAR(20);
