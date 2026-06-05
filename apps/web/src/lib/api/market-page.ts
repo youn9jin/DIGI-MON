@@ -195,6 +195,29 @@ async function getAuthorizationHeader(): Promise<HeadersInit> {
   return { Authorization: `Bearer ${idToken}` };
 }
 
+function getMarketPageErrorMessage(
+  status: number,
+  code?: string,
+  serverMessage?: string,
+): string {
+  if (code === "PAGE_NOT_FOUND") {
+    return "아직 공개할 수 있는 웹페이지가 없습니다. 생성이 완료된 뒤 다시 확인해주세요.";
+  }
+  if (code === "CONTENT_PARSE_ERROR") {
+    return "생성된 웹페이지 내용을 읽는 중 문제가 생겼습니다. 다시 생성하면 해결될 수 있어요.";
+  }
+  if (code === "MARKET_NOT_FOUND") {
+    return "연결된 시장 정보를 찾지 못했습니다. 온보딩 정보를 먼저 확인해주세요.";
+  }
+  if (status >= 500) {
+    return "서버에서 일시적인 문제가 발생했습니다. 잠시 후 다시 시도해주세요.";
+  }
+  if (serverMessage === "Unexpected error occurred") {
+    return "생성 결과를 불러오는 중 서버 오류가 발생했습니다. 다시 생성해보세요.";
+  }
+  return serverMessage ?? "웹페이지 생성 요청에 실패했습니다.";
+}
+
 async function parseEnvelope<T>(response: Response): Promise<T> {
   const body = (await response.json().catch(() => ({}))) as ApiEnvelope<T> & {
     message?: string;
@@ -202,14 +225,12 @@ async function parseEnvelope<T>(response: Response): Promise<T> {
 
   if (!response.ok || body.success === false) {
     const serverMessage = body.error?.message ?? body.message;
-    const message =
-      serverMessage === "Unexpected error occurred"
-        ? "생성 결과를 불러오는 중 서버 오류가 발생했습니다. 다시 생성해보세요."
-        : serverMessage ?? "웹페이지 생성 요청에 실패했습니다.";
+    const code = body.error?.code;
+    const message = getMarketPageErrorMessage(response.status, code, serverMessage);
 
     throw {
       status: response.status,
-      code: body.error?.code,
+      code,
       message,
     } as MarketPageApiError;
   }
@@ -385,7 +406,8 @@ export async function subscribeMarketPageStatus(
     eventSource.close();
     callbacks.onError?.({
       status: 0,
-      message: "웹페이지 생성 상태 연결에 실패했습니다.",
+      message:
+        "생성 상태 연결이 잠시 끊겼어요. 생성은 계속 진행될 수 있으니 웹사이트 관리에서 다시 확인해주세요.",
     });
   };
 

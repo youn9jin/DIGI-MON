@@ -67,6 +67,7 @@ export default function PublicMarketPage() {
     return (
       <TemplatePreviewStatus
         title="웹페이지를 불러오는 중"
+        tone="loading"
         message="공개 웹사이트 콘텐츠를 가져오고 있어요."
       />
     );
@@ -76,6 +77,7 @@ export default function PublicMarketPage() {
     return (
       <TemplatePreviewStatus
         title="웹페이지 내용을 불러오지 못했어요"
+        tone="error"
         message={errorMessage || "생성된 웹페이지가 아직 준비되지 않았습니다."}
       />
     );
