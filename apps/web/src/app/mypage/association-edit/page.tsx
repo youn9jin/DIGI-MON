@@ -19,18 +19,20 @@ type AssociationForm = {
 };
 
 function createInitialForm(user: User | null, me: MeResponse | null): AssociationForm {
-  const extendedMe = me as MeResponse & {
-    fax?: string;
-    managerTitle?: string;
-    title?: string;
-  };
+  const extendedMe = me as
+    | (MeResponse & {
+        fax?: string;
+        managerTitle?: string;
+        title?: string;
+      })
+    | null;
 
   return {
     name: me?.name ?? user?.displayName ?? "",
     email: me?.email ?? user?.email ?? "",
     phone: me?.phone ?? "",
-    fax: extendedMe.fax ?? "",
-    position: extendedMe.managerTitle ?? extendedMe.title ?? "",
+    fax: extendedMe?.fax ?? "",
+    position: extendedMe?.managerTitle ?? extendedMe?.title ?? "",
   };
 }
 
