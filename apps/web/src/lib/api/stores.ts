@@ -19,10 +19,13 @@ export interface StoreCreateItem {
   yearsOfOperation?: string;
   contact?: string;
   description?: string;
+  storeImageUrls?: string[];
+  menuImageUrls?: string[];
+  productImageUrls?: string[];
 }
 
 export interface CreateStoresResponse {
-  requestedCount: number;
+  requestedCount?: number;
   successCount: number;
   failedCount?: number;
   successStoreIds: Array<string | number>;
@@ -43,6 +46,9 @@ export interface StoreSummary {
   yearsOfOperation?: string | null;
   contact?: string | null;
   description?: string | null;
+  storeImageUrls?: string[] | null;
+  menuImageUrls?: string[] | null;
+  productImageUrls?: string[] | null;
 }
 
 export interface StoreDetail extends StoreSummary {
@@ -58,6 +64,9 @@ export type StoreUpdateRequest = {
   yearsOfOperation?: string | null;
   contact?: string | null;
   description?: string | null;
+  storeImageUrls?: string[] | null;
+  menuImageUrls?: string[] | null;
+  productImageUrls?: string[] | null;
 };
 
 export interface StoreListResponse {

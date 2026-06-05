@@ -587,6 +587,8 @@
   width: 100%;
   min-height: clamp(420px, 46.88vw, 900px);
   background: #d9d9d9;
+  background-position: center;
+  background-size: cover;
 }
 
 .storeInfoList {
@@ -629,6 +631,8 @@
 .detailPhotos div {
   min-height: clamp(360px, 34.9vw, 670px);
   background: #d9d9d9;
+  background-position: center;
+  background-size: cover;
 }
 
 @media (max-width: 900px) {

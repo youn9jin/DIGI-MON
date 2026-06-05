@@ -33,6 +33,9 @@ export default function ModernMarketStoreDetailTemplate({
   previewMode = false,
   publicBasePath,
 }: ModernMarketStoreDetailTemplateProps) {
+  const representativeImageUrl = store.storeImageUrls[0] ?? heroImageUrl;
+  const menuImageUrls = store.menuImageUrls.slice(0, 2);
+  const foodImageUrls = store.productImageUrls.slice(0, 4);
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
     const isPublicMarketPage = publicBasePath.startsWith("/markets/");
@@ -62,10 +65,10 @@ export default function ModernMarketStoreDetailTemplate({
       </header>
 
       <section className={styles.modernStoreDetailHero} aria-label="가게 상세">
-        {heroImageUrl ? (
+        {representativeImageUrl ? (
           <span
             className={styles.storeGuideHeroImageDynamic}
-            style={{ backgroundImage: `url(${heroImageUrl})` }}
+            style={{ backgroundImage: `url(${representativeImageUrl})` }}
           />
         ) : (
           <Image
@@ -97,18 +100,30 @@ export default function ModernMarketStoreDetailTemplate({
         <div>
           <h2>가게 메뉴판 보기</h2>
           <div className={styles.menuBoardGrid}>
-            <div />
-            <div />
+            {Array.from({ length: 2 }).map((_, index) => {
+              const imageUrl = menuImageUrls[index];
+              return (
+                <div
+                  key={index}
+                  style={imageUrl ? { backgroundImage: `url(${imageUrl})` } : undefined}
+                />
+              );
+            })}
           </div>
         </div>
 
         <div>
           <h2>가게 대표 음식 보기</h2>
           <div className={styles.foodGrid}>
-            <div />
-            <div />
-            <div />
-            <div />
+            {Array.from({ length: 4 }).map((_, index) => {
+              const imageUrl = foodImageUrls[index];
+              return (
+                <div
+                  key={index}
+                  style={imageUrl ? { backgroundImage: `url(${imageUrl})` } : undefined}
+                />
+              );
+            })}
           </div>
         </div>
       </section>

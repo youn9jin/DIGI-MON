@@ -12,6 +12,7 @@ import styles from "./EditorialMarketTemplate.module.css";
 const heroImage = "/images/templates/preview/editorial-store-hero.png";
 const menuImage1 = "/images/templates/preview/editorial-menu-1.png";
 const menuImage2 = "/images/templates/preview/editorial-menu-2.png";
+const fallbackMenuImages = [menuImage1, menuImage2];
 
 interface EditorialMarketStoreDetailTemplateProps {
   store: TemplateStore;
@@ -32,15 +33,19 @@ export default function EditorialMarketStoreDetailTemplate({
   previewMode = false,
   publicBasePath,
 }: EditorialMarketStoreDetailTemplateProps) {
+  const representativeImageUrl = store.storeImageUrls[0] ?? heroImageUrl;
+  const menuImageUrls = store.menuImageUrls.slice(0, 2);
+  const signatureImageUrl = store.productImageUrls[0] ?? store.storeImageUrls[0];
+
   return (
     <main className={`${styles.page} ${styles.detailPage}`}>
       <EditorialHeader marketName={marketName} publicBasePath={publicBasePath} />
 
       <section className={styles.detailHero} aria-label="가게 상세">
-        {heroImageUrl ? (
+        {representativeImageUrl ? (
           <span
             className={styles.dynamicHeroImage}
-            style={{ backgroundImage: `url(${heroImageUrl})` }}
+            style={{ backgroundImage: `url(${representativeImageUrl})` }}
             aria-hidden="true"
           />
         ) : (
@@ -70,15 +75,44 @@ export default function EditorialMarketStoreDetailTemplate({
       <section className={styles.menuSection} aria-label="메뉴">
         <h2>MENU</h2>
         <div className={styles.menuImages}>
-          <Image alt="메뉴판 예시 1" width={804} height={1058} src={menuImage1} />
-          <Image alt="메뉴판 예시 2" width={804} height={1058} src={menuImage2} />
+          {[0, 1].map((index) => {
+            const menuImageUrl = menuImageUrls[index];
+
+            if (menuImageUrl) {
+              return (
+                <span
+                  key={menuImageUrl}
+                  className={styles.dynamicMenuImage}
+                  style={{ backgroundImage: `url(${menuImageUrl})` }}
+                  aria-label={`메뉴판 이미지 ${index + 1}`}
+                />
+              );
+            }
+
+            return (
+              <Image
+                key={fallbackMenuImages[index]}
+                alt={`메뉴판 예시 ${index + 1}`}
+                width={804}
+                height={1058}
+                src={fallbackMenuImages[index]}
+              />
+            );
+          })}
         </div>
       </section>
 
       <section className={styles.signatureSection} aria-label="대표 음식">
         <h2>대표 음식</h2>
         <div className={styles.signatureGrid}>
-          <div className={styles.signaturePhoto} />
+          <div
+            className={styles.signaturePhoto}
+            style={
+              signatureImageUrl
+                ? { backgroundImage: `url(${signatureImageUrl})` }
+                : undefined
+            }
+          />
           <article>
             <h3>{store.menu}</h3>
             <p>{store.description}</p>

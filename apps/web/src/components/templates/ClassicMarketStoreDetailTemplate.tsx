@@ -26,6 +26,12 @@ export default function ClassicMarketStoreDetailTemplate({
   publicBasePath,
   previewMode = false,
 }: ClassicMarketStoreDetailTemplateProps) {
+  const mainPhotoUrl = store.storeImageUrls[0] ?? store.productImageUrls[0];
+  const detailPhotoUrls = [
+    ...store.productImageUrls,
+    ...store.storeImageUrls.slice(mainPhotoUrl ? 1 : 0),
+    ...store.menuImageUrls,
+  ].slice(0, 3);
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
     const isPublicMarketPage = publicBasePath.startsWith("/markets/");
@@ -64,7 +70,10 @@ export default function ClassicMarketStoreDetailTemplate({
       </section>
 
       <section className={styles.detailContent} aria-label="가게 상세 정보">
-        <div className={styles.storeMainPhoto} />
+        <div
+          className={styles.storeMainPhoto}
+          style={mainPhotoUrl ? { backgroundImage: `url(${mainPhotoUrl})` } : undefined}
+        />
 
         <dl className={styles.storeInfoList}>
           <div>
@@ -83,9 +92,15 @@ export default function ClassicMarketStoreDetailTemplate({
       </section>
 
       <section className={styles.detailPhotos} aria-label="가게 사진">
-        <div />
-        <div />
-        <div />
+        {Array.from({ length: 3 }).map((_, index) => {
+          const imageUrl = detailPhotoUrls[index];
+          return (
+            <div
+              key={index}
+              style={imageUrl ? { backgroundImage: `url(${imageUrl})` } : undefined}
+            />
+          );
+        })}
       </section>
 
       <footer className={styles.footer}>

@@ -28,6 +28,22 @@ export type UpdateMeRequest = {
   phone?: string | null;
 };
 
+export type UpdateAssociationRequest = {
+  managerName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  fax?: string | null;
+  managerTitle?: string | null;
+};
+
+export interface AssociationInfoResponse {
+  managerName?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  fax?: string | null;
+  managerTitle?: string | null;
+}
+
 export type WebsiteEntryPath = "/dashboard" | "/onboarding" | "/templates";
 
 function unwrapMeResponse(body: unknown): MeResponse {
@@ -115,6 +131,48 @@ export async function updateMe(
   }
 
   return unwrapMeResponse(body);
+}
+
+export async function updateAssociation(
+  association: UpdateAssociationRequest,
+  user = auth.currentUser,
+): Promise<AssociationInfoResponse> {
+  if (!user) {
+    throw new Error("로그인이 필요합니다.");
+  }
+
+  const idToken = await user.getIdToken();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const response = await fetch(`${baseUrl}/api/me/association`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify(association),
+  });
+  const body = (await response.json().catch(() => ({}))) as
+    | ApiEnvelope<AssociationInfoResponse>
+    | AssociationInfoResponse;
+
+  if (!response.ok || ("success" in body && body.success === false)) {
+    const message =
+      "error" in body && body.error?.message
+        ? body.error.message
+        : "상인회 담당자 정보를 수정하지 못했습니다.";
+    throw new Error(message);
+  }
+
+  if (
+    body &&
+    typeof body === "object" &&
+    "data" in body &&
+    typeof (body as ApiEnvelope<AssociationInfoResponse>).data === "object"
+  ) {
+    return (body as ApiEnvelope<AssociationInfoResponse>).data ?? {};
+  }
+
+  return (body ?? {}) as AssociationInfoResponse;
 }
 
 export async function hasGeneratedMarketPage(me: MeResponse): Promise<boolean> {
