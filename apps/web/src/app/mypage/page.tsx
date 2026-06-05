@@ -213,9 +213,9 @@ export default function MyPage() {
               <div className={styles.figmaAvatar} aria-hidden="true" />
               <strong>{displayName} 님</strong>
               <p>이메일 : {displayEmail}</p>
-              <button className={styles.figmaProfileButton} type="button">
+              <Link className={styles.figmaProfileButton} href="/mypage/association-edit">
                 상인회 정보 수정하기
-              </button>
+              </Link>
             </article>
 
             <h3 className={styles.figmaMarketTitle}>시장 정보</h3>

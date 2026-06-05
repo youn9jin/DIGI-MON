@@ -23,6 +23,11 @@ export interface MeResponse {
   missing?: string[];
 }
 
+export type UpdateMeRequest = {
+  name?: string | null;
+  phone?: string | null;
+};
+
 export type WebsiteEntryPath = "/dashboard" | "/onboarding" | "/templates";
 
 function unwrapMeResponse(body: unknown): MeResponse {
@@ -77,6 +82,39 @@ export async function deleteMe(user = auth.currentUser): Promise<void> {
   if (!response.ok || body.success === false) {
     throw new Error(body.error?.message ?? body.message ?? "회원 탈퇴에 실패했습니다.");
   }
+}
+
+export async function updateMe(
+  profile: UpdateMeRequest,
+  user = auth.currentUser,
+): Promise<MeResponse> {
+  if (!user) {
+    throw new Error("로그인이 필요합니다.");
+  }
+
+  const idToken = await user.getIdToken();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const response = await fetch(`${baseUrl}/api/me`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
+    },
+    body: JSON.stringify(profile),
+  });
+  const body = (await response.json().catch(() => ({}))) as
+    | ApiEnvelope<MeResponse>
+    | MeResponse;
+
+  if (!response.ok || ("success" in body && body.success === false)) {
+    const message =
+      "error" in body && body.error?.message
+        ? body.error.message
+        : "내 정보를 수정하지 못했습니다.";
+    throw new Error(message);
+  }
+
+  return unwrapMeResponse(body);
 }
 
 export async function hasGeneratedMarketPage(me: MeResponse): Promise<boolean> {

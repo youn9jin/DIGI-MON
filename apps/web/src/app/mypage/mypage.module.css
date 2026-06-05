@@ -927,14 +927,14 @@
 
 .editFigmaViewport {
   width: 100%;
-  height: calc(3010px * var(--mypage-edit-scale));
+  height: calc(var(--mypage-edit-height, 3010px) * var(--mypage-edit-scale));
   overflow: hidden;
 }
 
 .editFigmaCanvas {
   position: relative;
   width: 1920px;
-  height: 3010px;
+  height: var(--mypage-edit-height, 3010px);
   transform: scale(var(--mypage-edit-scale));
   transform-origin: left top;
 }
@@ -978,6 +978,17 @@
   left: 440px;
   width: 1320px;
   height: 2590px;
+  border-radius: 100px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.associationFigmaPanel {
+  position: absolute;
+  top: 333px;
+  left: 440px;
+  width: 1320px;
+  height: 1052px;
   border-radius: 100px;
   background: #fff;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
@@ -1153,6 +1164,45 @@
   top: 2855px;
   left: 680px;
   width: 750px;
+  margin: 0;
+  color: #777;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.associationFigmaSaveButton {
+  position: absolute;
+  z-index: 1;
+  top: 1256px;
+  left: 910px;
+  display: flex;
+  width: 379px;
+  height: 77px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 30px;
+  background: rgba(255, 242, 197, 0.77);
+  color: #000;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 45px;
+}
+
+.associationFigmaSaveButton:disabled {
+  color: #8f8f8f;
+  cursor: not-allowed;
+}
+
+.associationFigmaSaveMessage {
+  position: absolute;
+  z-index: 1;
+  top: 1214px;
+  left: 658px;
+  width: 780px;
   margin: 0;
   color: #777;
   font-size: 18px;
