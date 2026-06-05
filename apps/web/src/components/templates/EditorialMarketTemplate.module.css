@@ -529,6 +529,15 @@
   object-fit: cover;
 }
 
+.dynamicMenuImage {
+  display: block;
+  width: 100%;
+  aspect-ratio: 804 / 1058;
+  background-color: #f5efe4;
+  background-position: center;
+  background-size: cover;
+}
+
 .signatureSection {
   padding: 0 clamp(32px, 7.03vw, 135px) clamp(96px, 7.34vw, 141px);
 }
@@ -549,6 +558,8 @@
   width: 100%;
   aspect-ratio: 712 / 594;
   background: #d9d9d9;
+  background-position: center;
+  background-size: cover;
 }
 
 .signatureGrid h3 {

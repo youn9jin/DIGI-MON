@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
 import Header from "@/components/layout/Header";
 import DeleteAccountModal from "@/components/ui/DeleteAccountModal";
-import { deleteMe, getMe, updateMe, type MeResponse } from "@/lib/api/me";
+import { deleteMe, getMe, updateAssociation, type MeResponse } from "@/lib/api/me";
 import { auth } from "@/lib/firebase";
 import styles from "../mypage.module.css";
 
@@ -114,21 +114,41 @@ export default function AssociationEditPage() {
       setSaveMessage("전화번호는 숫자, +, -, (, ), 공백으로 구성된 5~20자여야 합니다.");
       return;
     }
+    const fax = form.fax.trim();
+    if (fax && !/^[0-9+\-() ]{5,20}$/.test(fax)) {
+      setSaveMessage("팩스 번호는 숫자, +, -, (, ), 공백으로 구성된 5~20자여야 합니다.");
+      return;
+    }
 
     setIsSaving(true);
 
     try {
-      const updated = await updateMe({
-        name: form.name.trim() || null,
+      const updated = await updateAssociation({
+        managerName: form.name.trim() || null,
+        email: form.email.trim() || null,
         phone: phone || null,
+        fax: fax || null,
+        managerTitle: form.position.trim() || null,
       });
-      setMe(updated);
       setForm((current) => ({
         ...current,
-        name: updated.name ?? current.name,
+        name: updated.managerName ?? current.name,
+        email: updated.email ?? current.email,
         phone: updated.phone ?? current.phone,
+        fax: updated.fax ?? current.fax,
+        position: updated.managerTitle ?? current.position,
       }));
-      setSaveMessage("상인회 정보를 수정했어요.");
+      setMe((current) =>
+        current
+          ? {
+              ...current,
+              name: updated.managerName ?? current.name,
+              email: updated.email ?? current.email,
+              phone: updated.phone ?? current.phone,
+            }
+          : current,
+      );
+      setSaveMessage("상인회 담당자 정보를 수정했어요.");
     } catch (error) {
       setSaveMessage(error instanceof Error ? error.message : "상인회 정보 수정에 실패했습니다.");
     } finally {

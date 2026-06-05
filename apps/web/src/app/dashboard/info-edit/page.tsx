@@ -25,6 +25,7 @@ import {
   type StoreUpdateRequest,
 } from "@/lib/api/stores";
 import { publishDashboardOperationToast } from "@/lib/dashboard-operation-toast";
+import { uploadMarketPageImage } from "@/lib/firebase-storage";
 import styles from "../manage.module.css";
 
 const setupStorageKey = "market_page_setup_draft";
@@ -56,6 +57,9 @@ type StoreFormValues = {
 type StoreUploadField = {
   label: string;
   placeholder: string;
+  imageKey: "storeImageUrls" | "menuImageUrls" | "productImageUrls";
+  slot: "store" | "menu" | "product";
+  maxFiles: number;
 };
 
 const storeCategories = ["전체보기", "농수산물", "먹거리", "의류", "생활용품", "기타"] as const;
@@ -94,34 +98,55 @@ const storeUploadFieldsByTemplate: Record<TemplateType, StoreUploadField[]> = {
     {
       label: "6. 가게 사진 등록하기(최대 3개)",
       placeholder: "대표 사진을 마우스로 끌어와주세요",
+      imageKey: "storeImageUrls",
+      slot: "store",
+      maxFiles: 3,
     },
     {
       label: "7. 가게 대표 사진 등록하기",
       placeholder: "메뉴판 사진을 마우스로 끌어와주세요",
+      imageKey: "productImageUrls",
+      slot: "product",
+      maxFiles: 1,
     },
   ],
   TEMPLATE_2: [
     {
       label: "6. 가게 대표 음식 사진 등록하기(최대 4개)",
       placeholder: "대표 메뉴 사진을 마우스로 끌어와주세요",
+      imageKey: "productImageUrls",
+      slot: "product",
+      maxFiles: 4,
     },
     {
       label: "7. 가게 메뉴판 사진 등록하기(최대 2개)",
       placeholder: "메뉴판 사진을 마우스로 끌어와주세요",
+      imageKey: "menuImageUrls",
+      slot: "menu",
+      maxFiles: 2,
     },
     {
       label: "8. 가게 대표 사진 등록하기",
       placeholder: "가게 대표 사진을 마우스로 끌어와주세요",
+      imageKey: "storeImageUrls",
+      slot: "store",
+      maxFiles: 1,
     },
   ],
   TEMPLATE_3: [
     {
       label: "6. 가게 대표 음식 사진 등록하기",
       placeholder: "대표 메뉴 사진을 마우스로 끌어와주세요",
+      imageKey: "productImageUrls",
+      slot: "product",
+      maxFiles: 1,
     },
     {
       label: "7. 가게 대표 사진 등록하기",
       placeholder: "가게 대표 사진을 마우스로 끌어와주세요",
+      imageKey: "storeImageUrls",
+      slot: "store",
+      maxFiles: 1,
     },
   ],
 };
@@ -404,6 +429,7 @@ export default function InfoEditPage() {
   const [storeError, setStoreError] = useState("");
   const [storeSaveMessage, setStoreSaveMessage] = useState("");
   const [storeFileNames, setStoreFileNames] = useState<Record<string, string>>({});
+  const [storeFiles, setStoreFiles] = useState<Record<string, File[]>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [saveError, setSaveError] = useState("");
@@ -474,6 +500,7 @@ export default function InfoEditPage() {
         setSelectedStore(null);
         setStoreValues(emptyStoreFormValues);
         setStoreFileNames({});
+        setStoreFiles({});
         setStoreSaveMessage("");
       } catch (error) {
         if (!isMounted) return;
@@ -502,6 +529,7 @@ export default function InfoEditPage() {
       setSelectedStore(detail);
       setStoreValues(getStoreValues(detail));
       setStoreFileNames({});
+      setStoreFiles({});
       setStoreSaveMessage("");
     } catch (error) {
       const apiError = error as Partial<MarketPageApiError>;
@@ -533,18 +561,25 @@ export default function InfoEditPage() {
     setSelectedStore(null);
     setStoreValues(emptyStoreFormValues);
     setStoreFileNames({});
+    setStoreFiles({});
     setStoreSaveMessage("");
     setStoreError("");
   }
 
-  function handleStoreFileChange(fieldLabel: string, files: FileList | null) {
-    const selectedFiles = Array.from(files ?? []);
+  function handleStoreFileChange(field: StoreUploadField, files: FileList | null) {
+    const selectedFiles = Array.from(files ?? [])
+      .filter((file) => file.type.startsWith("image/"))
+      .slice(0, field.maxFiles);
     setStoreFileNames((current) => ({
       ...current,
-      [fieldLabel]:
+      [field.label]:
         selectedFiles.length > 0
           ? selectedFiles.map((file) => file.name).join(", ")
           : "",
+    }));
+    setStoreFiles((current) => ({
+      ...current,
+      [field.label]: selectedFiles,
     }));
     setStoreSaveMessage("");
     setStoreError("");
@@ -586,7 +621,11 @@ export default function InfoEditPage() {
     );
     appendChangedValue(payload, "items", toNullableValue(storeValues.items), selectedStore.items);
 
-    if (Object.keys(payload).length === 0) {
+    const selectedUploadFields = storeUploadFields.filter(
+      (field) => (storeFiles[field.label]?.length ?? 0) > 0,
+    );
+
+    if (Object.keys(payload).length === 0 && selectedUploadFields.length === 0) {
       setStoreError("수정할 내용을 입력해주세요.");
       setStoreSaveMessage("");
       return;
@@ -597,9 +636,19 @@ export default function InfoEditPage() {
     setStoreSaveMessage("");
 
     try {
+      for (const field of selectedUploadFields) {
+        const files = storeFiles[field.label] ?? [];
+        const urls = await Promise.all(
+          files.map((file) => uploadMarketPageImage(file, field.slot)),
+        );
+        payload[field.imageKey] = urls;
+      }
+
       const updatedStore = await updateStore(selectedStore.storeId, payload);
       setSelectedStore(updatedStore);
       setStoreValues(getStoreValues(updatedStore));
+      setStoreFiles({});
+      setStoreFileNames({});
       setStores((currentStores) =>
         getUniqueStores(
           currentStores.map((store) =>
@@ -818,9 +867,9 @@ export default function InfoEditPage() {
                           className={styles.storeFileInput}
                           type="file"
                           accept="image/png,image/jpeg,image/webp"
-                          multiple={field.label.includes("최대")}
+                          multiple={field.maxFiles > 1}
                           onChange={(event) =>
-                            handleStoreFileChange(field.label, event.currentTarget.files)
+                            handleStoreFileChange(field, event.currentTarget.files)
                           }
                         />
                         <span className={styles.storeFilePlaceholder}>

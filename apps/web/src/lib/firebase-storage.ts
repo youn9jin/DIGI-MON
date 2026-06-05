@@ -41,7 +41,7 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
 
 export async function uploadMarketPageImage(
   file: File,
-  slot: "hero" | "logo" | "intro",
+  slot: "hero" | "logo" | "intro" | "store" | "menu" | "product",
 ): Promise<string> {
   const user = await getAuthenticatedUser();
   const safeName = getSafeFileName(file.name);

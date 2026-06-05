@@ -66,7 +66,12 @@ interface SetupDraft {
   selectedSections: MarketPageSection[];
 }
 
-const storeHeaderMap: Record<keyof StoreCreateItem, string[]> = {
+type StoreExcelField = Exclude<
+  keyof StoreCreateItem,
+  "storeImageUrls" | "menuImageUrls" | "productImageUrls"
+>;
+
+const storeHeaderMap: Record<StoreExcelField, string[]> = {
   name: ["name", "점포명", "가게명", "상호명", "상호"],
   category: ["category", "업종", "카테고리", "분류"],
   items: ["items", "취급품목", "취급 품목", "대표메뉴", "대표 메뉴", "품목"],
@@ -76,7 +81,7 @@ const storeHeaderMap: Record<keyof StoreCreateItem, string[]> = {
   description: ["description", "점포소개", "점포 소개", "소개"],
 };
 
-const storeTemplateHeaders: Array<keyof StoreCreateItem> = [
+const storeTemplateHeaders: StoreExcelField[] = [
   "name",
   "category",
   "items",
@@ -86,7 +91,7 @@ const storeTemplateHeaders: Array<keyof StoreCreateItem> = [
   "description",
 ];
 
-const storeTemplateHeaderLabels: Record<keyof StoreCreateItem, string> = {
+const storeTemplateHeaderLabels: Record<StoreExcelField, string> = {
   name: "점포명",
   category: "category",
   items: "대표메뉴/취급품목",
@@ -349,7 +354,7 @@ function getSaveErrorMessage(error: unknown): string {
   return message || "웹페이지 생성 설정 저장에 실패했습니다.";
 }
 
-function getCell(row: Record<string, unknown>, field: keyof StoreCreateItem): string {
+function getCell(row: Record<string, unknown>, field: StoreExcelField): string {
   const aliases = storeHeaderMap[field].map(normalizeHeader);
   const entry = Object.entries(row).find(([key]) => aliases.includes(normalizeHeader(key)));
   const value = entry?.[1];

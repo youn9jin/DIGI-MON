@@ -10,6 +10,9 @@ export interface TemplateStore {
   phone: string;
   menu: string;
   description: string;
+  storeImageUrls: string[];
+  menuImageUrls: string[];
+  productImageUrls: string[];
 }
 
 export interface PublicStoreLike {
@@ -24,6 +27,9 @@ export interface PublicStoreLike {
   contact?: string | null;
   description?: string | null;
   highlight?: string | null;
+  storeImageUrls?: string[] | null;
+  menuImageUrls?: string[] | null;
+  productImageUrls?: string[] | null;
 }
 
 export function normalizeStoreCategory(category?: string | null): string {
@@ -37,6 +43,12 @@ export function normalizeStoreCategory(category?: string | null): string {
 
 function firstText(...values: Array<string | null | undefined>): string {
   return values.find((value) => value && value.trim().length > 0)?.trim() ?? "";
+}
+
+function normalizeImageUrls(urls?: string[] | null): string[] {
+  return Array.isArray(urls)
+    ? urls.filter((url): url is string => typeof url === "string" && url.trim().length > 0)
+    : [];
 }
 
 export function mapStoreToTemplateStore(
@@ -57,5 +69,8 @@ export function mapStoreToTemplateStore(
     phone: firstText(source.contact, source.phone, "연락처 정보 준비 중"),
     menu,
     description: firstText(description, menu, `${name}의 대표 상품을 소개합니다.`),
+    storeImageUrls: normalizeImageUrls(source.storeImageUrls),
+    menuImageUrls: normalizeImageUrls(source.menuImageUrls),
+    productImageUrls: normalizeImageUrls(source.productImageUrls),
   };
 }
