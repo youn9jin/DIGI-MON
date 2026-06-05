@@ -42,31 +42,6 @@ const DEFAULT_DATA: ClassicMarketTemplateData = {
     "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.",
 };
 
-const bannerItems = [
-  { color: "blue" },
-  { color: "yellow" },
-  { color: "red" },
-  { color: "green" },
-  { color: "light" },
-  { color: "blue" },
-  { color: "yellow" },
-  { color: "red" },
-  { color: "green" },
-  { color: "light" },
-  { color: "blue" },
-  { color: "yellow" },
-  { color: "red" },
-  { color: "green", label: "시장소개", href: "/templates/classic" },
-  { color: "light" },
-  { color: "blue", label: "가게정보", href: "/templates/classic/stores" },
-  { color: "yellow" },
-  { color: "red", label: "관광정보", href: "/templates/classic#tour" },
-  { color: "green" },
-  { color: "light" },
-  { color: "blue", label: "EN / KR" },
-  { color: "yellow" },
-];
-
 interface ClassicMarketTemplateProps {
   data?: Partial<ClassicMarketTemplateData>;
   previewMode?: boolean;
@@ -96,20 +71,12 @@ export default function ClassicMarketTemplate({
   return (
     <main className={styles.page}>
       <header className={styles.topBanner} aria-label="템플릿 메뉴">
-        {bannerItems.map((item, index) => (
-          <div
-            className={`${styles.bannerPiece} ${styles[item.color]}`}
-            key={`${item.color}-${index}`}
-          >
-            {item.label && item.href ? (
-              <Link className={styles.bannerLabel} href={getHref(item.href)}>
-                {item.label}
-              </Link>
-            ) : item.label ? (
-              <span className={styles.bannerLabel}>{item.label}</span>
-            ) : null}
-          </div>
-        ))}
+        <nav className={styles.bannerNav}>
+          <Link href={getHref("/templates/classic#intro")}>시장소개</Link>
+          <Link href={getHref("/templates/classic/stores")}>가게정보</Link>
+          <Link href={getHref("/templates/classic#tour")}>관광정보</Link>
+          <span>EN/KR</span>
+        </nav>
       </header>
 
       <section className={styles.logoIntro} id="intro" aria-label="시장 소개">

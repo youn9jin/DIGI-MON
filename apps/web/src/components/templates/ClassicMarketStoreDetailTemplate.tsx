@@ -16,31 +16,6 @@ interface ClassicMarketStoreDetailTemplateProps {
   previewMode?: boolean;
 }
 
-const bannerItems = [
-  { color: "blue" },
-  { color: "yellow" },
-  { color: "red" },
-  { color: "green" },
-  { color: "light" },
-  { color: "blue" },
-  { color: "yellow" },
-  { color: "red" },
-  { color: "green" },
-  { color: "light" },
-  { color: "blue" },
-  { color: "yellow" },
-  { color: "red" },
-  { color: "green", label: "시장소개", href: "/templates/classic" },
-  { color: "light" },
-  { color: "blue", label: "가게정보", href: "/templates/classic/stores" },
-  { color: "yellow" },
-  { color: "red", label: "관광정보", href: "/templates/classic#tour" },
-  { color: "green" },
-  { color: "light" },
-  { color: "blue", label: "EN / KR" },
-  { color: "yellow" },
-];
-
 export default function ClassicMarketStoreDetailTemplate({
   store,
   address = "상세주소 text",
@@ -66,20 +41,12 @@ export default function ClassicMarketStoreDetailTemplate({
   return (
     <main className={`${styles.page} ${styles.storeDetailPage}`}>
       <header className={styles.topBanner} aria-label="템플릿 메뉴">
-        {bannerItems.map((item, index) => (
-          <div
-            className={`${styles.bannerPiece} ${styles[item.color]}`}
-            key={`${item.color}-${index}`}
-          >
-            {item.label && item.href ? (
-              <Link className={styles.bannerLabel} href={getHref(item.href)}>
-                {item.label}
-              </Link>
-            ) : item.label ? (
-              <span className={styles.bannerLabel}>{item.label}</span>
-            ) : null}
-          </div>
-        ))}
+        <nav className={styles.bannerNav}>
+          <Link href={getHref("/templates/classic#intro")}>시장소개</Link>
+          <Link href={getHref("/templates/classic/stores")}>가게정보</Link>
+          <Link href={getHref("/templates/classic#tour")}>관광정보</Link>
+          <span>EN/KR</span>
+        </nav>
       </header>
 
       <section className={styles.detailHero} aria-label="가게 대표 정보">
