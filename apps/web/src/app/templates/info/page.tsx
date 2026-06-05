@@ -426,6 +426,7 @@ export default function TemplateInfoPage() {
   const [representativeFileMessage, setRepresentativeFileMessage] = useState("");
   const [storeFileName, setStoreFileName] = useState("");
   const [storeUploadMessage, setStoreUploadMessage] = useState("");
+  const [saveErrorMessage, setSaveErrorMessage] = useState("");
   const [stores, setStores] = useState<StoreCreateItem[]>([]);
   const needsStoreFile = setupDraft.selectedSections.includes("stores");
   const previewConfig = previewTarget
@@ -517,12 +518,13 @@ export default function TemplateInfoPage() {
     if (isSaving || !isInfoComplete) return;
 
     setIsSaving(true);
+    setSaveErrorMessage("");
     try {
       if (stores.length > 0) {
         const result = await createStores(stores);
         if (result.failedItems?.length > 0) {
           const firstFailed = result.failedItems[0];
-          window.alert(
+          setSaveErrorMessage(
             `${result.successCount}개 등록, ${result.failedItems.length}개 실패했습니다.\n${firstFailed.name ?? "점포"}: ${firstFailed.reason}`,
           );
           setIsSaving(false);
@@ -552,7 +554,7 @@ export default function TemplateInfoPage() {
       window.sessionStorage.setItem(generationInProgressStorageKey, "true");
       router.push("/templates/generating");
     } catch (error) {
-      window.alert(getSaveErrorMessage(error));
+      setSaveErrorMessage(getSaveErrorMessage(error));
       setIsSaving(false);
     }
   }
@@ -706,6 +708,12 @@ export default function TemplateInfoPage() {
             )}
           </section>
         </form>
+
+        {saveErrorMessage && (
+          <p className={styles.saveErrorMessage} role="status" aria-live="polite">
+            {saveErrorMessage}
+          </p>
+        )}
 
         <div className={styles.actions}>
           <button

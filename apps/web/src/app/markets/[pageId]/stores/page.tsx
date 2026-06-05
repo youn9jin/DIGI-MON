@@ -100,6 +100,7 @@ export default function PublicEditorialStoresPage() {
     return (
       <TemplatePreviewStatus
         title="점포 목록을 불러오는 중"
+        tone="loading"
         message="등록된 점포 정보를 가져오고 있어요."
       />
     );
@@ -109,6 +110,7 @@ export default function PublicEditorialStoresPage() {
     return (
       <TemplatePreviewStatus
         title="점포 목록을 불러오지 못했어요"
+        tone="error"
         message={errorMessage || "점포 정보가 아직 준비되지 않았습니다."}
       />
     );
