@@ -70,4 +70,7 @@ public class Market {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "fax")
+    private String fax;
 }

@@ -5,6 +5,8 @@ import com.digimon.api.auth.FirebaseTokenService;
 import com.digimon.api.global.ResponseWrapper;
 import com.digimon.api.market.Market;
 import com.digimon.api.market.MarketRepository;
+import com.digimon.api.user.dto.AssociationInfoResponse;
+import com.digimon.api.user.dto.UpdateAssociationRequest;
 import com.digimon.api.user.dto.UpdateMeRequest;
 import com.google.firebase.auth.FirebaseToken;
 import jakarta.validation.Valid;
@@ -54,6 +56,16 @@ public class MeController {
         return withAuthenticatedUser(authorization, user -> {
             User updated = userService.updateProfile(user.getId(), request);
             return ResponseEntity.ok(buildMeResponse(updated));
+        });
+    }
+
+    @PatchMapping("/me/association")
+    public ResponseEntity<?> patchAssociation(
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            @Valid @RequestBody UpdateAssociationRequest request) {
+        return withAuthenticatedUser(authorization, user -> {
+            AssociationInfoResponse response = userService.updateAssociation(user.getId(), request);
+            return ResponseEntity.ok(ResponseWrapper.success(response));
         });
     }
 

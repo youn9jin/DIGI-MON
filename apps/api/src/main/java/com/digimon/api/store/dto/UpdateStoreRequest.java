@@ -1,9 +1,12 @@
 package com.digimon.api.store.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 /**
  * PATCH /api/stores/{storeId} 요청 바디.
@@ -34,4 +37,13 @@ public class UpdateStoreRequest {
     private String yearsOfOperation;
     private String contact;
     private String description;
+
+    @Size(max = 4, message = "storeImageUrls는 최대 4개까지 등록 가능합니다.")
+    private List<String> storeImageUrls;
+
+    @Size(max = 2, message = "menuImageUrls는 최대 2개까지 등록 가능합니다.")
+    private List<String> menuImageUrls;
+
+    @Size(max = 4, message = "productImageUrls는 최대 4개까지 등록 가능합니다.")
+    private List<String> productImageUrls;
 }

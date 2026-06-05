@@ -175,6 +175,16 @@ public class StoresService {
         if (req.getDescription() != null) {
             store.setDescription(trimToNull(req.getDescription()));
         }
+        // 이미지 배열: null이면 유지, 빈 배열이면 삭제, URL 배열이면 덮어쓰기
+        if (req.getStoreImageUrls() != null) {
+            store.setStoreImageUrls(req.getStoreImageUrls());
+        }
+        if (req.getMenuImageUrls() != null) {
+            store.setMenuImageUrls(req.getMenuImageUrls());
+        }
+        if (req.getProductImageUrls() != null) {
+            store.setProductImageUrls(req.getProductImageUrls());
+        }
 
         Store saved = storeRepository.save(store);
         return toDetailMap(saved);
@@ -227,6 +237,9 @@ public class StoresService {
         m.put("yearsOfOperation", store.getYearsOfOperation());
         m.put("contact", store.getContact());
         m.put("description", store.getDescription());
+        m.put("storeImageUrls", store.getStoreImageUrls() != null ? store.getStoreImageUrls() : new ArrayList<>());
+        m.put("menuImageUrls", store.getMenuImageUrls() != null ? store.getMenuImageUrls() : new ArrayList<>());
+        m.put("productImageUrls", store.getProductImageUrls() != null ? store.getProductImageUrls() : new ArrayList<>());
         return m;
     }
 
@@ -253,6 +266,9 @@ public class StoresService {
                 .yearsOfOperation(trimToNull(dto.getYearsOfOperation()))
                 .contact(trimToNull(dto.getContact()))
                 .description(trimToNull(dto.getDescription()))
+                .storeImageUrls(dto.getStoreImageUrls() != null ? dto.getStoreImageUrls() : new ArrayList<>())
+                .menuImageUrls(dto.getMenuImageUrls() != null ? dto.getMenuImageUrls() : new ArrayList<>())
+                .productImageUrls(dto.getProductImageUrls() != null ? dto.getProductImageUrls() : new ArrayList<>())
                 .build();
         return storeRepository.save(store);
     }
@@ -274,6 +290,15 @@ public class StoresService {
         if ((err = validateYearsOfOperation(dto.getYearsOfOperation())) != null) return err;
         if ((err = validateContact(dto.getContact())) != null) return err;
         if ((err = validateDescription(dto.getDescription())) != null) return err;
+        if (dto.getStoreImageUrls() != null && dto.getStoreImageUrls().size() > 4) {
+            return "storeImageUrls는 최대 4개까지 등록 가능합니다.";
+        }
+        if (dto.getMenuImageUrls() != null && dto.getMenuImageUrls().size() > 2) {
+            return "menuImageUrls는 최대 2개까지 등록 가능합니다.";
+        }
+        if (dto.getProductImageUrls() != null && dto.getProductImageUrls().size() > 4) {
+            return "productImageUrls는 최대 4개까지 등록 가능합니다.";
+        }
         return null;
     }
 
@@ -291,6 +316,18 @@ public class StoresService {
         addIfPresent(errors, "yearsOfOperation", validateYearsOfOperation(dto.getYearsOfOperation()));
         addIfPresent(errors, "contact", validateContact(dto.getContact()));
         addIfPresent(errors, "description", validateDescription(dto.getDescription()));
+        if (dto.getStoreImageUrls() != null && dto.getStoreImageUrls().size() > 4) {
+            errors.add(new ValidationErrorDetail("storeImageUrls",
+                    "storeImageUrls는 최대 4개까지 등록 가능합니다."));
+        }
+        if (dto.getMenuImageUrls() != null && dto.getMenuImageUrls().size() > 2) {
+            errors.add(new ValidationErrorDetail("menuImageUrls",
+                    "menuImageUrls는 최대 2개까지 등록 가능합니다."));
+        }
+        if (dto.getProductImageUrls() != null && dto.getProductImageUrls().size() > 4) {
+            errors.add(new ValidationErrorDetail("productImageUrls",
+                    "productImageUrls는 최대 4개까지 등록 가능합니다."));
+        }
         return errors;
     }
 
