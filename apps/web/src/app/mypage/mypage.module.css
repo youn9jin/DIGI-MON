@@ -159,8 +159,7 @@
 }
 
 .figmaAvatar img {
-  object-fit: contain;
-  padding: 20px;
+  object-fit: cover;
 }
 
 .figmaProfileCard strong {

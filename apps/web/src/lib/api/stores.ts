@@ -74,6 +74,32 @@ export interface StoreListResponse {
   stores: StoreSummary[];
 }
 
+function normalizeStoreIdentity(value?: string | null): string {
+  return value?.trim().replace(/\s+/g, " ").toLowerCase() ?? "";
+}
+
+function getUniqueStoreSummaries(stores: StoreSummary[]): StoreSummary[] {
+  const seenIds = new Set<string>();
+  const seenStores = new Set<string>();
+
+  return stores.filter((store) => {
+    const id = String(store.storeId ?? "").trim();
+    const contentKey = [
+      normalizeStoreIdentity(store.category),
+      normalizeStoreIdentity(store.name),
+      normalizeStoreIdentity(store.contact),
+    ].join("|");
+
+    if ((id && seenIds.has(id)) || seenStores.has(contentKey)) {
+      return false;
+    }
+
+    if (id) seenIds.add(id);
+    seenStores.add(contentKey);
+    return true;
+  });
+}
+
 async function getAuthenticatedUser(): Promise<User> {
   const currentUser = auth.currentUser;
   if (currentUser) return currentUser;
@@ -134,7 +160,14 @@ export async function getStores(): Promise<StoreListResponse> {
     headers: authHeader,
   });
 
-  return parseEnvelope<StoreListResponse>(response);
+  const result = await parseEnvelope<StoreListResponse>(response);
+  const stores = getUniqueStoreSummaries(result.stores ?? []);
+
+  return {
+    ...result,
+    total: stores.length,
+    stores,
+  };
 }
 
 export async function getStore(storeId: string | number): Promise<StoreDetail> {

@@ -44,6 +44,34 @@ export interface PublicStoreLike {
   productImageUrls?: unknown;
 }
 
+function normalizeStoreIdentity(value?: string | null): string {
+  return value?.trim().replace(/\s+/g, " ").toLowerCase() ?? "";
+}
+
+export function getUniqueTemplateStores(
+  stores: TemplateStore[],
+): TemplateStore[] {
+  const seenIds = new Set<string>();
+  const seenStores = new Set<string>();
+
+  return stores.filter((store) => {
+    const id = store.id.trim();
+    const contentKey = [
+      normalizeStoreIdentity(store.category),
+      normalizeStoreIdentity(store.name),
+      normalizeStoreIdentity(store.phone),
+    ].join("|");
+
+    if ((id && seenIds.has(id)) || seenStores.has(contentKey)) {
+      return false;
+    }
+
+    if (id) seenIds.add(id);
+    seenStores.add(contentKey);
+    return true;
+  });
+}
+
 export function normalizeStoreCategory(category?: string | null): string {
   const value = category?.trim();
   if (!value) return "기타";
