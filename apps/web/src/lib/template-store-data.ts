@@ -31,8 +31,11 @@ export interface PublicStoreLike {
   storeImageUrl?: string | null;
   menuImageUrl?: string | null;
   productImageUrl?: string | null;
+  thumbnailUrl?: string | null;
+  photoUrl?: string | null;
   images?: unknown;
   imageUrls?: unknown;
+  photoUrls?: unknown;
   storeImages?: unknown;
   menuImages?: unknown;
   productImages?: unknown;
@@ -102,28 +105,60 @@ export function mapStoreToTemplateStore(
       sourceRecord.store_images,
       source.storeImageUrl,
       sourceRecord.store_image_url,
+      sourceRecord.storeImageUrlList,
+      sourceRecord.store_image_url_list,
+      sourceRecord.storeImageList,
+      sourceRecord.store_image_list,
+      sourceRecord.storeImage,
+      sourceRecord.store_image,
       source.imageUrls,
       sourceRecord.image_urls,
+      sourceRecord.imageUrlList,
+      sourceRecord.image_url_list,
       source.images,
       source.imageUrl,
       sourceRecord.image_url,
+      source.photoUrls,
+      sourceRecord.photo_urls,
+      source.photoUrl,
+      sourceRecord.photo_url,
+      source.thumbnailUrl,
+      sourceRecord.thumbnail_url,
     ),
     menuImageUrls: normalizeImageUrls(
       source.menuImageUrls,
       sourceRecord.menu_image_urls,
+      sourceRecord.menuImageUrlList,
+      sourceRecord.menu_image_url_list,
+      sourceRecord.menuImageList,
+      sourceRecord.menu_image_list,
       source.menuImages,
       sourceRecord.menu_images,
       source.menuImageUrl,
       sourceRecord.menu_image_url,
+      sourceRecord.menuImage,
+      sourceRecord.menu_image,
+      sourceRecord.menuBoardImageUrls,
+      sourceRecord.menu_board_image_urls,
+      sourceRecord.menuBoardImages,
+      sourceRecord.menu_board_images,
     ),
     productImageUrls: normalizeImageUrls(
       source.productImageUrls,
       sourceRecord.product_image_urls,
+      sourceRecord.productImageUrlList,
+      sourceRecord.product_image_url_list,
+      sourceRecord.productImageList,
+      sourceRecord.product_image_list,
       source.productImages,
       sourceRecord.product_images,
       source.productImageUrl,
       sourceRecord.product_image_url,
+      sourceRecord.productImage,
+      sourceRecord.product_image,
       sourceRecord.menu_item_image_urls,
+      sourceRecord.menuItemImageUrls,
+      sourceRecord.menu_item_image_url_list,
       sourceRecord.product_urls,
     ),
   };

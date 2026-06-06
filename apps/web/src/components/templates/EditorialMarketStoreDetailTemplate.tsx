@@ -67,11 +67,6 @@ export default function EditorialMarketStoreDetailTemplate({
         <p>{store.intro}</p>
       </section>
 
-      <div className={styles.detailActions}>
-        <button type="button">수정</button>
-        <button type="button">삭제</button>
-      </div>
-
       <section className={styles.menuSection} aria-label="메뉴">
         <h2>MENU</h2>
         <div className={styles.menuImages}>

@@ -36,6 +36,29 @@ function findPublicStore(content: MarketPageContentResponse, storeId: string) {
     : null;
 }
 
+function mergeStoreImages(
+  publicStore: TemplateStore,
+  ownerStore?: TemplateStore,
+): TemplateStore {
+  if (!ownerStore) return publicStore;
+
+  return {
+    ...publicStore,
+    storeImageUrls:
+      publicStore.storeImageUrls.length > 0
+        ? publicStore.storeImageUrls
+        : ownerStore.storeImageUrls,
+    menuImageUrls:
+      publicStore.menuImageUrls.length > 0
+        ? publicStore.menuImageUrls
+        : ownerStore.menuImageUrls,
+    productImageUrls:
+      publicStore.productImageUrls.length > 0
+        ? publicStore.productImageUrls
+        : ownerStore.productImageUrls,
+  };
+}
+
 export default function PublicEditorialStoreDetailPage() {
   const params = useParams<{ pageId: string; storeId: string }>();
   const marketId = params.pageId;
@@ -59,13 +82,16 @@ export default function PublicEditorialStoreDetailPage() {
         if (!isMounted) return;
 
         setContent(publicContent);
-        let nextStore: TemplateStore | null = null;
+        const publicStore = findPublicStore(publicContent, storeId);
+        let nextStore = publicStore ? mapStoreToTemplateStore(publicStore) : null;
 
-        try {
-          nextStore = mapStoreToTemplateStore(await getStore(storeId));
-        } catch {
-          const publicStore = findPublicStore(publicContent, storeId);
-          nextStore = publicStore ? mapStoreToTemplateStore(publicStore) : null;
+        if (nextStore) {
+          try {
+            const ownerStore = mapStoreToTemplateStore(await getStore(storeId));
+            nextStore = mergeStoreImages(nextStore, ownerStore);
+          } catch {
+            // Public visitors may not be authenticated. Keep the public API response.
+          }
         }
 
         if (!isMounted) return;

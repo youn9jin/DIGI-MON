@@ -43,7 +43,7 @@ export default function DashboardOperationPending({ type }: DashboardOperationPe
             fill
             priority
             sizes="32vw"
-            src="/images/onboarding/market-illustration.png"
+            src="/images/onboarding/generating-hero-logo.png"
           />
         </div>
       </section>

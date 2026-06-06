@@ -37,6 +37,44 @@ function getFallbackStores(content: MarketPageContentResponse): TemplateStore[] 
   );
 }
 
+function findOwnerStore(
+  publicStore: TemplateStore,
+  ownerStores: TemplateStore[],
+) {
+  return ownerStores.find((store) => {
+    const publicId = publicStore.id == null ? "" : String(publicStore.id);
+    const ownerId = store.id == null ? "" : String(store.id);
+
+    return (
+      (publicId && ownerId && publicId === ownerId) ||
+      store.name.trim() === publicStore.name.trim()
+    );
+  });
+}
+
+function mergeStoreImages(
+  publicStore: TemplateStore,
+  ownerStore?: TemplateStore,
+): TemplateStore {
+  if (!ownerStore) return publicStore;
+
+  return {
+    ...publicStore,
+    storeImageUrls:
+      publicStore.storeImageUrls.length > 0
+        ? publicStore.storeImageUrls
+        : ownerStore.storeImageUrls,
+    menuImageUrls:
+      publicStore.menuImageUrls.length > 0
+        ? publicStore.menuImageUrls
+        : ownerStore.menuImageUrls,
+    productImageUrls:
+      publicStore.productImageUrls.length > 0
+        ? publicStore.productImageUrls
+        : ownerStore.productImageUrls,
+  };
+}
+
 export default function PublicEditorialStoresPage() {
   const params = useParams<{ pageId: string }>();
   const marketId = params.pageId;
@@ -59,17 +97,18 @@ export default function PublicEditorialStoresPage() {
         if (!isMounted) return;
 
         setContent(publicContent);
-        let nextStores = getFallbackStores(publicContent);
+        const publicStores = getFallbackStores(publicContent);
+        let nextStores = publicStores;
 
         try {
-          const ownerStores = await getStores();
-          if (ownerStores.stores.length > 0) {
-            nextStores = ownerStores.stores.map((store, index) =>
-              mapStoreToTemplateStore(store, index),
-            );
-          }
+          const ownerStores = (await getStores()).stores.map((store, index) =>
+            mapStoreToTemplateStore(store, index),
+          );
+          nextStores = publicStores.map((store) =>
+            mergeStoreImages(store, findOwnerStore(store, ownerStores)),
+          );
         } catch {
-          // Public visitors may not be authenticated. Use public content fallback.
+          // Public visitors may not be authenticated. Keep the public API response.
         }
 
         if (!isMounted) return;
