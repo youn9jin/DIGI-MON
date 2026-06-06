@@ -27,7 +27,8 @@
 }
 
 .bannerNav a,
-.bannerNav span {
+.bannerNav span,
+.bannerNav button {
   color: #fff;
   font-size: clamp(14px, 1.3vw, 25px);
   font-weight: 500;

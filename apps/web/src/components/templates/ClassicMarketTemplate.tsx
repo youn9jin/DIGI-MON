@@ -4,6 +4,9 @@ import Link from "next/link";
 import styles from "./ClassicMarketTemplate.module.css";
 import GoogleMapEmbed from "./GoogleMapEmbed";
 import TemplateGenerationActions from "./TemplateGenerationActions";
+import TemplateLanguageToggle, {
+  useTemplateLanguage,
+} from "./TemplateLanguageToggle";
 
 export interface ClassicMarketTemplateData {
   marketName: string;
@@ -53,6 +56,7 @@ export default function ClassicMarketTemplate({
   previewMode = false,
   publicBasePath,
 }: ClassicMarketTemplateProps) {
+  const { t } = useTemplateLanguage();
   const content = { ...DEFAULT_DATA, ...data };
   const introImageUrls = content.introImageUrls ?? [];
   const secondIntroImageUrl = introImageUrls[1] ?? introImageUrls[0];
@@ -72,10 +76,10 @@ export default function ClassicMarketTemplate({
     <main className={styles.page}>
       <header className={styles.topBanner} aria-label="템플릿 메뉴">
         <nav className={styles.bannerNav}>
-          <Link href={getHref("/templates/classic#intro")}>시장소개</Link>
-          <Link href={getHref("/templates/classic/stores")}>가게정보</Link>
-          <Link href={getHref("/templates/classic#tour")}>관광정보</Link>
-          <span>EN/KR</span>
+          <Link href={getHref("/templates/classic#intro")}>{t("marketIntro")}</Link>
+          <Link href={getHref("/templates/classic/stores")}>{t("storeInfo")}</Link>
+          <Link href={getHref("/templates/classic#tour")}>{t("tourInfo")}</Link>
+          <TemplateLanguageToggle />
         </nav>
       </header>
 
@@ -128,30 +132,30 @@ export default function ClassicMarketTemplate({
       </section>
 
       <section className={styles.mapSection} id="map" aria-label="찾아오시는 길">
-        <h2>찾아오시는 길</h2>
+        <h2>{t("directions")}</h2>
         <GoogleMapEmbed address={content.address} label={content.marketName} />
       </section>
 
       <footer className={styles.footer}>
         <nav className={styles.footerNav} aria-label="하단 메뉴">
-          <Link href={getHref("/templates/classic#intro")}>시장소개</Link>
-          <Link href={getHref("/templates/classic/stores")}>가게안내</Link>
-          <Link href={getHref("/templates/classic#tour")}>관광정보</Link>
-          <Link href={getHref("/templates/classic#map")}>찾아오시는 길</Link>
+          <Link href={getHref("/templates/classic#intro")}>{t("marketIntro")}</Link>
+          <Link href={getHref("/templates/classic/stores")}>{t("shopGuide")}</Link>
+          <Link href={getHref("/templates/classic#tour")}>{t("tourInfo")}</Link>
+          <Link href={getHref("/templates/classic#map")}>{t("directions")}</Link>
         </nav>
 
         <div className={styles.footerInfo}>
           <div>
-            <h3>주소</h3>
+            <h3>{t("address")}</h3>
             <p>{content.address}</p>
           </div>
           <div>
-            <h3>문의</h3>
+            <h3>{t("contact")}</h3>
             <p>TEL : {content.contact}</p>
             <p>FAX : {content.fax}</p>
           </div>
           <div>
-            <h3>이메일</h3>
+            <h3>{t("email")}</h3>
             <p>{content.emailPrimary}</p>
             <p>{content.emailSecondary}</p>
           </div>
