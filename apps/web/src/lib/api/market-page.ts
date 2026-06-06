@@ -154,7 +154,10 @@ export interface MarketPageContentResponse {
     storeImageUrl?: string | null;
     menuImageUrl?: string | null;
     productImageUrl?: string | null;
+    thumbnailUrl?: string | null;
+    photoUrl?: string | null;
     imageUrls?: unknown;
+    photoUrls?: unknown;
     storeImages?: unknown;
     menuImages?: unknown;
     productImages?: unknown;

@@ -61,10 +61,6 @@ export default function ClassicMarketStoreDetailTemplate({
       </section>
 
       <section className={styles.detailIntro} aria-label="가게 소개">
-        <div className={styles.detailActions}>
-          <button type="button">수정</button>
-          <button type="button">삭제</button>
-        </div>
         <h2>{store.name}</h2>
         <p>{store.intro}</p>
       </section>

@@ -93,10 +93,6 @@ export default function ModernMarketStoreDetailTemplate({
             <li>주요 메뉴 : {store.menu}</li>
           </ul>
         </article>
-        <div className={styles.modernDetailActions}>
-          <button type="button">수정</button>
-          <button type="button">삭제</button>
-        </div>
       </section>
 
       <section className={styles.modernDetailGallery} aria-label="가게 사진">
