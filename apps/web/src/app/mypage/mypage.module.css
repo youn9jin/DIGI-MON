@@ -154,7 +154,13 @@
   width: 123px;
   height: 123px;
   border-radius: 50%;
-  background: #d9d9d9;
+  overflow: hidden;
+  background: #fff7db;
+}
+
+.figmaAvatar img {
+  object-fit: contain;
+  padding: 20px;
 }
 
 .figmaProfileCard strong {
@@ -1111,6 +1117,12 @@
 
 .editFigmaTimeInput::placeholder {
   color: #9f9f9f;
+}
+
+.editFigmaTimeInput:disabled {
+  background: #f2f2f2;
+  color: #a1a1a1;
+  cursor: not-allowed;
 }
 
 .editFigmaCheckbox {

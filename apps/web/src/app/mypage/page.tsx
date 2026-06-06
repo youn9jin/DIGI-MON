@@ -11,8 +11,15 @@ import {
   getPublicMarketPageContent,
   type MarketPageContentResponse,
 } from "@/lib/api/market-page";
-import { deleteMe, getMe, type MeResponse } from "@/lib/api/me";
+import {
+  deleteMe,
+  getMe,
+  getMyPage,
+  type MeResponse,
+  type MyPageResponse,
+} from "@/lib/api/me";
 import { auth } from "@/lib/firebase";
+import { formatOperatingHours } from "@/lib/market-info";
 import styles from "./mypage.module.css";
 
 type CopyState = "idle" | "copied";
@@ -37,6 +44,7 @@ export default function MyPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [me, setMe] = useState<MeResponse | null>(null);
+  const [myPage, setMyPage] = useState<MyPageResponse | null>(null);
   const [content, setContent] = useState<MarketPageContentResponse | null>(null);
   const [origin, setOrigin] = useState("");
   const [copyState, setCopyState] = useState<CopyState>("idle");
@@ -65,8 +73,12 @@ export default function MyPage() {
       setUser(currentUser);
 
       try {
-        const nextMe = await getMe(currentUser);
+        const [nextMe, nextMyPage] = await Promise.all([
+          getMe(currentUser),
+          getMyPage(currentUser).catch(() => null),
+        ]);
         setMe(nextMe);
+        setMyPage(nextMyPage);
 
         if (nextMe.marketId) {
           try {
@@ -92,11 +104,27 @@ export default function MyPage() {
     return `${origin}/markets/${me.marketId}`;
   }, [me?.marketId, origin]);
 
-  const displayName = formatEmpty(me?.name ?? user?.displayName, "상인회");
-  const displayEmail = formatEmpty(me?.email ?? user?.email, "이메일 정보 없음");
-  const marketName = formatEmpty(content?.marketName ?? me?.marketName, "시장 이름");
-  const marketAddress = formatEmpty(content?.address ?? me?.address, "주소 정보 없음");
-  const marketContact = formatEmpty(content?.contact ?? me?.phone, "연락처 정보 없음");
+  const displayName = formatEmpty(
+    myPage?.profile?.name ?? me?.name ?? user?.displayName,
+    "상인회",
+  );
+  const displayEmail = formatEmpty(
+    myPage?.profile?.email ?? me?.email ?? user?.email,
+    "이메일 정보 없음",
+  );
+  const marketName = formatEmpty(
+    content?.marketName ?? myPage?.market?.name ?? me?.marketName,
+    "시장 이름",
+  );
+  const marketAddress = formatEmpty(
+    content?.address ?? myPage?.market?.address ?? me?.address,
+    "주소 정보 없음",
+  );
+  const marketContact = formatEmpty(
+    content?.contact ?? myPage?.market?.contact ?? me?.phone,
+    "연락처 정보 없음",
+  );
+  const marketOperatingHours = formatOperatingHours(myPage?.market?.operatingHours);
   const marketImage = getMarketImage(content);
   const canvasHeight = activeView === "website" ? "780px" : activeView === "profile" ? "870px" : "1370px";
   const canvasStyle = {
@@ -210,7 +238,14 @@ export default function MyPage() {
 
             <h3 className={styles.figmaProfileTitle}>상인회 프로필</h3>
             <article className={styles.figmaProfileCard}>
-              <div className={styles.figmaAvatar} aria-hidden="true" />
+              <div className={styles.figmaAvatar}>
+                <Image
+                  alt="DIGI-MON 상인회 기본 프로필"
+                  fill
+                  sizes="123px"
+                  src="/images/onboarding/market-illustration.png"
+                />
+              </div>
               <strong>{displayName} 님</strong>
               <p>이메일 : {displayEmail}</p>
               <Link className={styles.figmaProfileButton} href="/mypage/association-edit">
@@ -230,7 +265,7 @@ export default function MyPage() {
                 <b>{marketName}</b>
                 <p>주소 | {marketAddress}</p>
                 <p>연락처 | {marketContact}</p>
-                <p>영업시간 | 운영 시간 정보 없음</p>
+                <p>영업시간 | {marketOperatingHours}</p>
               </div>
               <Link className={styles.figmaMarketButton} href="/mypage/market-info-edit">
                 시장 상세 정보 수정하기

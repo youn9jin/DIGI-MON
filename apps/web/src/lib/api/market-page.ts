@@ -91,6 +91,7 @@ export interface UpdateMarketInfoRequest {
     weekday?: string | null;
     weekend?: string | null;
   } | null;
+  targetCustomers?: string | null;
   contact?: string | null;
 }
 
@@ -104,6 +105,7 @@ export interface UpdateMarketInfoResponse {
     weekday?: string | null;
     weekend?: string | null;
   } | null;
+  targetCustomers?: string | null;
   contact?: string | null;
   message?: string;
 }

@@ -12,8 +12,20 @@ import {
   type UpdateMarketInfoRequest,
   updateMarketInfo,
 } from "@/lib/api/market-page";
-import { deleteMe, getMe, type MeResponse } from "@/lib/api/me";
+import {
+  deleteMe,
+  getMe,
+  getMyPage,
+  type MeResponse,
+  type MyPageResponse,
+} from "@/lib/api/me";
 import { auth } from "@/lib/firebase";
+import {
+  joinTimeRange,
+  parseOperatingHours,
+  splitMarketAddress,
+  splitTimeRange,
+} from "@/lib/market-info";
 import styles from "../mypage.module.css";
 
 const marketTypes = ["전통시장", "상점가", "복합시장"] as const;
@@ -31,47 +43,72 @@ type FormState = {
   detailAddress: string;
   marketType: string;
   storeRange: string;
-  weekdayHours: string;
-  weekendHours: string;
+  weekdayOpenHour: string;
+  weekdayOpenMinute: string;
+  weekdayCloseHour: string;
+  weekdayCloseMinute: string;
+  weekendOpenHour: string;
+  weekendOpenMinute: string;
+  weekendCloseHour: string;
+  weekendCloseMinute: string;
   sundayClosed: boolean;
   mainVisitors: string;
   contact: string;
 };
 
+function getStoreRange(storeCount: number): string {
+  if (storeCount >= 50) return "50개 이상";
+  if (storeCount >= 40) return "40개 이상 50개 미만";
+  if (storeCount >= 30) return "30개 이상 40개 미만";
+  if (storeCount >= 20) return "20개 이상 30개 미만";
+  return "10개 이상 20개 미만";
+}
+
 function createInitialForm(
   me: MeResponse | null,
   content: MarketPageContentResponse | null,
+  myPage: MyPageResponse | null,
 ): FormState {
-  const address = content?.address ?? me?.address ?? "";
-  const storeCount = content?.stores?.length ?? 0;
+  const address = content?.address ?? myPage?.market?.address ?? me?.address ?? "";
+  const { roadAddress, detailAddress } = splitMarketAddress(address);
+  const operatingHours = parseOperatingHours(myPage?.market?.operatingHours);
+  const weekday = splitTimeRange(operatingHours.weekday);
+  const weekend = splitTimeRange(operatingHours.weekend);
+  const storeCount = myPage?.storeCount ?? content?.stores?.length ?? 0;
+  const savedStoreRange =
+    typeof myPage?.market?.totalStores === "string" &&
+    storeRanges.includes(myPage.market.totalStores as (typeof storeRanges)[number])
+      ? myPage.market.totalStores
+      : getStoreRange(
+          typeof myPage?.market?.totalStores === "number"
+            ? myPage.market.totalStores
+            : storeCount,
+        );
 
   return {
-    marketName: content?.marketName ?? me?.marketName ?? "",
-    roadAddress: address,
-    detailAddress: "",
-    marketType: "전통시장",
-    storeRange:
-      storeCount >= 50
-        ? "50개 이상"
-        : storeCount >= 40
-          ? "40개 이상 50개 미만"
-          : storeCount >= 30
-            ? "30개 이상 40개 미만"
-            : storeCount >= 20
-              ? "20개 이상 30개 미만"
-              : "10개 이상 20개 미만",
-    weekdayHours: "",
-    weekendHours: "",
-    sundayClosed: false,
-    mainVisitors: "",
-    contact: content?.contact ?? me?.phone ?? "",
+    marketName: content?.marketName ?? myPage?.market?.name ?? me?.marketName ?? "",
+    roadAddress,
+    detailAddress,
+    marketType: myPage?.market?.marketType ?? "전통시장",
+    storeRange: savedStoreRange,
+    weekdayOpenHour: weekday.openHour,
+    weekdayOpenMinute: weekday.openMinute,
+    weekdayCloseHour: weekday.closeHour,
+    weekdayCloseMinute: weekday.closeMinute,
+    weekendOpenHour: weekend.openHour,
+    weekendOpenMinute: weekend.openMinute,
+    weekendCloseHour: weekend.closeHour,
+    weekendCloseMinute: weekend.closeMinute,
+    sundayClosed: Boolean(operatingHours.weekday && !operatingHours.weekend),
+    mainVisitors: myPage?.market?.targetCustomers ?? "",
+    contact: content?.contact ?? myPage?.market?.contact ?? me?.phone ?? "",
   };
 }
 
 export default function MarketInfoEditPage() {
   const router = useRouter();
   const [me, setMe] = useState<MeResponse | null>(null);
-  const [form, setForm] = useState<FormState>(() => createInitialForm(null, null));
+  const [form, setForm] = useState<FormState>(() => createInitialForm(null, null, null));
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
@@ -93,7 +130,10 @@ export default function MarketInfoEditPage() {
       }
 
       try {
-        const nextMe = await getMe(currentUser);
+        const [nextMe, nextMyPage] = await Promise.all([
+          getMe(currentUser),
+          getMyPage(currentUser).catch(() => null),
+        ]);
         let nextContent: MarketPageContentResponse | null = null;
 
         if (nextMe.marketId) {
@@ -105,7 +145,7 @@ export default function MarketInfoEditPage() {
         }
 
         setMe(nextMe);
-        setForm(createInitialForm(nextMe, nextContent));
+        setForm(createInitialForm(nextMe, nextContent, nextMyPage));
       } finally {
         setIsLoading(false);
       }
@@ -123,6 +163,21 @@ export default function MarketInfoEditPage() {
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
+  }
+
+  function updateTimeField(
+    key:
+      | "weekdayOpenHour"
+      | "weekdayOpenMinute"
+      | "weekdayCloseHour"
+      | "weekdayCloseMinute"
+      | "weekendOpenHour"
+      | "weekendOpenMinute"
+      | "weekendCloseHour"
+      | "weekendCloseMinute",
+    value: string,
+  ) {
+    updateField(key, value.replace(/\D/g, "").slice(0, 2));
   }
 
   async function handleLogout() {
@@ -157,15 +212,41 @@ export default function MarketInfoEditPage() {
     const address = [form.roadAddress.trim(), form.detailAddress.trim()]
       .filter(Boolean)
       .join(" ");
+    const weekdayHours = joinTimeRange({
+      openHour: form.weekdayOpenHour,
+      openMinute: form.weekdayOpenMinute,
+      closeHour: form.weekdayCloseHour,
+      closeMinute: form.weekdayCloseMinute,
+    });
+    const weekendHours = form.sundayClosed
+      ? null
+      : joinTimeRange({
+          openHour: form.weekendOpenHour,
+          openMinute: form.weekendOpenMinute,
+          closeHour: form.weekendCloseHour,
+          closeMinute: form.weekendCloseMinute,
+        });
+
+    if (!weekdayHours) {
+      setSaveMessage("평일 운영 시간을 모두 입력해주세요.");
+      return;
+    }
+
+    if (!form.sundayClosed && !weekendHours) {
+      setSaveMessage("주말 운영 시간을 모두 입력하거나 일요일 휴무를 선택해주세요.");
+      return;
+    }
+
     const payload: UpdateMarketInfoRequest = {
       name: form.marketName.trim() || null,
       address: address || null,
       marketType: form.marketType || null,
       totalStores: form.storeRange || null,
       operatingHours: {
-        weekday: form.weekdayHours.trim() || null,
-        weekend: form.sundayClosed ? null : form.weekendHours.trim() || null,
+        weekday: weekdayHours,
+        weekend: weekendHours,
       },
+      targetCustomers: form.mainVisitors.trim() || null,
       contact: contact || null,
     };
 
@@ -324,25 +405,51 @@ export default function MarketInfoEditPage() {
           <input
             className={styles.editFigmaTimeInput}
             style={{ left: 518, top: 1973 }}
-            value={form.weekdayHours}
-            onChange={(event) => updateField("weekdayHours", event.target.value)}
-            placeholder="(입력된 운영 시간)"
+            value={form.weekdayOpenHour}
+            onChange={(event) => updateTimeField("weekdayOpenHour", event.target.value)}
+            placeholder="09"
+            inputMode="numeric"
+            maxLength={2}
           />
           <span className={styles.editFigmaTimeText} style={{ left: 733, top: 1982 }}>
             시
           </span>
-          <input className={styles.editFigmaTimeInput} style={{ left: 767, top: 1973 }} />
+          <input
+            className={styles.editFigmaTimeInput}
+            style={{ left: 767, top: 1973 }}
+            value={form.weekdayOpenMinute}
+            onChange={(event) => updateTimeField("weekdayOpenMinute", event.target.value)}
+            placeholder="00"
+            inputMode="numeric"
+            maxLength={2}
+          />
           <span className={styles.editFigmaTimeText} style={{ left: 982, top: 1982 }}>
             분
           </span>
           <span className={styles.editFigmaTimeText} style={{ left: 1016, top: 1982 }}>
             부터
           </span>
-          <input className={styles.editFigmaTimeInput} style={{ left: 1074, top: 1973 }} />
+          <input
+            className={styles.editFigmaTimeInput}
+            style={{ left: 1074, top: 1973 }}
+            value={form.weekdayCloseHour}
+            onChange={(event) => updateTimeField("weekdayCloseHour", event.target.value)}
+            placeholder="18"
+            inputMode="numeric"
+            maxLength={2}
+          />
           <span className={styles.editFigmaTimeText} style={{ left: 1289, top: 1982 }}>
             시
           </span>
-          <input className={styles.editFigmaTimeInput} style={{ left: 1323, top: 1973 }} />
+          <input
+            className={styles.editFigmaTimeInput}
+            style={{ left: 1323, top: 1973 }}
+            value={form.weekdayCloseMinute}
+            onChange={(event) => updateTimeField("weekdayCloseMinute", event.target.value)}
+            placeholder="00"
+            inputMode="numeric"
+            maxLength={2}
+          />
           <span className={styles.editFigmaTimeText} style={{ left: 1538, top: 1982 }}>
             분
           </span>
@@ -356,24 +463,55 @@ export default function MarketInfoEditPage() {
           <input
             className={styles.editFigmaTimeInput}
             style={{ left: 518, top: 2118 }}
-            value={form.weekendHours}
-            onChange={(event) => updateField("weekendHours", event.target.value)}
+            value={form.weekendOpenHour}
+            onChange={(event) => updateTimeField("weekendOpenHour", event.target.value)}
+            placeholder="09"
+            inputMode="numeric"
+            maxLength={2}
+            disabled={form.sundayClosed}
           />
           <span className={styles.editFigmaTimeText} style={{ left: 733, top: 2127 }}>
             시
           </span>
-          <input className={styles.editFigmaTimeInput} style={{ left: 767, top: 2118 }} />
+          <input
+            className={styles.editFigmaTimeInput}
+            style={{ left: 767, top: 2118 }}
+            value={form.weekendOpenMinute}
+            onChange={(event) => updateTimeField("weekendOpenMinute", event.target.value)}
+            placeholder="00"
+            inputMode="numeric"
+            maxLength={2}
+            disabled={form.sundayClosed}
+          />
           <span className={styles.editFigmaTimeText} style={{ left: 982, top: 2127 }}>
             분
           </span>
           <span className={styles.editFigmaTimeText} style={{ left: 1016, top: 2127 }}>
             부터
           </span>
-          <input className={styles.editFigmaTimeInput} style={{ left: 1074, top: 2118 }} />
+          <input
+            className={styles.editFigmaTimeInput}
+            style={{ left: 1074, top: 2118 }}
+            value={form.weekendCloseHour}
+            onChange={(event) => updateTimeField("weekendCloseHour", event.target.value)}
+            placeholder="18"
+            inputMode="numeric"
+            maxLength={2}
+            disabled={form.sundayClosed}
+          />
           <span className={styles.editFigmaTimeText} style={{ left: 1289, top: 2127 }}>
             시
           </span>
-          <input className={styles.editFigmaTimeInput} style={{ left: 1323, top: 2118 }} />
+          <input
+            className={styles.editFigmaTimeInput}
+            style={{ left: 1323, top: 2118 }}
+            value={form.weekendCloseMinute}
+            onChange={(event) => updateTimeField("weekendCloseMinute", event.target.value)}
+            placeholder="00"
+            inputMode="numeric"
+            maxLength={2}
+            disabled={form.sundayClosed}
+          />
           <span className={styles.editFigmaTimeText} style={{ left: 1538, top: 2127 }}>
             분
           </span>

@@ -44,6 +44,39 @@ export interface AssociationInfoResponse {
   managerTitle?: string | null;
 }
 
+export interface MyPageMarketResponse {
+  marketId?: number | string;
+  name?: string | null;
+  address?: string | null;
+  marketType?: string | null;
+  mainCategories?: string | null;
+  totalStores?: string | number | null;
+  operatingHours?: unknown;
+  targetCustomers?: string | null;
+  contact?: string | null;
+  description?: string | null;
+}
+
+export interface MyPageResponse {
+  profile?: {
+    id?: number | string;
+    email?: string | null;
+    name?: string | null;
+    phone?: string | null;
+    role?: string | null;
+  } | null;
+  market?: MyPageMarketResponse | null;
+  marketPage?: {
+    pageId?: number | string;
+    templateType?: string | null;
+    heroDescription?: string | null;
+    isPublished?: boolean | null;
+  } | null;
+  storeCount?: number;
+  contentCount?: number;
+  missing?: string[];
+}
+
 export type WebsiteEntryPath = "/dashboard" | "/onboarding" | "/templates";
 
 function unwrapMeResponse(body: unknown): MeResponse {
@@ -78,6 +111,36 @@ export async function getMe(user: User): Promise<MeResponse> {
   }
 
   return unwrapMeResponse(body);
+}
+
+export async function getMyPage(user: User): Promise<MyPageResponse> {
+  const idToken = await user.getIdToken();
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const response = await fetch(`${baseUrl}/api/mypage`, {
+    headers: { Authorization: `Bearer ${idToken}` },
+  });
+  const body = (await response.json().catch(() => ({}))) as
+    | ApiEnvelope<MyPageResponse>
+    | MyPageResponse;
+
+  if (!response.ok || ("success" in body && body.success === false)) {
+    const message =
+      "error" in body && body.error?.message
+        ? body.error.message
+        : "마이페이지 정보를 불러오지 못했습니다.";
+    throw new Error(message);
+  }
+
+  if (
+    body &&
+    typeof body === "object" &&
+    "data" in body &&
+    typeof (body as ApiEnvelope<MyPageResponse>).data === "object"
+  ) {
+    return (body as ApiEnvelope<MyPageResponse>).data ?? {};
+  }
+
+  return (body ?? {}) as MyPageResponse;
 }
 
 export async function deleteMe(user = auth.currentUser): Promise<void> {
