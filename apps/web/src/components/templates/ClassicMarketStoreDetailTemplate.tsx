@@ -29,9 +29,9 @@ export default function ClassicMarketStoreDetailTemplate({
   const mainPhotoUrl = store.storeImageUrls[0] ?? store.productImageUrls[0];
   const detailPhotoUrls = [
     ...store.productImageUrls,
-    ...store.storeImageUrls.slice(mainPhotoUrl ? 1 : 0),
+    ...store.storeImageUrls,
     ...store.menuImageUrls,
-  ].slice(0, 3);
+  ].filter((url) => url !== mainPhotoUrl).slice(0, 3);
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
     const isPublicMarketPage = publicBasePath.startsWith("/markets/");
