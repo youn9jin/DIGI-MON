@@ -81,6 +81,12 @@ public class MarketPageGenerationService {
         try {
             AiGenerateRequest body = self.buildRequest(marketId);
 
+            try {
+                log.info("[FastAPI request] pageId={} body={}", pageId, objectMapper.writeValueAsString(body));
+            } catch (Exception e) {
+                log.warn("request logging failed", e);
+            }
+
             String responseJson = aiWebClient.post()
                     .uri(GENERATE_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
