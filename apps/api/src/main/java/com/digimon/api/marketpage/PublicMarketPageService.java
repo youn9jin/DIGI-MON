@@ -4,13 +4,17 @@ import com.digimon.api.market.Market;
 import com.digimon.api.market.MarketRepository;
 import com.digimon.api.marketpage.dto.AiGenerateResponse;
 import com.digimon.api.marketpage.dto.PublicMarketPageResponse;
+import com.digimon.api.store.Store;
+import com.digimon.api.store.StoreRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * GET /api/market/{marketId} 공개 시장 페이지 조회 서비스.
@@ -25,15 +29,18 @@ public class PublicMarketPageService {
     private final MarketRepository marketRepository;
     private final MarketPageRepository marketPageRepository;
     private final MarketPageConfigRepository marketPageConfigRepository;
+    private final StoreRepository storeRepository;
     private final ObjectMapper objectMapper;
 
     public PublicMarketPageService(MarketRepository marketRepository,
                                      MarketPageRepository marketPageRepository,
                                      MarketPageConfigRepository marketPageConfigRepository,
+                                     StoreRepository storeRepository,
                                      ObjectMapper objectMapper) {
         this.marketRepository = marketRepository;
         this.marketPageRepository = marketPageRepository;
         this.marketPageConfigRepository = marketPageConfigRepository;
+        this.storeRepository = storeRepository;
         this.objectMapper = objectMapper;
     }
 
@@ -79,6 +86,21 @@ public class PublicMarketPageService {
         String historyText = configOpt.map(MarketPageConfig::getHistoryText).orElse(null);
         String directionsText = configOpt.map(MarketPageConfig::getDirectionsText).orElse(null);
 
+        List<Store> stores = storeRepository.findByMarketId(marketId);
+        List<PublicMarketPageResponse.StoreDto> storeDtos = stores.stream()
+                .map(s -> PublicMarketPageResponse.StoreDto.builder()
+                        .storeId(s.getId())
+                        .name(s.getName())
+                        .category(s.getCategory())
+                        .items(s.getItems())
+                        .operatingHours(s.getOperatingHours())
+                        .description(s.getDescription())
+                        .storeImageUrls(s.getStoreImageUrls() != null ? s.getStoreImageUrls() : new ArrayList<>())
+                        .menuImageUrls(s.getMenuImageUrls() != null ? s.getMenuImageUrls() : new ArrayList<>())
+                        .productImageUrls(s.getProductImageUrls() != null ? s.getProductImageUrls() : new ArrayList<>())
+                        .build())
+                .collect(Collectors.toList());
+
         // 5) 섹션 필터링 없이 파싱 결과 전체 반환 (렌더링 여부는 프론트가 selectedSections 로 결정)
         return PublicMarketPageResponse.builder()
                 .pageId(page.getId())
@@ -99,6 +121,7 @@ public class PublicMarketPageService {
                 .features(toFeatureDtos(generated.getFeatures()))
                 .storeHighlights(toStoreHighlightDtos(generated.getStoreHighlights()))
                 .cta(toCtaDto(generated.getCta()))
+                .stores(storeDtos)
                 .build();
     }
 
