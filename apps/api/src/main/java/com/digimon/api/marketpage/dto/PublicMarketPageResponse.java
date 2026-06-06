@@ -41,6 +41,7 @@ public class PublicMarketPageResponse {
     private List<FeatureDto> features;
     private List<StoreHighlightDto> storeHighlights;
     private CtaDto cta;
+    private List<StoreDto> stores;
 
     @Getter
     @NoArgsConstructor
@@ -84,5 +85,19 @@ public class PublicMarketPageResponse {
     @Builder
     public static class CtaDto {
         private String text;
+    }
+
+    @Getter
+    @Builder
+    public static class StoreDto {
+        private Long storeId;
+        private String name;
+        private String category;
+        private String items;
+        private String operatingHours;
+        private String description;
+        private List<String> storeImageUrls;
+        private List<String> menuImageUrls;
+        private List<String> productImageUrls;
     }
 }
