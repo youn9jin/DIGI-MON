@@ -524,6 +524,11 @@
   gap: clamp(36px, 2.14vw, 41px);
 }
 
+.singleMenuImage,
+.menuImages:has(.menuImagePlaceholder) {
+  grid-template-columns: minmax(0, 804px);
+}
+
 .menuImages img {
   width: 100%;
   height: auto;
@@ -537,6 +542,17 @@
   background-color: #f5efe4;
   background-position: center;
   background-size: cover;
+}
+
+.menuImagePlaceholder {
+  display: grid;
+  width: 100%;
+  min-height: 360px;
+  place-items: center;
+  border: 1px solid #ddd4c8;
+  background: #f5efe4;
+  color: #7d746a;
+  font-size: clamp(18px, 1.25vw, 24px);
 }
 
 .signatureSection {

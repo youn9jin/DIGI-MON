@@ -103,11 +103,11 @@ const storeUploadFieldsByTemplate: Record<TemplateType, StoreUploadField[]> = {
       maxFiles: 3,
     },
     {
-      label: "7. 가게 대표 사진 등록하기",
-      placeholder: "메뉴판 사진을 마우스로 끌어와주세요",
-      imageKey: "productImageUrls",
-      slot: "product",
-      maxFiles: 1,
+      label: "7. 가게 메뉴판 사진 등록하기(최대 2개)",
+      placeholder: "메뉴판 사진을 선택하거나 마우스로 끌어와주세요",
+      imageKey: "menuImageUrls",
+      slot: "menu",
+      maxFiles: 2,
     },
   ],
   TEMPLATE_2: [

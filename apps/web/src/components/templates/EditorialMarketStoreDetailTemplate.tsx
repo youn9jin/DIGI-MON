@@ -11,9 +11,6 @@ import styles from "./EditorialMarketTemplate.module.css";
 import { useTemplateLanguage } from "./TemplateLanguageToggle";
 
 const heroImage = "/images/templates/preview/editorial-store-hero.png";
-const menuImage1 = "/images/templates/preview/editorial-menu-1.png";
-const menuImage2 = "/images/templates/preview/editorial-menu-2.png";
-const fallbackMenuImages = [menuImage1, menuImage2];
 
 interface EditorialMarketStoreDetailTemplateProps {
   store: TemplateStore;
@@ -36,7 +33,9 @@ export default function EditorialMarketStoreDetailTemplate({
 }: EditorialMarketStoreDetailTemplateProps) {
   const { t } = useTemplateLanguage();
   const representativeImageUrl = store.storeImageUrls[0] ?? heroImageUrl;
-  const menuImageUrls = store.menuImageUrls.slice(0, 2);
+  const menuImageUrls = Array.from(
+    new Set([...store.menuImageUrls, ...store.productImageUrls]),
+  ).slice(0, 2);
   const signatureImageUrl = store.productImageUrls[0] ?? store.storeImageUrls[0];
 
   return (
@@ -71,31 +70,25 @@ export default function EditorialMarketStoreDetailTemplate({
 
       <section className={styles.menuSection} aria-label="메뉴">
         <h2>MENU</h2>
-        <div className={styles.menuImages}>
-          {[0, 1].map((index) => {
-            const menuImageUrl = menuImageUrls[index];
-
-            if (menuImageUrl) {
-              return (
-                <span
-                  key={menuImageUrl}
-                  className={styles.dynamicMenuImage}
-                  style={{ backgroundImage: `url(${menuImageUrl})` }}
-                  aria-label={`메뉴판 이미지 ${index + 1}`}
-                />
-              );
-            }
-
-            return (
-              <Image
-                key={fallbackMenuImages[index]}
-                alt={`메뉴판 예시 ${index + 1}`}
-                width={804}
-                height={1058}
-                src={fallbackMenuImages[index]}
+        <div
+          className={`${styles.menuImages} ${
+            menuImageUrls.length === 1 ? styles.singleMenuImage : ""
+          }`}
+        >
+          {menuImageUrls.length > 0 ? (
+            menuImageUrls.map((menuImageUrl, index) => (
+              <span
+                key={menuImageUrl}
+                className={styles.dynamicMenuImage}
+                style={{ backgroundImage: `url(${menuImageUrl})` }}
+                aria-label={`메뉴판 이미지 ${index + 1}`}
               />
-            );
-          })}
+            ))
+          ) : (
+            <div className={styles.menuImagePlaceholder}>
+              메뉴판 이미지 준비 중
+            </div>
+          )}
         </div>
       </section>
 
