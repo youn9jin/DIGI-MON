@@ -76,6 +76,7 @@ export default function AssociationEditPage() {
   }, [router]);
 
   const websiteHref = me?.marketId ? `/markets/${me.marketId}` : "/templates";
+  const websiteOpensNewTab = websiteHref.startsWith("/markets/");
   const canvasStyle = {
     "--mypage-edit-scale": scale,
     "--mypage-edit-height": "1440px",
@@ -180,7 +181,12 @@ export default function AssociationEditPage() {
             <Link className={`${styles.figmaSideButton} ${styles.figmaSideActive}`} href="/mypage">
               내 정보
             </Link>
-            <Link className={styles.figmaSideButton} href={websiteHref}>
+            <Link
+              className={styles.figmaSideButton}
+              href={websiteHref}
+              target={websiteOpensNewTab ? "_blank" : undefined}
+              rel={websiteOpensNewTab ? "noopener noreferrer" : undefined}
+            >
               웹사이트 확인
             </Link>
             <button

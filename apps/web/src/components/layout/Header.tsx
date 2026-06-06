@@ -65,6 +65,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
   }, []);
 
   const headerClassName = `${styles.header} ${isScrolled ? styles.scrolledHeader : ""}`;
+  const websiteCheckOpensNewTab = websiteCheckHref.startsWith("/markets/");
 
   if (variant === "builder") {
     const displayName = user?.displayName || user?.email?.split("@")[0] || "사용자";
@@ -92,7 +93,13 @@ export default function Header({ variant = "default" }: HeaderProps) {
               <a href="#">사용방법</a>
               <a href="#">커뮤니티</a>
               <Link href={websiteHref}>웹사이트 관리</Link>
-              <Link href={websiteCheckHref}>웹사이트 확인</Link>
+              <Link
+                href={websiteCheckHref}
+                target={websiteCheckOpensNewTab ? "_blank" : undefined}
+                rel={websiteCheckOpensNewTab ? "noopener noreferrer" : undefined}
+              >
+                웹사이트 확인
+              </Link>
             </nav>
           </div>
 
@@ -141,7 +148,13 @@ export default function Header({ variant = "default" }: HeaderProps) {
               <a href="#">사용방법</a>
               <a href="#">커뮤니티</a>
               <Link href={websiteHref}>웹사이트 관리</Link>
-              <Link href={websiteCheckHref}>웹사이트 확인</Link>
+              <Link
+                href={websiteCheckHref}
+                target={websiteCheckOpensNewTab ? "_blank" : undefined}
+                rel={websiteCheckOpensNewTab ? "noopener noreferrer" : undefined}
+              >
+                웹사이트 확인
+              </Link>
             </nav>
           </div>
 

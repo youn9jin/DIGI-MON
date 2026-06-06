@@ -160,6 +160,7 @@ export default function MarketInfoEditPage() {
   const websiteHref = useMemo(() => {
     return me?.marketId ? `/markets/${me.marketId}` : "/templates";
   }, [me?.marketId]);
+  const websiteOpensNewTab = websiteHref.startsWith("/markets/");
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -288,7 +289,12 @@ export default function MarketInfoEditPage() {
             <Link className={`${styles.figmaSideButton} ${styles.figmaSideActive}`} href="/mypage">
               내 정보
             </Link>
-            <Link className={styles.figmaSideButton} href={websiteHref}>
+            <Link
+              className={styles.figmaSideButton}
+              href={websiteHref}
+              target={websiteOpensNewTab ? "_blank" : undefined}
+              rel={websiteOpensNewTab ? "noopener noreferrer" : undefined}
+            >
               웹사이트 확인
             </Link>
             <button
