@@ -10,6 +10,7 @@ import {
   type MarketPageApiError,
   type MarketPageStatus,
 } from "@/lib/api/market-page";
+import { getGenerationErrorMessage } from "@/lib/generation-error";
 import { getGeneratedMarketPageHref } from "@/lib/market-page-template-data";
 import styles from "./template-generating.module.css";
 
@@ -79,10 +80,7 @@ export default function TemplateGeneratingPage() {
           window.sessionStorage.removeItem(generationInProgressStorageKey);
           setStatus("FAILED");
           setShowCompletionAlert(false);
-          setErrorMessage(
-            result.error ??
-              "AI가 웹페이지 내용을 생성하지 못했습니다. 다시 생성해보세요.",
-          );
+          setErrorMessage(getGenerationErrorMessage(result.error));
         },
         onError: (error) => {
           if (!isMounted) return;
@@ -93,7 +91,7 @@ export default function TemplateGeneratingPage() {
           window.sessionStorage.removeItem(generationInProgressStorageKey);
           setStatus("FAILED");
           setShowCompletionAlert(false);
-          setErrorMessage(error.message);
+          setErrorMessage(getGenerationErrorMessage(error.message));
         },
       });
     }
@@ -147,7 +145,7 @@ export default function TemplateGeneratingPage() {
         window.sessionStorage.removeItem(generationInProgressStorageKey);
         setStatus("FAILED");
         setShowCompletionAlert(false);
-        setErrorMessage(apiError.message ?? "웹페이지 생성 요청에 실패했습니다.");
+        setErrorMessage(getGenerationErrorMessage(apiError.message));
       }
     }
 

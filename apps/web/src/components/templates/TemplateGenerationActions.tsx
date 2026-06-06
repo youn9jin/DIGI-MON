@@ -9,6 +9,7 @@ import {
   type MarketPageApiError,
   type TemplateType,
 } from "@/lib/api/market-page";
+import { getGenerationErrorMessage } from "@/lib/generation-error";
 import { getGeneratedMarketPageHref } from "@/lib/market-page-template-data";
 import styles from "./ClassicMarketTemplate.module.css";
 
@@ -63,7 +64,7 @@ export default function TemplateGenerationActions({
 
       if (result.status === "FAILED") {
         setIsGenerating(false);
-        setFeedbackMessage(result.error ?? "AI 웹페이지 생성에 실패했습니다. 다시 시도해주세요.");
+        setFeedbackMessage(getGenerationErrorMessage(result.error));
         return;
       }
 
@@ -71,7 +72,7 @@ export default function TemplateGenerationActions({
     } catch (error) {
       setIsGenerating(false);
       const apiError = error as MarketPageApiError;
-      setFeedbackMessage(apiError.message ?? "생성 상태 확인에 실패했습니다.");
+      setFeedbackMessage(getGenerationErrorMessage(apiError.message));
     }
   }
 
@@ -86,7 +87,7 @@ export default function TemplateGenerationActions({
     } catch (error) {
       setIsGenerating(false);
       const apiError = error as MarketPageApiError;
-      setFeedbackMessage(apiError.message ?? "웹페이지 생성 요청에 실패했습니다.");
+      setFeedbackMessage(getGenerationErrorMessage(apiError.message));
     }
   }
 

@@ -555,6 +555,7 @@ export default function TemplateInfoPage() {
         introImageUrls,
       });
       window.sessionStorage.removeItem(generatedPageIdStorageKey);
+      window.sessionStorage.removeItem("generated_market_public_market_id");
       window.sessionStorage.setItem(generationVersionStorageKey, String(Date.now()));
       window.sessionStorage.setItem(generationInProgressStorageKey, "true");
       router.push("/templates/generating");
