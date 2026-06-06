@@ -150,9 +150,17 @@ export interface MarketPageContentResponse {
     contact?: string | null;
     description?: string | null;
     highlight?: string | null;
-    storeImageUrls?: string[] | null;
-    menuImageUrls?: string[] | null;
-    productImageUrls?: string[] | null;
+    imageUrl?: string | null;
+    storeImageUrl?: string | null;
+    menuImageUrl?: string | null;
+    productImageUrl?: string | null;
+    imageUrls?: unknown;
+    storeImages?: unknown;
+    menuImages?: unknown;
+    productImages?: unknown;
+    storeImageUrls?: unknown;
+    menuImageUrls?: unknown;
+    productImageUrls?: unknown;
   }[] | null;
   cta?: {
     text?: string;

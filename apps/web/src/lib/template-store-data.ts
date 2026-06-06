@@ -27,9 +27,18 @@ export interface PublicStoreLike {
   contact?: string | null;
   description?: string | null;
   highlight?: string | null;
-  storeImageUrls?: string[] | null;
-  menuImageUrls?: string[] | null;
-  productImageUrls?: string[] | null;
+  imageUrl?: string | null;
+  storeImageUrl?: string | null;
+  menuImageUrl?: string | null;
+  productImageUrl?: string | null;
+  images?: unknown;
+  imageUrls?: unknown;
+  storeImages?: unknown;
+  menuImages?: unknown;
+  productImages?: unknown;
+  storeImageUrls?: unknown;
+  menuImageUrls?: unknown;
+  productImageUrls?: unknown;
 }
 
 export function normalizeStoreCategory(category?: string | null): string {
@@ -45,10 +54,26 @@ function firstText(...values: Array<string | null | undefined>): string {
   return values.find((value) => value && value.trim().length > 0)?.trim() ?? "";
 }
 
-function normalizeImageUrls(urls?: string[] | null): string[] {
-  return Array.isArray(urls)
-    ? urls.filter((url): url is string => typeof url === "string" && url.trim().length > 0)
-    : [];
+function normalizeImageUrls(...sources: unknown[]): string[] {
+  const urls = sources.flatMap((source) => {
+    if (typeof source === "string") return [source];
+    if (!Array.isArray(source)) return [];
+
+    return source.flatMap((item) => {
+      if (typeof item === "string") return [item];
+      if (item && typeof item === "object") {
+        const record = item as Record<string, unknown>;
+        return [record.url, record.imageUrl, record.downloadUrl].filter(
+          (value): value is string => typeof value === "string",
+        );
+      }
+      return [];
+    });
+  });
+
+  return Array.from(
+    new Set(urls.map((url) => url.trim()).filter((url) => url.length > 0)),
+  );
 }
 
 export function mapStoreToTemplateStore(
@@ -56,6 +81,7 @@ export function mapStoreToTemplateStore(
   index = 0,
 ): TemplateStore {
   const source = store as StoreSummary & PublicStoreLike & ClassicStore;
+  const sourceRecord = source as unknown as Record<string, unknown>;
   const name = firstText(source.name, source.storeName, `가게이름 ${index + 1}`);
   const description = firstText(source.description, source.highlight, source.intro);
   const menu = firstText(source.items, source.menu, "대표 메뉴 정보 준비 중");
@@ -69,8 +95,36 @@ export function mapStoreToTemplateStore(
     phone: firstText(source.contact, source.phone, "연락처 정보 준비 중"),
     menu,
     description: firstText(description, menu, `${name}의 대표 상품을 소개합니다.`),
-    storeImageUrls: normalizeImageUrls(source.storeImageUrls),
-    menuImageUrls: normalizeImageUrls(source.menuImageUrls),
-    productImageUrls: normalizeImageUrls(source.productImageUrls),
+    storeImageUrls: normalizeImageUrls(
+      source.storeImageUrls,
+      sourceRecord.store_image_urls,
+      source.storeImages,
+      sourceRecord.store_images,
+      source.storeImageUrl,
+      sourceRecord.store_image_url,
+      source.imageUrls,
+      sourceRecord.image_urls,
+      source.images,
+      source.imageUrl,
+      sourceRecord.image_url,
+    ),
+    menuImageUrls: normalizeImageUrls(
+      source.menuImageUrls,
+      sourceRecord.menu_image_urls,
+      source.menuImages,
+      sourceRecord.menu_images,
+      source.menuImageUrl,
+      sourceRecord.menu_image_url,
+    ),
+    productImageUrls: normalizeImageUrls(
+      source.productImageUrls,
+      sourceRecord.product_image_urls,
+      source.productImages,
+      sourceRecord.product_images,
+      source.productImageUrl,
+      sourceRecord.product_image_url,
+      sourceRecord.menu_item_image_urls,
+      sourceRecord.product_urls,
+    ),
   };
 }

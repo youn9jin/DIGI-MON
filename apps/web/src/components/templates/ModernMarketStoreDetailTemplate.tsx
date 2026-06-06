@@ -35,7 +35,10 @@ export default function ModernMarketStoreDetailTemplate({
 }: ModernMarketStoreDetailTemplateProps) {
   const representativeImageUrl = store.storeImageUrls[0] ?? heroImageUrl;
   const menuImageUrls = store.menuImageUrls.slice(0, 2);
-  const foodImageUrls = store.productImageUrls.slice(0, 4);
+  const foodImageUrls = [
+    ...store.productImageUrls,
+    ...store.storeImageUrls.filter((url) => url !== representativeImageUrl),
+  ].slice(0, 4);
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
     const isPublicMarketPage = publicBasePath.startsWith("/markets/");
