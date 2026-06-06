@@ -34,7 +34,8 @@
 }
 
 .header nav a,
-.header nav span {
+.header nav span,
+.header nav button {
   color: #fff;
   font-size: clamp(14px, 1.15vw, 22px);
   font-weight: 400;

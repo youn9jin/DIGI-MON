@@ -4,6 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import TemplateGenerationActions from "./TemplateGenerationActions";
+import TemplateLanguageToggle, {
+  translateStoreCategory,
+  useTemplateLanguage,
+} from "./TemplateLanguageToggle";
 import { classicStores } from "./classicStoreData";
 import styles from "./ModernMarketTemplate.module.css";
 import {
@@ -26,12 +30,6 @@ interface ModernMarketStoresTemplateProps {
 
 const categories = ["농/수산물", "먹거리", "의류", "생활용품", "기타"];
 
-const navItems = [
-  { label: "시장소개", href: "/templates/modern" },
-  { label: "점포 안내", href: "/templates/modern/stores" },
-  { label: "관광 정보", href: "/templates/modern#tour" },
-];
-
 export default function ModernMarketStoresTemplate({
   marketName = "Market Name",
   address = "상세주소 text",
@@ -41,6 +39,7 @@ export default function ModernMarketStoresTemplate({
   previewMode = false,
   publicBasePath,
 }: ModernMarketStoresTemplateProps) {
+  const { language, t } = useTemplateLanguage();
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const sourceStores = useMemo(
     () =>
@@ -72,6 +71,11 @@ export default function ModernMarketStoresTemplate({
     publicBasePath?.startsWith("/markets/")
       ? `${publicBasePath}/stores/${encodeURIComponent(storeId)}`
       : `/templates/modern/stores/${storeId}${previewSuffix}`;
+  const navItems = [
+    { label: t("marketIntro"), href: "/templates/modern" },
+    { label: t("storeGuide"), href: "/templates/modern/stores" },
+    { label: t("tourInfoSpaced"), href: "/templates/modern#tour" },
+  ];
 
   return (
     <main className={`${styles.page} ${styles.storeGuidePage}`}>
@@ -85,7 +89,7 @@ export default function ModernMarketStoresTemplate({
               {item.label}
             </Link>
           ))}
-          <span>EN | KR</span>
+          <TemplateLanguageToggle />
         </nav>
       </header>
 
@@ -107,13 +111,13 @@ export default function ModernMarketStoresTemplate({
         )}
         <div />
         <article>
-          <h1>가게 찾기</h1>
-          <p>가게들을 카테고리 별로 확인해보세요</p>
+          <h1>{t("findStore")}</h1>
+          <p>{t("findStoreDescription")}</p>
         </article>
       </section>
 
       <section className={styles.modernCategorySection} aria-label="카테고리 검색">
-        <h2>CATEGORY</h2>
+        <h2>{language === "en" ? "CATEGORY" : "카테고리"}</h2>
         <div className={styles.modernCategoryList}>
           {categories.map((category) => (
             <button
@@ -122,7 +126,7 @@ export default function ModernMarketStoresTemplate({
               type="button"
               onClick={() => setSelectedCategory(category)}
             >
-              {category}
+              {translateStoreCategory(category, language)}
             </button>
           ))}
         </div>
@@ -135,7 +139,7 @@ export default function ModernMarketStoresTemplate({
             href={getStoreHref(store.id)}
             key={`${store.id}-${index}`}
           >
-            <span>{store.category}</span>
+            <span>{translateStoreCategory(store.category, language)}</span>
             <h3>{store.name}</h3>
             <p>{store.intro}</p>
           </Link>
@@ -144,23 +148,23 @@ export default function ModernMarketStoresTemplate({
 
       <footer className={styles.footer}>
         <nav aria-label="하단 메뉴">
-          <Link href={getHref("/templates/modern#intro")}>시장소개</Link>
-          <Link href={getHref("/templates/modern/stores")}>가게안내</Link>
-          <Link href={getHref("/templates/modern#tour")}>관광정보</Link>
-          <Link href={getHref("/templates/modern#map")}>찾아오시는 길</Link>
+          <Link href={getHref("/templates/modern#intro")}>{t("marketIntro")}</Link>
+          <Link href={getHref("/templates/modern/stores")}>{t("shopGuide")}</Link>
+          <Link href={getHref("/templates/modern#tour")}>{t("tourInfo")}</Link>
+          <Link href={getHref("/templates/modern#map")}>{t("directions")}</Link>
         </nav>
         <div className={styles.footerInfo}>
           <div>
-            <h3>주소</h3>
+            <h3>{t("address")}</h3>
             <p>{address}</p>
           </div>
           <div>
-            <h3>문의</h3>
+            <h3>{t("contact")}</h3>
             <p>TEL : {contact}</p>
             <p>FAX : FAXNUM</p>
           </div>
           <div>
-            <h3>이메일</h3>
+            <h3>{t("email")}</h3>
             <p>이메일1</p>
             <p>이메일2</p>
           </div>

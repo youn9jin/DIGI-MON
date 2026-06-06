@@ -7,6 +7,7 @@ import {
   EditorialHeaderWithBasePath,
 } from "./EditorialMarketStoresTemplate";
 import TemplateGenerationActions from "./TemplateGenerationActions";
+import { useTemplateLanguage } from "./TemplateLanguageToggle";
 import styles from "./EditorialMarketTemplate.module.css";
 
 const heroImage = "/images/templates/preview/editorial-hero.png";
@@ -83,6 +84,7 @@ export default function EditorialMarketTemplate({
   previewMode = false,
   publicBasePath,
 }: EditorialMarketTemplateProps) {
+  const { t } = useTemplateLanguage();
   const content = { ...DEFAULT_DATA, ...data };
   const introImageUrls = content.introImageUrls ?? [];
   const imagePool = [content.heroImageUrl, ...introImageUrls];
@@ -170,7 +172,7 @@ export default function EditorialMarketTemplate({
       </section>
 
       <section className={styles.mapSection} id="map" aria-label="찾아오시는 길">
-        <h2>찾아오시는 길</h2>
+        <h2>{t("directions")}</h2>
         <div className={styles.mapBox}>
           <GoogleMapEmbed address={content.address} label={content.marketName} />
         </div>
@@ -178,13 +180,13 @@ export default function EditorialMarketTemplate({
           <dl className={styles.directionsInfo}>
             {routeText && (
               <div>
-                <dt>빨리오시는 길 :</dt>
+                <dt>{t("fastestRoute")} :</dt>
                 <dd>{routeText}</dd>
               </div>
             )}
             {parkingText && (
               <div>
-                <dt>주차 안내 :</dt>
+                <dt>{t("parking")} :</dt>
                 <dd>{parkingText}</dd>
               </div>
             )}

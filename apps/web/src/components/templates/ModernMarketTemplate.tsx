@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import TemplateGenerationActions from "./TemplateGenerationActions";
+import TemplateLanguageToggle, {
+  useTemplateLanguage,
+} from "./TemplateLanguageToggle";
 import styles from "./ModernMarketTemplate.module.css";
 
 export interface ModernMarketTemplateData {
@@ -39,12 +42,6 @@ const DEFAULT_DATA: ModernMarketTemplateData = {
     "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",
 };
 
-const navItems = [
-  { label: "시장소개", href: "/templates/modern" },
-  { label: "점포 안내", href: "/templates/modern/stores" },
-  { label: "관광 정보", href: "#tour" },
-];
-
 interface ModernMarketTemplateProps {
   data?: Partial<ModernMarketTemplateData>;
   previewMode?: boolean;
@@ -56,6 +53,7 @@ export default function ModernMarketTemplate({
   previewMode = false,
   publicBasePath,
 }: ModernMarketTemplateProps) {
+  const { t } = useTemplateLanguage();
   const content = { ...DEFAULT_DATA, ...data };
   const introImageUrls = content.introImageUrls ?? [];
   const getIntroImageUrl = (index: number) => introImageUrls[index] ?? introImageUrls[0];
@@ -71,6 +69,11 @@ export default function ModernMarketTemplate({
     const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
     return `${publicBasePath}${hash}`;
   };
+  const navItems = [
+    { label: t("marketIntro"), href: "/templates/modern" },
+    { label: t("storeGuide"), href: "/templates/modern/stores" },
+    { label: t("tourInfoSpaced"), href: "#tour" },
+  ];
 
   return (
     <main className={styles.page}>
@@ -84,7 +87,7 @@ export default function ModernMarketTemplate({
               {item.label}
             </Link>
           ))}
-          <span>EN | KR</span>
+          <TemplateLanguageToggle />
         </nav>
       </header>
 
@@ -97,7 +100,7 @@ export default function ModernMarketTemplate({
 
       <section className={styles.introSection} aria-label="시장 소개 상세">
         <div className={styles.sectionTitle}>
-          <h2>시장 소개</h2>
+          <h2>{t("marketIntroSpaced")}</h2>
           <span />
         </div>
 
@@ -154,23 +157,23 @@ export default function ModernMarketTemplate({
 
       <footer className={styles.footer}>
         <nav aria-label="하단 메뉴">
-          <Link href={getHref("/templates/modern#intro")}>시장소개</Link>
-          <Link href={getHref("/templates/modern/stores")}>가게안내</Link>
-          <Link href={getHref("/templates/modern#tour")}>관광정보</Link>
-          <Link href={getHref("/templates/modern#map")}>찾아오시는 길</Link>
+          <Link href={getHref("/templates/modern#intro")}>{t("marketIntro")}</Link>
+          <Link href={getHref("/templates/modern/stores")}>{t("shopGuide")}</Link>
+          <Link href={getHref("/templates/modern#tour")}>{t("tourInfo")}</Link>
+          <Link href={getHref("/templates/modern#map")}>{t("directions")}</Link>
         </nav>
         <div className={styles.footerInfo}>
           <div>
-            <h3>주소</h3>
+            <h3>{t("address")}</h3>
             <p>{content.address}</p>
           </div>
           <div>
-            <h3>문의</h3>
+            <h3>{t("contact")}</h3>
             <p>TEL : {content.contact}</p>
             <p>FAX : FAXNUM</p>
           </div>
           <div>
-            <h3>이메일</h3>
+            <h3>{t("email")}</h3>
             <p>이메일1</p>
             <p>이메일2</p>
           </div>

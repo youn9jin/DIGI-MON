@@ -40,7 +40,8 @@
   gap: clamp(24px, 3.96vw, 76px);
 }
 
-.header nav a {
+.header nav a,
+.header nav button {
   color: #fff;
   font-size: clamp(16px, 1.46vw, 28px);
   font-weight: 500;
@@ -609,7 +610,8 @@
     gap: 14px;
   }
 
-  .header nav a {
+  .header nav a,
+  .header nav button {
     font-size: 15px;
   }
 

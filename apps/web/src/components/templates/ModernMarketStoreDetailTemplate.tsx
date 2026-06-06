@@ -3,6 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import TemplateGenerationActions from "./TemplateGenerationActions";
+import TemplateLanguageToggle, {
+  useTemplateLanguage,
+} from "./TemplateLanguageToggle";
 import styles from "./ModernMarketTemplate.module.css";
 import type { TemplateStore } from "@/lib/template-store-data";
 
@@ -18,12 +21,6 @@ interface ModernMarketStoreDetailTemplateProps {
   publicBasePath?: string;
 }
 
-const navItems = [
-  { label: "시장 소개", href: "/templates/modern" },
-  { label: "점포 안내", href: "/templates/modern/stores" },
-  { label: "관광 정보", href: "/templates/modern#tour" },
-];
-
 export default function ModernMarketStoreDetailTemplate({
   store,
   marketName = "Market Name",
@@ -33,6 +30,7 @@ export default function ModernMarketStoreDetailTemplate({
   previewMode = false,
   publicBasePath,
 }: ModernMarketStoreDetailTemplateProps) {
+  const { t } = useTemplateLanguage();
   const representativeImageUrl = store.storeImageUrls[0] ?? heroImageUrl;
   const menuImageUrls = store.menuImageUrls.slice(0, 2);
   const foodImageUrls = [
@@ -50,6 +48,11 @@ export default function ModernMarketStoreDetailTemplate({
     const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
     return `${publicBasePath}${hash}`;
   };
+  const navItems = [
+    { label: t("marketIntroSpaced"), href: "/templates/modern" },
+    { label: t("storeGuide"), href: "/templates/modern/stores" },
+    { label: t("tourInfoSpaced"), href: "/templates/modern#tour" },
+  ];
 
   return (
     <main className={`${styles.page} ${styles.modernStoreDetailPage}`}>
@@ -63,7 +66,7 @@ export default function ModernMarketStoreDetailTemplate({
               {item.label}
             </Link>
           ))}
-          <span>EN | KR</span>
+          <TemplateLanguageToggle />
         </nav>
       </header>
 
@@ -86,18 +89,18 @@ export default function ModernMarketStoreDetailTemplate({
         <div />
         <article>
           <h1>{store.name}</h1>
-          <p>가게 한줄 소개 : {store.intro}</p>
+          <p>{t("storeIntro")} : {store.intro}</p>
           <ul>
-            <li>영업 시간 : {store.hours}</li>
-            <li>가게 전화번호 : {store.phone}</li>
-            <li>주요 메뉴 : {store.menu}</li>
+            <li>{t("businessHours")} : {store.hours}</li>
+            <li>{t("storePhone")} : {store.phone}</li>
+            <li>{t("mainMenu")} : {store.menu}</li>
           </ul>
         </article>
       </section>
 
       <section className={styles.modernDetailGallery} aria-label="가게 사진">
         <div>
-          <h2>가게 메뉴판 보기</h2>
+          <h2>{t("menuBoard")}</h2>
           <div className={styles.menuBoardGrid}>
             {Array.from({ length: 2 }).map((_, index) => {
               const imageUrl = menuImageUrls[index];
@@ -112,7 +115,7 @@ export default function ModernMarketStoreDetailTemplate({
         </div>
 
         <div>
-          <h2>가게 대표 음식 보기</h2>
+          <h2>{t("featuredFood")}</h2>
           <div className={styles.foodGrid}>
             {Array.from({ length: 4 }).map((_, index) => {
               const imageUrl = foodImageUrls[index];
@@ -129,23 +132,23 @@ export default function ModernMarketStoreDetailTemplate({
 
       <footer className={styles.footer}>
         <nav aria-label="하단 메뉴">
-          <Link href={getHref("/templates/modern#intro")}>시장소개</Link>
-          <Link href={getHref("/templates/modern/stores")}>가게안내</Link>
-          <Link href={getHref("/templates/modern#tour")}>관광정보</Link>
-          <Link href={getHref("/templates/modern#map")}>찾아오시는 길</Link>
+          <Link href={getHref("/templates/modern#intro")}>{t("marketIntro")}</Link>
+          <Link href={getHref("/templates/modern/stores")}>{t("shopGuide")}</Link>
+          <Link href={getHref("/templates/modern#tour")}>{t("tourInfo")}</Link>
+          <Link href={getHref("/templates/modern#map")}>{t("directions")}</Link>
         </nav>
         <div className={styles.footerInfo}>
           <div>
-            <h3>주소</h3>
+            <h3>{t("address")}</h3>
             <p>{address}</p>
           </div>
           <div>
-            <h3>문의</h3>
+            <h3>{t("contact")}</h3>
             <p>TEL : {contact}</p>
             <p>FAX : FAXNUM</p>
           </div>
           <div>
-            <h3>이메일</h3>
+            <h3>{t("email")}</h3>
             <p>이메일1</p>
             <p>이메일2</p>
           </div>

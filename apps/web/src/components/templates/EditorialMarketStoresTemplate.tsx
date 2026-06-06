@@ -4,6 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import TemplateGenerationActions from "./TemplateGenerationActions";
+import TemplateLanguageToggle, {
+  translateStoreCategory,
+  useTemplateLanguage,
+} from "./TemplateLanguageToggle";
 import { classicStores } from "./classicStoreData";
 import {
   getUniqueTemplateStores,
@@ -35,6 +39,7 @@ export default function EditorialMarketStoresTemplate({
   previewMode = false,
   publicBasePath,
 }: EditorialMarketStoresTemplateProps) {
+  const { language, t } = useTemplateLanguage();
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -97,11 +102,11 @@ export default function EditorialMarketStoresTemplate({
         )}
         <div className={styles.heroOverlay} />
         <div className={styles.storeHeroTitle}>
-          <h1>점포 찾기</h1>
+          <h1>{t("findStorePoint")}</h1>
           <span />
         </div>
         <label className={styles.searchBox}>
-          {!searchTerm && <span>찾고싶은 가게 이름을 입력하세요</span>}
+          {!searchTerm && <span>{t("searchStoreName")}</span>}
           <input
             aria-label="가게 이름 검색"
             value={searchTerm}
@@ -112,8 +117,8 @@ export default function EditorialMarketStoresTemplate({
       </section>
 
       <section className={styles.categorySection} aria-label="카테고리">
-        <h2>CATEGORY</h2>
-        <p>카테고리를 선택하시면 해당하는 가게를 확인하실 수 있습니다.</p>
+        <h2>{language === "en" ? "CATEGORY" : "카테고리"}</h2>
+        <p>{t("categoryDescription")}</p>
         <div className={styles.categoryButtons}>
           {categories.map((category) => (
             <button
@@ -122,7 +127,7 @@ export default function EditorialMarketStoresTemplate({
               type="button"
               onClick={() => setSelectedCategory(category)}
             >
-              {category}
+              {translateStoreCategory(category, language)}
             </button>
           ))}
         </div>
@@ -135,7 +140,7 @@ export default function EditorialMarketStoresTemplate({
             href={getStoreHref(store.id)}
             key={store.id}
           >
-            <strong>{store.category}</strong>
+            <strong>{translateStoreCategory(store.category, language)}</strong>
             <span>{store.name}</span>
           </Link>
         ))}
@@ -179,6 +184,7 @@ export function EditorialHeaderWithBasePath({
   marketName: string;
   publicBasePath?: string;
 }) {
+  const { t } = useTemplateLanguage();
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
     if (href.includes("/stores")) {
@@ -190,9 +196,9 @@ export function EditorialHeaderWithBasePath({
     return `${publicBasePath}${hash}`;
   };
   const navItems = [
-    { label: "정보 안내", href: "/templates/editorial#intro" },
-    { label: "점포 안내", href: "/templates/editorial/stores" },
-    { label: "관광 정보", href: "/templates/editorial#culture" },
+    { label: t("information"), href: "/templates/editorial#intro" },
+    { label: t("storeGuide"), href: "/templates/editorial/stores" },
+    { label: t("tourInfoSpaced"), href: "/templates/editorial#culture" },
   ];
 
   return (
@@ -206,6 +212,7 @@ export function EditorialHeaderWithBasePath({
             {item.label}
           </Link>
         ))}
+        <TemplateLanguageToggle />
       </nav>
     </header>
   );
@@ -220,6 +227,7 @@ export function EditorialFooter({
   contact: string;
   publicBasePath?: string;
 }) {
+  const { t } = useTemplateLanguage();
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
     if (href.includes("/stores")) {
@@ -234,23 +242,23 @@ export function EditorialFooter({
   return (
     <footer className={styles.footer}>
       <nav aria-label="하단 메뉴">
-        <Link href={getHref("/templates/editorial#intro")}>시장소개</Link>
-        <Link href={getHref("/templates/editorial/stores")}>가게안내</Link>
-        <Link href={getHref("/templates/editorial#culture")}>관광정보</Link>
-        <Link href={getHref("/templates/editorial#map")}>찾아오시는 길</Link>
+        <Link href={getHref("/templates/editorial#intro")}>{t("marketIntro")}</Link>
+        <Link href={getHref("/templates/editorial/stores")}>{t("shopGuide")}</Link>
+        <Link href={getHref("/templates/editorial#culture")}>{t("tourInfo")}</Link>
+        <Link href={getHref("/templates/editorial#map")}>{t("directions")}</Link>
       </nav>
       <div className={styles.footerInfo}>
         <div>
-          <h3>주소</h3>
+          <h3>{t("address")}</h3>
           <p>{address}</p>
         </div>
         <div>
-          <h3>문의</h3>
+          <h3>{t("contact")}</h3>
           <p>TEL : {contact}</p>
           <p>FAX : FAXNUM</p>
         </div>
         <div>
-          <h3>이메일</h3>
+          <h3>{t("email")}</h3>
           <p>이메일1</p>
           <p>이메일2</p>
         </div>

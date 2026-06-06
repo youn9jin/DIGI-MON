@@ -8,6 +8,7 @@ import {
   EditorialHeader,
 } from "./EditorialMarketStoresTemplate";
 import styles from "./EditorialMarketTemplate.module.css";
+import { useTemplateLanguage } from "./TemplateLanguageToggle";
 
 const heroImage = "/images/templates/preview/editorial-store-hero.png";
 const menuImage1 = "/images/templates/preview/editorial-menu-1.png";
@@ -33,6 +34,7 @@ export default function EditorialMarketStoreDetailTemplate({
   previewMode = false,
   publicBasePath,
 }: EditorialMarketStoreDetailTemplateProps) {
+  const { t } = useTemplateLanguage();
   const representativeImageUrl = store.storeImageUrls[0] ?? heroImageUrl;
   const menuImageUrls = store.menuImageUrls.slice(0, 2);
   const signatureImageUrl = store.productImageUrls[0] ?? store.storeImageUrls[0];
@@ -98,7 +100,7 @@ export default function EditorialMarketStoreDetailTemplate({
       </section>
 
       <section className={styles.signatureSection} aria-label="대표 음식">
-        <h2>대표 음식</h2>
+        <h2>{t("featuredFoodShort")}</h2>
         <div className={styles.signatureGrid}>
           <div
             className={styles.signaturePhoto}
@@ -114,9 +116,9 @@ export default function EditorialMarketStoreDetailTemplate({
           </article>
         </div>
         <ul className={styles.storeInfoList}>
-          <li>영업 시간 : {store.hours}</li>
-          <li>가게 연락처 : {store.phone}</li>
-          <li>가게 위치 : (구글맵 링크)</li>
+          <li>{t("businessHours")} : {store.hours}</li>
+          <li>{t("storeContact")} : {store.phone}</li>
+          <li>{t("storeLocation")} : (Google Maps)</li>
         </ul>
       </section>
 

@@ -3,6 +3,10 @@
 import Link from "next/link";
 import styles from "./ClassicMarketTemplate.module.css";
 import TemplateGenerationActions from "./TemplateGenerationActions";
+import TemplateLanguageToggle, {
+  translateStoreCategory,
+  useTemplateLanguage,
+} from "./TemplateLanguageToggle";
 import type { TemplateStore } from "@/lib/template-store-data";
 
 interface ClassicMarketStoreDetailTemplateProps {
@@ -26,6 +30,7 @@ export default function ClassicMarketStoreDetailTemplate({
   publicBasePath,
   previewMode = false,
 }: ClassicMarketStoreDetailTemplateProps) {
+  const { language, t } = useTemplateLanguage();
   const mainPhotoUrl = store.storeImageUrls[0] ?? store.productImageUrls[0];
   const detailPhotoUrls = [
     ...store.productImageUrls,
@@ -48,15 +53,15 @@ export default function ClassicMarketStoreDetailTemplate({
     <main className={`${styles.page} ${styles.storeDetailPage}`}>
       <header className={styles.topBanner} aria-label="템플릿 메뉴">
         <nav className={styles.bannerNav}>
-          <Link href={getHref("/templates/classic#intro")}>시장소개</Link>
-          <Link href={getHref("/templates/classic/stores")}>가게정보</Link>
-          <Link href={getHref("/templates/classic#tour")}>관광정보</Link>
-          <span>EN/KR</span>
+          <Link href={getHref("/templates/classic#intro")}>{t("marketIntro")}</Link>
+          <Link href={getHref("/templates/classic/stores")}>{t("storeInfo")}</Link>
+          <Link href={getHref("/templates/classic#tour")}>{t("tourInfo")}</Link>
+          <TemplateLanguageToggle />
         </nav>
       </header>
 
       <section className={styles.detailHero} aria-label="가게 대표 정보">
-        <h1>{store.category}</h1>
+        <h1>{translateStoreCategory(store.category, language)}</h1>
         <p>{store.name}</p>
       </section>
 
@@ -73,15 +78,15 @@ export default function ClassicMarketStoreDetailTemplate({
 
         <dl className={styles.storeInfoList}>
           <div>
-            <dt>영업시간</dt>
+            <dt>{t("businessHours")}</dt>
             <dd>{store.hours}</dd>
           </div>
           <div>
-            <dt>가게 연락처</dt>
+            <dt>{t("storeContact")}</dt>
             <dd>{store.phone}</dd>
           </div>
           <div>
-            <dt>주요 메뉴</dt>
+            <dt>{t("mainMenu")}</dt>
             <dd>{store.menu}</dd>
           </div>
         </dl>
@@ -101,24 +106,24 @@ export default function ClassicMarketStoreDetailTemplate({
 
       <footer className={styles.footer}>
         <nav className={styles.footerNav} aria-label="하단 메뉴">
-          <Link href={getHref("/templates/classic#intro")}>시장소개</Link>
-          <Link href={getHref("/templates/classic/stores")}>가게안내</Link>
-          <Link href={getHref("/templates/classic#tour")}>관광정보</Link>
-          <Link href={getHref("/templates/classic#map")}>찾아오시는 길</Link>
+          <Link href={getHref("/templates/classic#intro")}>{t("marketIntro")}</Link>
+          <Link href={getHref("/templates/classic/stores")}>{t("shopGuide")}</Link>
+          <Link href={getHref("/templates/classic#tour")}>{t("tourInfo")}</Link>
+          <Link href={getHref("/templates/classic#map")}>{t("directions")}</Link>
         </nav>
 
         <div className={styles.footerInfo}>
           <div>
-            <h3>주소</h3>
+            <h3>{t("address")}</h3>
             <p>{address}</p>
           </div>
           <div>
-            <h3>문의</h3>
+            <h3>{t("contact")}</h3>
             <p>TEL : {contact}</p>
             <p>FAX : {fax}</p>
           </div>
           <div>
-            <h3>이메일</h3>
+            <h3>{t("email")}</h3>
             <p>{emailPrimary}</p>
             <p>{emailSecondary}</p>
           </div>
