@@ -79,7 +79,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
                 <div className={styles.logoMark}>
                   <Image
                     src="/images/onboarding/market-illustration.png"
-                    alt="DIGI-MON"
+                    alt="WithOn"
                     width={283}
                     height={286}
                     priority
@@ -134,7 +134,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
                 <div className={styles.logoMark}>
                   <Image
                     src="/images/onboarding/market-illustration.png"
-                    alt="DIGI-MON"
+                    alt="WithOn"
                     width={283}
                     height={286}
                     priority
@@ -183,7 +183,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
               <div className={styles.logoMark}>
                 <Image
                   src="/images/onboarding/market-illustration.png"
-                  alt="DIGI-MON"
+                  alt="WithOn"
                   width={283}
                   height={286}
                   priority
