@@ -11,19 +11,28 @@ import styles from "./landing.module.css";
 
 export default function LandingPage() {
   const [ctaHref, setCtaHref] = useState<string>("/intro");
+  const [isAuthReady, setIsAuthReady] = useState(false);
+  const [hasWebsite, setHasWebsite] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (!user) {
         setCtaHref("/intro");
+        setHasWebsite(false);
+        setIsAuthReady(true);
         return;
       }
 
       try {
         const me = await getMe(user);
-        setCtaHref(await getWebsiteEntryPath(me));
+        const entryPath = await getWebsiteEntryPath(me);
+        setCtaHref(entryPath);
+        setHasWebsite(entryPath === "/dashboard");
       } catch {
         setCtaHref("/onboarding");
+        setHasWebsite(false);
+      } finally {
+        setIsAuthReady(true);
       }
     });
 
@@ -48,9 +57,13 @@ export default function LandingPage() {
         </div>
 
         {/* CTA 버튼 */}
-        <Link href={ctaHref} className={styles.heroCtaButton}>
-          우리 시장 맞춤 웹사이트 만들러 가기
-        </Link>
+        {isAuthReady && (
+          <Link href={ctaHref} className={styles.heroCtaButton}>
+            {hasWebsite
+              ? "우리 시장 맞춤 웹사이트 관리하러 가기"
+              : "우리 시장 맞춤 웹사이트 만들러 가기"}
+          </Link>
+        )}
 
         {/* 하단 chevron */}
         <div className={styles.scrollArrow} aria-hidden="true">
