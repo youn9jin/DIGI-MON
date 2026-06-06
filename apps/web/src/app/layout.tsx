@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DIGI-MON",
-  description: "DIGI-MON frontend",
+  title: "WithOn",
+  description: "WithOn 전통시장 웹사이트",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

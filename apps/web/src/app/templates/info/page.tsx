@@ -653,12 +653,12 @@ export default function TemplateInfoPage() {
             </div>
             <div className={styles.uploadGuide}>
               <p className={styles.uploadHint}>
-                DIGI-MON 공식 양식 파일을 사용해주세요. category는 농수산물/먹거리/의류/생활용품/기타 중 하나로 입력해야 하며, 해당하지 않는 경우 자동으로 기타로 분류됩니다.
+                WithOn 공식 양식 파일을 사용해주세요. category는 농수산물/먹거리/의류/생활용품/기타 중 하나로 입력해야 하며, 해당하지 않는 경우 자동으로 기타로 분류됩니다.
               </p>
               <a
                 className={styles.templateDownloadButton}
-                href="/downloads/DIGI-MON_점포등록_공식양식.xlsx"
-                download="DIGI-MON_점포등록_공식양식.xlsx"
+                href="/downloads/WithOn_점포등록_공식양식.xlsx"
+                download="WithOn_점포등록_공식양식.xlsx"
               >
                 양식 파일 다운로드
               </a>

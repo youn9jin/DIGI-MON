@@ -240,7 +240,7 @@ export default function MyPage() {
             <article className={styles.figmaProfileCard}>
               <div className={styles.figmaAvatar}>
                 <Image
-                  alt="DIGI-MON 상인회 기본 프로필"
+                  alt="WithOn 상인회 기본 프로필"
                   fill
                   sizes="123px"
                   src="/images/mypage/default-profile.svg"

@@ -26,7 +26,7 @@ export default function FindIdPage() {
           <h1 className={styles.cardTitle}>아이디 찾기</h1>
 
           <p style={{ color: "#3b3b3b", fontSize: "clamp(13px, 1.042vw, 20px)", lineHeight: 1.7, marginBottom: "clamp(16px, 1.667vw, 32px)" }}>
-            DIGI-MON은 <strong>이메일 주소</strong>를 아이디로 사용합니다.
+            WithOn은 <strong>이메일 주소</strong>를 아이디로 사용합니다.
             <br />
             회원가입 시 입력한 이메일 주소가 곧 아이디입니다.
           </p>
