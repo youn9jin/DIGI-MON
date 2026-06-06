@@ -1,11 +1,35 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 
 export type TemplateLanguage = "ko" | "en";
 
 const STORAGE_KEY = "digi-mon-template-language";
 const LANGUAGE_EVENT = "digi-mon-template-language-change";
+const GOOGLE_TRANSLATE_ELEMENT_ID = "google_translate_element";
+const GOOGLE_TRANSLATE_SCRIPT_ID = "google-translate-script";
+
+interface GoogleTranslateElementConstructor {
+  new (
+    options: {
+      autoDisplay: boolean;
+      includedLanguages: string;
+      pageLanguage: string;
+    },
+    elementId: string,
+  ): unknown;
+}
+
+declare global {
+  interface Window {
+    google?: {
+      translate?: {
+        TranslateElement?: GoogleTranslateElementConstructor;
+      };
+    };
+    googleTranslateElementInit?: () => void;
+  }
+}
 
 const translations = {
   marketIntro: { ko: "시장소개", en: "About" },
@@ -71,6 +95,48 @@ function getServerLanguageSnapshot(): TemplateLanguage {
   return "ko";
 }
 
+function applyGoogleTranslateLanguage(
+  language: TemplateLanguage,
+  remainingAttempts = 20,
+) {
+  const languageSelect = document.querySelector<HTMLSelectElement>(".goog-te-combo");
+
+  if (!languageSelect) {
+    if (remainingAttempts > 0) {
+      window.setTimeout(
+        () => applyGoogleTranslateLanguage(language, remainingAttempts - 1),
+        150,
+      );
+    }
+    return;
+  }
+
+  if (languageSelect.value === language) return;
+
+  languageSelect.value = language;
+  languageSelect.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+function initializeGoogleTranslate() {
+  const TranslateElement = window.google?.translate?.TranslateElement;
+  const container = document.getElementById(GOOGLE_TRANSLATE_ELEMENT_ID);
+
+  if (!TranslateElement || !container || container.childElementCount > 0) {
+    return;
+  }
+
+  new TranslateElement(
+    {
+      autoDisplay: false,
+      includedLanguages: "ko,en",
+      pageLanguage: "ko",
+    },
+    GOOGLE_TRANSLATE_ELEMENT_ID,
+  );
+
+  applyGoogleTranslateLanguage(getLanguageSnapshot());
+}
+
 export function useTemplateLanguage(): {
   language: TemplateLanguage;
   t: (key: TemplateTranslationKey) => string;
@@ -125,22 +191,73 @@ export function translateStoreCategory(
 export default function TemplateLanguageToggle() {
   const { language, toggleLanguage } = useTemplateLanguage();
 
+  useEffect(() => {
+    window.googleTranslateElementInit = initializeGoogleTranslate;
+
+    if (window.google?.translate?.TranslateElement) {
+      initializeGoogleTranslate();
+      return;
+    }
+
+    const existingScript = document.getElementById(
+      GOOGLE_TRANSLATE_SCRIPT_ID,
+    ) as HTMLScriptElement | null;
+
+    if (existingScript) {
+      existingScript.addEventListener("load", initializeGoogleTranslate);
+      return () => {
+        existingScript.removeEventListener("load", initializeGoogleTranslate);
+      };
+    }
+
+    const script = document.createElement("script");
+    script.id = GOOGLE_TRANSLATE_SCRIPT_ID;
+    script.async = true;
+    script.src =
+      "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+    document.head.appendChild(script);
+  }, []);
+
+  const handleToggle = useCallback(() => {
+    const nextLanguage = language === "ko" ? "en" : "ko";
+    toggleLanguage();
+    applyGoogleTranslateLanguage(nextLanguage);
+  }, [language, toggleLanguage]);
+
   return (
-    <button
-      aria-label={language === "ko" ? "Switch to English" : "한국어로 전환"}
-      onClick={toggleLanguage}
-      style={{
-        appearance: "none",
-        background: "none",
-        border: 0,
-        color: "inherit",
-        cursor: "pointer",
-        font: "inherit",
-        padding: 0,
-      }}
-      type="button"
-    >
-      EN / KR
-    </button>
+    <>
+      <button
+        aria-label={language === "ko" ? "Switch to English" : "한국어로 전환"}
+        className="skiptranslate"
+        onClick={handleToggle}
+        style={{
+          appearance: "none",
+          background: "none",
+          border: 0,
+          color: "inherit",
+          cursor: "pointer",
+          font: "inherit",
+          padding: 0,
+        }}
+        translate="no"
+        type="button"
+      >
+        EN / KR
+      </button>
+      <span
+        aria-hidden="true"
+        className="skiptranslate"
+        id={GOOGLE_TRANSLATE_ELEMENT_ID}
+        style={{
+          height: 1,
+          left: -9999,
+          overflow: "hidden",
+          position: "fixed",
+          top: 0,
+          width: 1,
+        }}
+        translate="no"
+      />
+    </>
   );
 }
