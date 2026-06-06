@@ -5,7 +5,11 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import TemplateGenerationActions from "./TemplateGenerationActions";
 import { classicStores } from "./classicStoreData";
-import { mapStoreToTemplateStore, type TemplateStore } from "@/lib/template-store-data";
+import {
+  getUniqueTemplateStores,
+  mapStoreToTemplateStore,
+  type TemplateStore,
+} from "@/lib/template-store-data";
 import styles from "./EditorialMarketTemplate.module.css";
 
 const heroImage = "/images/templates/preview/editorial-store-hero.png";
@@ -35,7 +39,13 @@ export default function EditorialMarketStoresTemplate({
   const [searchTerm, setSearchTerm] = useState("");
 
   const sourceStores = useMemo(
-    () => storeItems ?? classicStores.map((store, index) => mapStoreToTemplateStore(store, index)),
+    () =>
+      getUniqueTemplateStores(
+        storeItems ??
+          classicStores.map((store, index) =>
+            mapStoreToTemplateStore(store, index),
+          ),
+      ),
     [storeItems],
   );
   const stores = useMemo(() => {

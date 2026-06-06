@@ -7,6 +7,7 @@ import TemplateGenerationActions from "./TemplateGenerationActions";
 import { classicStores } from "./classicStoreData";
 import styles from "./ModernMarketTemplate.module.css";
 import {
+  getUniqueTemplateStores,
   mapStoreToTemplateStore,
   type TemplateStore,
 } from "@/lib/template-store-data";
@@ -42,7 +43,13 @@ export default function ModernMarketStoresTemplate({
 }: ModernMarketStoresTemplateProps) {
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const sourceStores = useMemo(
-    () => stores ?? classicStores.map((store, index) => mapStoreToTemplateStore(store, index)),
+    () =>
+      getUniqueTemplateStores(
+        stores ??
+          classicStores.map((store, index) =>
+            mapStoreToTemplateStore(store, index),
+          ),
+      ),
     [stores],
   );
   const visibleStores =

@@ -6,6 +6,7 @@ import styles from "./ClassicMarketTemplate.module.css";
 import { classicStores } from "./classicStoreData";
 import TemplateGenerationActions from "./TemplateGenerationActions";
 import {
+  getUniqueTemplateStores,
   mapStoreToTemplateStore,
   type TemplateStore,
 } from "@/lib/template-store-data";
@@ -40,7 +41,13 @@ export default function ClassicMarketIntroTemplate({
   const [selectedCategory, setSelectedCategory] = useState<string>("전체");
   const [searchKeyword, setSearchKeyword] = useState("");
   const sourceStores = useMemo(
-    () => stores ?? classicStores.map((store, index) => mapStoreToTemplateStore(store, index)),
+    () =>
+      getUniqueTemplateStores(
+        stores ??
+          classicStores.map((store, index) =>
+            mapStoreToTemplateStore(store, index),
+          ),
+      ),
     [stores],
   );
   const visibleStores =

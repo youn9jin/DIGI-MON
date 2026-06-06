@@ -13,6 +13,7 @@ import {
 } from "@/lib/api/market-page";
 import { getStores } from "@/lib/api/stores";
 import {
+  getUniqueTemplateStores,
   mapStoreToTemplateStore,
   type TemplateStore,
 } from "@/lib/template-store-data";
@@ -20,20 +21,8 @@ import { getTemplateRouteSlug } from "@/lib/market-page-template-data";
 
 function getFallbackStores(content: MarketPageContentResponse): TemplateStore[] {
   const publicStores = content.stores ?? [];
-  if (publicStores.length > 0) {
-    return publicStores.map((store, index) => mapStoreToTemplateStore(store, index));
-  }
-
-  return (content.storeHighlights ?? []).map((store, index) =>
-    mapStoreToTemplateStore(
-      {
-        id: index + 1,
-        name: store.storeName,
-        description: store.highlight,
-        highlight: store.highlight,
-      },
-      index,
-    ),
+  return getUniqueTemplateStores(
+    publicStores.map((store, index) => mapStoreToTemplateStore(store, index)),
   );
 }
 
@@ -101,12 +90,16 @@ export default function PublicEditorialStoresPage() {
         let nextStores = publicStores;
 
         try {
-          const ownerStores = (await getStores()).stores.map((store, index) =>
-            mapStoreToTemplateStore(store, index),
+          const ownerStores = getUniqueTemplateStores(
+            (await getStores()).stores.map((store, index) =>
+              mapStoreToTemplateStore(store, index),
+            ),
           );
-          nextStores = publicStores.map((store) =>
-            mergeStoreImages(store, findOwnerStore(store, ownerStores)),
-          );
+          if (ownerStores.length > 0) {
+            nextStores = ownerStores.map((store) =>
+              mergeStoreImages(store, findOwnerStore(store, publicStores)),
+            );
+          }
         } catch {
           // Public visitors may not be authenticated. Keep the public API response.
         }

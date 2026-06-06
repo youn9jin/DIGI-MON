@@ -243,7 +243,7 @@ export default function MyPage() {
                   alt="DIGI-MON 상인회 기본 프로필"
                   fill
                   sizes="123px"
-                  src="/images/onboarding/market-illustration.png"
+                  src="/images/mypage/default-profile.svg"
                 />
               </div>
               <strong>{displayName} 님</strong>
