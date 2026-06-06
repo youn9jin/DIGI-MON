@@ -81,26 +81,6 @@ const storeHeaderMap: Record<StoreExcelField, string[]> = {
   description: ["description", "점포소개", "점포 소개", "소개"],
 };
 
-const storeTemplateHeaders: StoreExcelField[] = [
-  "name",
-  "category",
-  "items",
-  "operatingHours",
-  "yearsOfOperation",
-  "contact",
-  "description",
-];
-
-const storeTemplateHeaderLabels: Record<StoreExcelField, string> = {
-  name: "점포명",
-  category: "category",
-  items: "대표메뉴/취급품목",
-  operatingHours: "영업시간",
-  yearsOfOperation: "운영연수",
-  contact: "연락처",
-  description: "점포 소개",
-};
-
 const previewConfigs: Record<TemplateType, Record<PreviewTarget, PreviewConfig>> = {
   TEMPLATE_1: {
     intro: {
@@ -397,24 +377,6 @@ async function parseStoreSheet(file: File): Promise<StoreCreateItem[]> {
   });
 }
 
-function downloadStoreTemplate() {
-  const worksheet = XLSX.utils.aoa_to_sheet([
-    storeTemplateHeaders.map((header) => storeTemplateHeaderLabels[header]),
-    [
-      "예시상회",
-      "먹거리",
-      "떡볶이, 김밥",
-      "09:00-18:00",
-      "10년",
-      "010-0000-0000",
-      "시장 입구에 있는 분식 점포입니다.",
-    ],
-  ]);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "점포등록");
-  XLSX.writeFile(workbook, "DIGI-MON_점포등록_양식.xlsx");
-}
-
 export default function TemplateInfoPage() {
   const router = useRouter();
   const [setupDraft] = useState<SetupDraft>(getSetupDraft);
@@ -693,13 +655,13 @@ export default function TemplateInfoPage() {
               <p className={styles.uploadHint}>
                 DIGI-MON 공식 양식 파일을 사용해주세요. category는 농수산물/먹거리/의류/생활용품/기타 중 하나로 입력해야 하며, 해당하지 않는 경우 자동으로 기타로 분류됩니다.
               </p>
-              <button
+              <a
                 className={styles.templateDownloadButton}
-                type="button"
-                onClick={downloadStoreTemplate}
+                href="/downloads/DIGI-MON_점포등록_공식양식.xlsx"
+                download="DIGI-MON_점포등록_공식양식.xlsx"
               >
                 양식 파일 다운로드
-              </button>
+              </a>
             </div>
             <label className={styles.fileUpload}>
               <input

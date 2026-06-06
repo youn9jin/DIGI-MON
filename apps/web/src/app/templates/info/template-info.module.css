@@ -256,9 +256,12 @@
 }
 
 .templateDownloadButton {
+  display: inline-flex;
   flex: 0 0 auto;
   min-width: 174px;
   height: 42px;
+  align-items: center;
+  justify-content: center;
   border: 0;
   border-radius: 14px;
   background: rgba(255, 242, 197, 0.9);
@@ -268,6 +271,7 @@
   font-family: inherit;
   font-size: 15px;
   font-weight: 500;
+  text-decoration: none;
 }
 
 .fileUpload {
