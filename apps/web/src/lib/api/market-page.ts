@@ -1,5 +1,6 @@
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
+import { GENERATION_STATUS_CONNECTION_MESSAGE } from "@/lib/generation-error";
 
 export type TemplateType = "TEMPLATE_1" | "TEMPLATE_2" | "TEMPLATE_3";
 export type MarketPageStatus = "PENDING" | "DONE" | "FAILED";
@@ -422,8 +423,8 @@ export async function subscribeMarketPageStatus(
     eventSource.close();
     callbacks.onError?.({
       status: 0,
-      message:
-        "생성 상태 연결이 잠시 끊겼어요. 생성은 계속 진행될 수 있으니 웹사이트 관리에서 다시 확인해주세요.",
+      code: "GENERATION_STATUS_CONNECTION_LOST",
+      message: GENERATION_STATUS_CONNECTION_MESSAGE,
     });
   };
 
