@@ -19,6 +19,13 @@ interface TimeValue {
   minute: string;
 }
 
+const DAYS = ["월", "화", "수", "목", "금", "토", "일"] as const;
+type Day = (typeof DAYS)[number];
+
+function isWeekday(day: Day) {
+  return day !== "토" && day !== "일";
+}
+
 function splitTime(value?: string): TimeValue {
   const [hour = "", minute = ""] = value?.split(":") ?? [];
   return { hour, minute };
@@ -75,20 +82,70 @@ export default function OnboardingStepSixPage() {
   const [weekendClose, setWeekendClose] = useState<TimeValue>(() =>
     splitTime(savedData.weekendClose),
   );
-  const [closedSunday, setClosedSunday] = useState(
-    savedData.closedSunday ?? false,
+  const [closedHolidays, setClosedHolidays] = useState(
+    savedData.closedHolidays ?? false,
   );
+  const [selectedDays, setSelectedDays] = useState<Day[]>(() =>
+    savedData.closedSunday ? DAYS.filter((day) => day !== "일") : [...DAYS],
+  );
+  const [activeDay, setActiveDay] = useState<Day>("월");
 
-  const isComplete = [
+  const activeIsWeekday = isWeekday(activeDay);
+  const activeOpen = activeIsWeekday ? weekdayOpen : weekendOpen;
+  const activeClose = activeIsWeekday ? weekdayClose : weekendClose;
+  const hasWeekday = selectedDays.some(isWeekday);
+  const hasWeekend = selectedDays.some((day) => !isWeekday(day));
+  const weekdayIsComplete = [
     weekdayOpen.hour,
     weekdayOpen.minute,
     weekdayClose.hour,
     weekdayClose.minute,
+  ].every(Boolean);
+  const weekendIsComplete = [
     weekendOpen.hour,
     weekendOpen.minute,
     weekendClose.hour,
     weekendClose.minute,
   ].every(Boolean);
+  const isComplete =
+    selectedDays.length > 0 &&
+    (!hasWeekday || weekdayIsComplete) &&
+    (!hasWeekend || weekendIsComplete);
+
+  function updateActiveOpen(next: TimeValue) {
+    if (activeIsWeekday) {
+      setWeekdayOpen(next);
+      if (!weekendOpen.hour && !weekendOpen.minute && hasWeekend) {
+        setWeekendOpen(next);
+      }
+    } else {
+      setWeekendOpen(next);
+      if (!weekdayOpen.hour && !weekdayOpen.minute && hasWeekday) {
+        setWeekdayOpen(next);
+      }
+    }
+  }
+
+  function updateActiveClose(next: TimeValue) {
+    if (activeIsWeekday) {
+      setWeekdayClose(next);
+      if (!weekendClose.hour && !weekendClose.minute && hasWeekend) {
+        setWeekendClose(next);
+      }
+    } else {
+      setWeekendClose(next);
+      if (!weekdayClose.hour && !weekdayClose.minute && hasWeekday) {
+        setWeekdayClose(next);
+      }
+    }
+  }
+
+  function selectDay(day: Day) {
+    setActiveDay(day);
+    setSelectedDays((current) =>
+      current.includes(day) ? current : [...current, day],
+    );
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -100,7 +157,8 @@ export default function OnboardingStepSixPage() {
       weekdayClose: `${weekdayClose.hour}:${weekdayClose.minute}`,
       weekendOpen: `${weekendOpen.hour}:${weekendOpen.minute}`,
       weekendClose: `${weekendClose.hour}:${weekendClose.minute}`,
-      closedSunday,
+      closedSunday: !selectedDays.includes("일"),
+      closedHolidays,
     });
     router.push("/onboarding/step-7");
   }
@@ -135,51 +193,89 @@ export default function OnboardingStepSixPage() {
             <label id="onboarding-question">요일별 시장 운영 시간을 입력해주세요</label>
           </div>
 
-          <fieldset className={`${styles.hoursFieldset} ${styles.weekdayHours}`}>
-            <legend>평일(월 ~ 금)</legend>
+          <div className={styles.daySelector} aria-label="운영 요일 선택">
+            {DAYS.map((day) => {
+              const isSelected = selectedDays.includes(day);
+              const isActive = activeDay === day;
+
+              return (
+                <button
+                  key={day}
+                  type="button"
+                  className={[
+                    styles.dayButton,
+                    isSelected ? styles.dayButtonSelected : "",
+                    isActive ? styles.dayButtonActive : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  aria-pressed={isSelected}
+                  onClick={() => selectDay(day)}
+                >
+                  {day}
+                </button>
+              );
+            })}
+            <button
+              type="button"
+              className={styles.addDayButton}
+              aria-label="모든 요일 선택"
+              onClick={() => {
+                setSelectedDays([...DAYS]);
+                setActiveDay("월");
+              }}
+            >
+              +
+            </button>
+          </div>
+
+          <fieldset className={`${styles.hoursFieldset} ${styles.singleHours}`}>
+            <legend>
+              {activeDay}요일 운영 시간
+            </legend>
             <div className={styles.timeRangeInput}>
               <div className={styles.timePair}>
                 <TimeField
-                  name="weekdayOpenHour"
-                  label="평일 운영 시작 시"
+                  name="openHour"
+                  label={`${activeDay}요일 운영 시작 시`}
                   unit="시"
                   options={HOUR_OPTIONS}
-                  value={weekdayOpen.hour}
+                  value={activeOpen.hour}
                   onChange={(hour) =>
-                    setWeekdayOpen((current) => ({ ...current, hour }))
+                    updateActiveOpen({ ...activeOpen, hour })
                   }
                 />
                 <TimeField
-                  name="weekdayOpenMinute"
-                  label="평일 운영 시작 분"
+                  name="openMinute"
+                  label={`${activeDay}요일 운영 시작 분`}
                   unit="분"
                   options={MINUTE_OPTIONS}
-                  value={weekdayOpen.minute}
+                  value={activeOpen.minute}
                   onChange={(minute) =>
-                    setWeekdayOpen((current) => ({ ...current, minute }))
+                    updateActiveOpen({ ...activeOpen, minute })
                   }
                 />
               </div>
               <span className={styles.rangeWord}>부터</span>
               <div className={styles.timePair}>
                 <TimeField
-                  name="weekdayCloseHour"
-                  label="평일 운영 종료 시"
+                  name="closeHour"
+                  label={`${activeDay}요일 운영 종료 시`}
                   unit="시"
                   options={HOUR_OPTIONS}
-                  value={weekdayClose.hour}
+                  value={activeClose.hour}
                   onChange={(hour) =>
-                    setWeekdayClose((current) => ({ ...current, hour }))
+                    updateActiveClose({ ...activeClose, hour })
                   }
                 />
                 <TimeField
-                  name="weekdayCloseMinute"
-                  label="평일 운영 종료 분"
+                  name="closeMinute"
+                  label={`${activeDay}요일 운영 종료 분`}
                   unit="분"
                   options={MINUTE_OPTIONS}
-                  value={weekdayClose.minute}
+                  value={activeClose.minute}
                   onChange={(minute) =>
-                    setWeekdayClose((current) => ({ ...current, minute }))
+                    updateActiveClose({ ...activeClose, minute })
                   }
                 />
               </div>
@@ -187,66 +283,14 @@ export default function OnboardingStepSixPage() {
             </div>
           </fieldset>
 
-          <fieldset className={`${styles.hoursFieldset} ${styles.weekendHours}`}>
-            <legend>주말(토 ~ 일)</legend>
-            <div className={styles.timeRangeInput}>
-              <div className={styles.timePair}>
-                <TimeField
-                  name="weekendOpenHour"
-                  label="주말 운영 시작 시"
-                  unit="시"
-                  options={HOUR_OPTIONS}
-                  value={weekendOpen.hour}
-                  onChange={(hour) =>
-                    setWeekendOpen((current) => ({ ...current, hour }))
-                  }
-                />
-                <TimeField
-                  name="weekendOpenMinute"
-                  label="주말 운영 시작 분"
-                  unit="분"
-                  options={MINUTE_OPTIONS}
-                  value={weekendOpen.minute}
-                  onChange={(minute) =>
-                    setWeekendOpen((current) => ({ ...current, minute }))
-                  }
-                />
-              </div>
-              <span className={styles.rangeWord}>부터</span>
-              <div className={styles.timePair}>
-                <TimeField
-                  name="weekendCloseHour"
-                  label="주말 운영 종료 시"
-                  unit="시"
-                  options={HOUR_OPTIONS}
-                  value={weekendClose.hour}
-                  onChange={(hour) =>
-                    setWeekendClose((current) => ({ ...current, hour }))
-                  }
-                />
-                <TimeField
-                  name="weekendCloseMinute"
-                  label="주말 운영 종료 분"
-                  unit="분"
-                  options={MINUTE_OPTIONS}
-                  value={weekendClose.minute}
-                  onChange={(minute) =>
-                    setWeekendClose((current) => ({ ...current, minute }))
-                  }
-                />
-              </div>
-              <span className={styles.rangeWord}>까지</span>
-            </div>
-          </fieldset>
-
-          <label className={styles.sundayClosedLabel}>
+          <label className={styles.holidayClosedLabel}>
             <input
               type="checkbox"
-              name="closedSunday"
-              checked={closedSunday}
-              onChange={(event) => setClosedSunday(event.target.checked)}
+              name="closedHolidays"
+              checked={closedHolidays}
+              onChange={(event) => setClosedHolidays(event.target.checked)}
             />
-            <span>일요일에는 시장을 운영하지 않습니다.</span>
+            <span>공휴일에는 시장을 운영하지 않습니다.</span>
           </label>
 
           <button

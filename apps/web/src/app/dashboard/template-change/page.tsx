@@ -33,7 +33,7 @@ const templates = [
     id: "TEMPLATE_3" as const,
     href: "/templates/classic",
     label: "클래식 시장형",
-    image: "/images/dashboard/manage-template-3.png",
+    image: "/images/templates/template-classic-new.jpg",
     thumbClassName: styles.templateThree,
   },
 ];

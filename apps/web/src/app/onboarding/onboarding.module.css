@@ -408,12 +408,48 @@
   line-height: clamp(24px, 2.344vw, 45px);
 }
 
-.weekdayHours {
-  top: clamp(106px, 18.333svh, 198px);
+.daySelector {
+  position: absolute;
+  top: clamp(104px, 18.056svh, 195px);
+  left: clamp(53px, 5.208vw, 100px);
+  display: grid;
+  width: clamp(575px, 56.25vw, 1080px);
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: clamp(7px, 0.729vw, 14px);
 }
 
-.weekendHours {
-  top: clamp(183px, 31.481svh, 340px);
+.dayButton,
+.addDayButton {
+  height: clamp(34px, 3.333vw, 64px);
+  border: 1px solid #aaa;
+  border-radius: clamp(11px, 1.042vw, 20px);
+  background: #fff;
+  color: #3b3b3b;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: clamp(11px, 1.042vw, 20px);
+  font-weight: 500;
+}
+
+.dayButtonSelected {
+  background: #fff7dd;
+}
+
+.dayButtonActive {
+  border: 2px solid #c43d31;
+  color: #000;
+  font-weight: 700;
+}
+
+.addDayButton {
+  border-style: dashed;
+  color: #777;
+  font-size: clamp(16px, 1.563vw, 30px);
+  font-weight: 300;
+}
+
+.singleHours {
+  top: clamp(180px, 31.296svh, 338px);
 }
 
 .timeRangeInput {
@@ -467,9 +503,9 @@
   font-weight: 500;
 }
 
-.sundayClosedLabel {
+.holidayClosedLabel {
   position: absolute;
-  top: clamp(261px, 45.278svh, 489px);
+  top: clamp(252px, 43.796svh, 473px);
   left: clamp(53px, 5.208vw, 100px);
   display: flex;
   align-items: center;
@@ -481,7 +517,7 @@
   line-height: 20px;
 }
 
-.sundayClosedLabel input {
+.holidayClosedLabel input {
   width: clamp(11px, 1.094vw, 21px);
   height: clamp(11px, 1.094vw, 21px);
   margin: 0;
@@ -736,6 +772,25 @@
     width: 100%;
   }
 
+  .daySelector {
+    position: static;
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .dayButton,
+  .addDayButton {
+    height: 42px;
+    border-radius: 12px;
+    font-size: 13px;
+  }
+
+  .addDayButton {
+    font-size: 20px;
+  }
+
   .hoursFieldset legend {
     font-size: 13px;
   }
@@ -771,7 +826,7 @@
     padding-left: 4px;
   }
 
-  .sundayClosedLabel {
+  .holidayClosedLabel {
     position: static;
     font-size: 13px;
     gap: 8px;
