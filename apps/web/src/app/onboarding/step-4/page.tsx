@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { saveOnboardingData } from "@/lib/onboarding-store";
+import { getOnboardingData, saveOnboardingData } from "@/lib/onboarding-store";
 import Header from "@/components/layout/Header";
 import StepIndicator from "@/components/ui/StepIndicator";
 import styles from "../onboarding.module.css";
@@ -12,7 +12,9 @@ const BUSINESS_TYPES = ["농/수산물", "음식점", "의류", "생활용품", 
 
 export default function OnboardingStepFourPage() {
   const router = useRouter();
-  const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(
+    () => getOnboardingData().mainCategories ?? [],
+  );
 
   function toggleBusinessType(type: string) {
     setSelectedTypes((currentTypes) =>

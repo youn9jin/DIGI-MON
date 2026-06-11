@@ -7,7 +7,10 @@ import TemplateLanguageToggle, {
   translateStoreCategory,
   useTemplateLanguage,
 } from "./TemplateLanguageToggle";
-import type { TemplateStore } from "@/lib/template-store-data";
+import {
+  getDefaultStoreImage,
+  type TemplateStore,
+} from "@/lib/template-store-data";
 
 interface ClassicMarketStoreDetailTemplateProps {
   store: TemplateStore;
@@ -31,7 +34,10 @@ export default function ClassicMarketStoreDetailTemplate({
   previewMode = false,
 }: ClassicMarketStoreDetailTemplateProps) {
   const { language, t } = useTemplateLanguage();
-  const mainPhotoUrl = store.storeImageUrls[0] ?? store.productImageUrls[0];
+  const mainPhotoUrl =
+    store.storeImageUrls[0] ??
+    store.productImageUrls[0] ??
+    getDefaultStoreImage(store.category);
   const detailPhotoUrls = [
     ...store.productImageUrls,
     ...store.storeImageUrls,

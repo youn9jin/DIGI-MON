@@ -343,6 +343,12 @@
   background: #e7e6e6;
 }
 
+.storeLogoBox.storeLogoBoxImage {
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
 .storeLogoBox strong {
   color: rgba(0, 0, 0, 0.5);
   font-size: clamp(20px, 2.1vw, 40px);

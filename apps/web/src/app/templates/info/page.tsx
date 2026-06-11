@@ -544,7 +544,7 @@ export default function TemplateInfoPage() {
       <section className={styles.panel} aria-label="시장 정보 입력">
         <header className={styles.stepHeader}>
           <h2>3단계 - 시장 정보 입력하기</h2>
-          <p>웹사이트를 완성하기 위해 정보를 작성해주세요. 글 작성은 AI의 도움을 받을 수 있습니다.</p>
+          <p>웹사이트를 완성하기 위해 정보를 작성해주세요.</p>
         </header>
 
         <form className={styles.form}>
@@ -580,9 +580,6 @@ export default function TemplateInfoPage() {
                   });
                 }}
               />
-              <button className={styles.aiButton} type="button">
-                AI 도움받기
-              </button>
               {field.id === "intro" && (
                 <section className={styles.inlineUploadGroup}>
                   <div className={styles.inlineUploadTitle}>

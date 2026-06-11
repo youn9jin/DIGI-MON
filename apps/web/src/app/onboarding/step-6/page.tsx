@@ -115,6 +115,7 @@ export default function OnboardingStepSixPage() {
     () => getInitialDays(savedData)[0] ?? null,
   );
   const [isDayPickerOpen, setIsDayPickerOpen] = useState(false);
+  const [validationMessage, setValidationMessage] = useState("");
 
   const activeIsWeekday = activeDay ? isWeekday(activeDay) : true;
   const activeOpen = activeIsWeekday ? weekdayOpen : weekendOpen;
@@ -193,8 +194,12 @@ export default function OnboardingStepSixPage() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!isComplete) return;
+    if (!isComplete) {
+      setValidationMessage("운영 요일과 시간을 모두 입력해주세요.");
+      return;
+    }
 
+    setValidationMessage("");
     const fallbackOpen = hasWeekday ? weekdayOpen : weekendOpen;
     const fallbackClose = hasWeekday ? weekdayClose : weekendClose;
 
@@ -368,11 +373,16 @@ export default function OnboardingStepSixPage() {
             <span>공휴일에는 시장을 운영하지 않습니다.</span>
           </label>
 
+          {validationMessage && (
+            <p className={styles.hoursValidationMessage} role="alert">
+              {validationMessage}
+            </p>
+          )}
+
           <button
             type="submit"
             className={`${styles.nextButton} ${styles.hoursNextButton}`}
             data-node-id="148:2248"
-            disabled={!isComplete}
           >
             다음
           </button>

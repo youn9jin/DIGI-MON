@@ -77,8 +77,42 @@ export function normalizeStoreCategory(category?: string | null): string {
   if (!value) return "기타";
   if (value === "농수산물") return "농/수산물";
   if (value === "농/수산물") return value;
+  if (value === "음식점") return "먹거리";
   if (["먹거리", "의류", "생활용품", "기타"].includes(value)) return value;
   return "기타";
+}
+
+const DEFAULT_STORE_IMAGES: Record<string, string> = {
+  "농/수산물": "/images/stores/defaults/agriculture-seafood.jpg",
+  먹거리: "/images/stores/defaults/food.jpg",
+  의류: "/images/stores/defaults/clothing.jpg",
+  생활용품: "/images/stores/defaults/household.jpg",
+  기타: "/images/stores/defaults/other.jpg",
+};
+
+export function getDefaultStoreImage(category?: string | null): string {
+  return DEFAULT_STORE_IMAGES[normalizeStoreCategory(category)];
+}
+
+function isDefaultStoreImage(url: string): boolean {
+  return Object.values(DEFAULT_STORE_IMAGES).includes(url);
+}
+
+export function preferUploadedStoreImages(
+  primaryImages: string[],
+  fallbackImages: string[],
+): string[] {
+  const primaryUploaded = primaryImages.filter(
+    (url) => !isDefaultStoreImage(url),
+  );
+  if (primaryUploaded.length > 0) return primaryUploaded;
+
+  const fallbackUploaded = fallbackImages.filter(
+    (url) => !isDefaultStoreImage(url),
+  );
+  if (fallbackUploaded.length > 0) return fallbackUploaded;
+
+  return primaryImages.length > 0 ? primaryImages : fallbackImages;
 }
 
 function firstText(...values: Array<string | null | undefined>): string {
@@ -116,43 +150,49 @@ export function mapStoreToTemplateStore(
   const name = firstText(source.name, source.storeName, `가게이름 ${index + 1}`);
   const description = firstText(source.description, source.highlight, source.intro);
   const menu = firstText(source.items, source.menu, "대표 메뉴 정보 준비 중");
+  const category = normalizeStoreCategory(source.category);
+  const uploadedStoreImageUrls = normalizeImageUrls(
+    source.storeImageUrls,
+    sourceRecord.store_image_urls,
+    source.storeImages,
+    sourceRecord.store_images,
+    source.storeImageUrl,
+    sourceRecord.store_image_url,
+    sourceRecord.storeImageUrlList,
+    sourceRecord.store_image_url_list,
+    sourceRecord.storeImageList,
+    sourceRecord.store_image_list,
+    sourceRecord.storeImage,
+    sourceRecord.store_image,
+    source.imageUrls,
+    sourceRecord.image_urls,
+    sourceRecord.imageUrlList,
+    sourceRecord.image_url_list,
+    source.images,
+    source.imageUrl,
+    sourceRecord.image_url,
+    source.photoUrls,
+    sourceRecord.photo_urls,
+    source.photoUrl,
+    sourceRecord.photo_url,
+    source.thumbnailUrl,
+    sourceRecord.thumbnail_url,
+  );
+  const storeImageUrls =
+    uploadedStoreImageUrls.length > 0
+      ? uploadedStoreImageUrls
+      : [getDefaultStoreImage(category)];
 
   return {
     id: String(source.storeId ?? source.id ?? index + 1),
-    category: normalizeStoreCategory(source.category),
+    category,
     name,
     intro: firstText(description, menu, `${name} 소개`),
     hours: firstText(source.operatingHours, source.hours, "영업시간 정보 준비 중"),
     phone: firstText(source.contact, source.phone, "연락처 정보 준비 중"),
     menu,
     description: firstText(description, menu, `${name}의 대표 상품을 소개합니다.`),
-    storeImageUrls: normalizeImageUrls(
-      source.storeImageUrls,
-      sourceRecord.store_image_urls,
-      source.storeImages,
-      sourceRecord.store_images,
-      source.storeImageUrl,
-      sourceRecord.store_image_url,
-      sourceRecord.storeImageUrlList,
-      sourceRecord.store_image_url_list,
-      sourceRecord.storeImageList,
-      sourceRecord.store_image_list,
-      sourceRecord.storeImage,
-      sourceRecord.store_image,
-      source.imageUrls,
-      sourceRecord.image_urls,
-      sourceRecord.imageUrlList,
-      sourceRecord.image_url_list,
-      source.images,
-      source.imageUrl,
-      sourceRecord.image_url,
-      source.photoUrls,
-      sourceRecord.photo_urls,
-      source.photoUrl,
-      sourceRecord.photo_url,
-      source.thumbnailUrl,
-      sourceRecord.thumbnail_url,
-    ),
+    storeImageUrls,
     menuImageUrls: normalizeImageUrls(
       source.menuImageUrls,
       sourceRecord.menu_image_urls,

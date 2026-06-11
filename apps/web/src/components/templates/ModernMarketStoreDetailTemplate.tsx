@@ -7,7 +7,10 @@ import TemplateLanguageToggle, {
   useTemplateLanguage,
 } from "./TemplateLanguageToggle";
 import styles from "./ModernMarketTemplate.module.css";
-import type { TemplateStore } from "@/lib/template-store-data";
+import {
+  getDefaultStoreImage,
+  type TemplateStore,
+} from "@/lib/template-store-data";
 
 const imgMarketMainPhoto = "/images/templates/preview/modern-store-detail-hero.png";
 
@@ -31,7 +34,10 @@ export default function ModernMarketStoreDetailTemplate({
   publicBasePath,
 }: ModernMarketStoreDetailTemplateProps) {
   const { t } = useTemplateLanguage();
-  const representativeImageUrl = store.storeImageUrls[0] ?? heroImageUrl;
+  const representativeImageUrl =
+    store.storeImageUrls[0] ??
+    getDefaultStoreImage(store.category) ??
+    heroImageUrl;
   const menuImageUrls = store.menuImageUrls.slice(0, 2);
   const foodImageUrls = [
     ...store.productImageUrls,

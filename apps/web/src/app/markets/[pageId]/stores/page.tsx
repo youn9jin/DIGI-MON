@@ -15,6 +15,7 @@ import { getStores } from "@/lib/api/stores";
 import {
   getUniqueTemplateStores,
   mapStoreToTemplateStore,
+  preferUploadedStoreImages,
   type TemplateStore,
 } from "@/lib/template-store-data";
 import { getTemplateRouteSlug } from "@/lib/market-page-template-data";
@@ -49,10 +50,10 @@ function mergeStoreImages(
 
   return {
     ...publicStore,
-    storeImageUrls:
-      publicStore.storeImageUrls.length > 0
-        ? publicStore.storeImageUrls
-        : ownerStore.storeImageUrls,
+    storeImageUrls: preferUploadedStoreImages(
+      publicStore.storeImageUrls,
+      ownerStore.storeImageUrls,
+    ),
     menuImageUrls:
       publicStore.menuImageUrls.length > 0
         ? publicStore.menuImageUrls
@@ -164,6 +165,7 @@ export default function PublicEditorialStoresPage() {
         return (
           <ClassicMarketIntroTemplate
             marketName={commonProps.marketName}
+            logoImageUrl={content.logoImageUrl ?? undefined}
             address={commonProps.address}
             contact={commonProps.contact}
             stores={stores}
