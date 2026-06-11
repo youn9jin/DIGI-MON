@@ -39,7 +39,7 @@ class StoreInput(BaseModel):
 class GenerateRequest(BaseModel):
     market: MarketInput
     stores: List[StoreInput]
-    template_type: str  # 필수 (TEMPLATE_1 / TEMPLATE_2 등)
+    template_type: str  
     selected_sections: Optional[List[str]] = None  # Optional로 변경
     user_content: Optional[Dict[str, Any]] = None  # Dict[str, Any] 구조로 변경하여 유연화
 
@@ -102,19 +102,12 @@ def build_prompt(request: GenerateRequest) -> str:
     market_data = market.model_dump()
     market_data["total_stores_converted"] = stores_count_str
 
-    tone_guide = {
-        "TEMPLATE_1": "따뜻하고 정겨운 동네 시장 느낌의 친근한 어조",
-        "TEMPLATE_2": "세련되고 현대적인 어조, MZ세대를 타겟으로",
-    }.get(template_type, "친근하고 활기찬 어조")
-
     # 2) 완벽한 프롬프트 서식 형태로 조립
     return f"""
 # 시스템 역할 및 페르소나
 당신은 전통시장 소상공인과 상인회를 위해 홍보 웹페이지 콘텐츠를 제작하는 전문 카피라이터입니다.
 제공된 시장 데이터와 요청 사항을 분석하여 최적의 웹 사이트 카피를 JSON 형태로 생성하세요.
 
-# 톤앤매너 가이드라인
-- 적용할 어조: {tone_guide}
 
 # [핵심] 섹션별 생성 유무 및 작성 규칙
 LLM인 당신은 아래의 '선택된 섹션 목록'에 포함된 항목만 콘텐츠를 생성해야 합니다. 
@@ -124,14 +117,14 @@ LLM인 당신은 아래의 '선택된 섹션 목록'에 포함된 항목만 콘�
 - {", ".join(sections) if sections else "선택된 섹션 없음 (기본 hero, cta만 생성)"}
 
 ## 2. 섹션별 세부 지침
-- **hero** (기본 필수): 시장 이름과 제공된 데이터를 녹여내어 핵심 슬로건(title/subtitle)과 2~3문장의 매력적인 요약 소개글(description)을 작성하세요.
-- **cta** (기본 필수): 방문을 강력히 유도하는 매력적인 마케팅 문구 1개를 작성하세요.
-- **intro**: '선택된 섹션 목록'에 포함된 경우에만 생성합니다. [사용자 초안: {user_content.get("intro_text", "없음")}]이 있다면 이를 기반으로 3~4문장의 자연스러운 소개글로 확장하고, 없다면 시장 정보를 바탕으로 창작하세요.
-- **history 관련 반영**: '선택된 섹션 목록'에 'history'가 포함된 경우, [사용자 초안: {user_content.get("history_text", "없음")}]를 바탕으로 시장의 깊은 역사와 전통이 느껴지도록 hero나 intro의 스토리를 더 서사적이고 풍부하게 다듬어주세요.
-- **features**: '선택된 섹션 목록'에 [intro, directions, tourism] 중 하나라도 포함되면 생성합니다. 아래의 서브 데이터를 조합하여 2~3개의 핵심 특징 카드(title, description)를 리스트 형태로 만드세요.
+- hero (기본 필수): 시장 이름과 제공된 데이터를 녹여내어 핵심 슬로건(title/subtitle)과 2~3문장의 매력적인 요약 소개글(description)을 작성하세요.
+- cta (기본 필수): 방문을 강력히 유도하는 매력적인 마케팅 문구 1개를 작성하세요.
+- intro '선택된 섹션 목록'에 포함된 경우에만 생성합니다. [사용자 초안: {user_content.get("intro_text", "없음")}]이 있다면 이를 기반으로 3~4문장의 자연스러운 소개글로 확장하고, 없다면 시장 정보를 바탕으로 창작하세요.
+- history 관련 반영**: '선택된 섹션 목록'에 'history'가 포함된 경우, [사용자 초안: {user_content.get("history_text", "없음")}]를 바탕으로 시장의 깊은 역사와 전통이 느껴지도록 hero나 intro의 스토리를 더 서사적이고 풍부하게 다듬어주세요.
+- features '선택된 섹션 목록'에 [intro, directions, tourism] 중 하나라도 포함되면 생성합니다. 아래의 서브 데이터를 조합하여 2~3개의 핵심 특징 카드(title, description)를 리스트 형태로 만드세요.
   * directions 포함 시 반영할 정보: {f"교통편 위치 ({user_content.get('directions_text')})" if user_content.get('directions_text') else f"시장 주소({market.address}) 기반 접근성 안내"}
   * tourism 포함 시 반영할 정보: 시장 주변의 명소, 즐길 거리, 혹은 시장 자체의 관광 요소 및 MZ세대 추천 포인트
-- **store_highlights**: '선택된 섹션 목록'에 'stores'가 포함된 경우에만 생성합니다. 제공된 점포 목록을 바탕으로 상점별 '한줄 매력 포인트(highlight)'를 작성하세요.
+- store_highlights '선택된 섹션 목록'에 'stores'가 포함된 경우에만 생성합니다. 제공된 점포 목록을 바탕으로 상점별 '한줄 매력 포인트(highlight)'를 작성하세요.
 
 # 입력 데이터
 ## 1. 시장 기본 정보
@@ -179,10 +172,10 @@ LLM인 당신은 아래의 '선택된 섹션 목록'에 포함된 항목만 콘�
 @app.post("/generate", response_model=GenerateResponse)
 async def generate_content(request: GenerateRequest):
     # 템플릿 타입 사전 검증 (422 에러 대응)
-    if request.template_type not in ["TEMPLATE_1", "TEMPLATE_2"]:
+    if request.template_type not in ["TEMPLATE_1", "TEMPLATE_2", "TEMPLATE_3"]:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="잘못된 template_type입니다. 'TEMPLATE_1' 또는 'TEMPLATE_2'를 사용하세요."
+            detail="잘못된 template_type입니다."
         )
 
     # 프롬프트 생성 및 Gemini 호출
