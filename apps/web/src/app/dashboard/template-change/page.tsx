@@ -33,7 +33,7 @@ const templates = [
     id: "TEMPLATE_3" as const,
     href: "/templates/classic",
     label: "클래식 시장형",
-    image: "/images/templates/template-classic.webp",
+    image: "/images/templates/template-classic-gradient.png",
     thumbClassName: styles.templateThree,
   },
 ];
