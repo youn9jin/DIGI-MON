@@ -286,6 +286,13 @@
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
 }
 
+.threeShotGrid img {
+  display: block;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: center;
+}
+
 /* ════════════════════════════════════════════════════
    모바일 반응형 (≤ 900px)
    ════════════════════════════════════════════════════ */
