@@ -39,6 +39,7 @@ const translations = {
   shopGuide: { ko: "가게안내", en: "Stores" },
   tourInfo: { ko: "관광정보", en: "Tour" },
   tourInfoSpaced: { ko: "관광 정보", en: "Tour" },
+  openingSoon: { ko: "오픈 예정", en: "Coming Soon" },
   information: { ko: "정보 안내", en: "Information" },
   directions: { ko: "찾아오시는 길", en: "Directions" },
   address: { ko: "주소", en: "Address" },
@@ -186,6 +187,31 @@ export function translateStoreCategory(
   };
 
   return categoryTranslations[category] ?? category;
+}
+
+export function TemplateTourComingSoon({
+  spaced = false,
+}: {
+  spaced?: boolean;
+}) {
+  const { t } = useTemplateLanguage();
+
+  return (
+    <span
+      aria-disabled="true"
+      title={t("openingSoon")}
+      style={{
+        color: "inherit",
+        cursor: "default",
+        font: "inherit",
+        opacity: 0.58,
+        textDecoration: "none",
+        whiteSpace: "nowrap",
+      }}
+    >
+      {t(spaced ? "tourInfoSpaced" : "tourInfo")} ({t("openingSoon")})
+    </span>
+  );
 }
 
 export default function TemplateLanguageToggle() {

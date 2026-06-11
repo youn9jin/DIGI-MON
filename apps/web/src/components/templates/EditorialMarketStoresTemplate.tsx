@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import TemplateGenerationActions from "./TemplateGenerationActions";
 import TemplateLanguageToggle, {
+  TemplateTourComingSoon,
   translateStoreCategory,
   useTemplateLanguage,
 } from "./TemplateLanguageToggle";
@@ -198,7 +199,6 @@ export function EditorialHeaderWithBasePath({
   const navItems = [
     { label: t("information"), href: "/templates/editorial#intro" },
     { label: t("storeGuide"), href: "/templates/editorial/stores" },
-    { label: t("tourInfoSpaced"), href: "/templates/editorial#culture" },
   ];
 
   return (
@@ -212,6 +212,7 @@ export function EditorialHeaderWithBasePath({
             {item.label}
           </Link>
         ))}
+        <TemplateTourComingSoon spaced />
         <TemplateLanguageToggle />
       </nav>
     </header>
@@ -244,7 +245,7 @@ export function EditorialFooter({
       <nav aria-label="하단 메뉴">
         <Link href={getHref("/templates/editorial#intro")}>{t("marketIntro")}</Link>
         <Link href={getHref("/templates/editorial/stores")}>{t("shopGuide")}</Link>
-        <Link href={getHref("/templates/editorial#culture")}>{t("tourInfo")}</Link>
+        <TemplateTourComingSoon />
         <Link href={getHref("/templates/editorial#map")}>{t("directions")}</Link>
       </nav>
       <div className={styles.footerInfo}>
