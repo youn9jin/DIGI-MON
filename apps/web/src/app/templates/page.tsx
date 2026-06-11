@@ -12,7 +12,7 @@ const backgroundImage =
 const templateImages: Record<TemplateType, string> = {
   TEMPLATE_1: "/images/templates/template-editorial.webp",
   TEMPLATE_2: "/images/templates/template-modern.webp",
-  TEMPLATE_3: "/images/templates/template-classic.webp",
+  TEMPLATE_3: "/images/templates/template-classic-new.jpg",
 };
 
 const templates = [

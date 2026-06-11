@@ -11,6 +11,7 @@ export interface OnboardingData {
   weekendOpen?: string;
   weekendClose?: string;
   closedSunday?: boolean;
+  closedHolidays?: boolean;
   targetCustomers?: string;
   contactNumber?: string;
   introduction?: string;
