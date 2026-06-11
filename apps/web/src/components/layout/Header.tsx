@@ -19,6 +19,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
   const [websiteHref, setWebsiteHref] =
     useState<"/intro" | "/onboarding" | "/templates" | "/dashboard">("/intro");
   const [websiteCheckHref, setWebsiteCheckHref] = useState("/intro");
+  const [canCheckWebsite, setCanCheckWebsite] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -27,6 +28,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
       if (!currentUser) {
         setWebsiteHref("/intro");
         setWebsiteCheckHref("/intro");
+        setCanCheckWebsite(false);
         setReady(true);
         return;
       }
@@ -40,6 +42,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
             ? "/dashboard"
             : "/templates";
         setWebsiteHref(entryPath);
+        setCanCheckWebsite(hasPage && me.marketId != null);
         setWebsiteCheckHref(
           hasPage && me.marketId != null
             ? `/markets/${encodeURIComponent(String(me.marketId))}`
@@ -48,6 +51,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
       } catch {
         setWebsiteHref("/onboarding");
         setWebsiteCheckHref("/onboarding");
+        setCanCheckWebsite(false);
       }
 
       setReady(true);
@@ -66,6 +70,11 @@ export default function Header({ variant = "default" }: HeaderProps) {
 
   const headerClassName = `${styles.header} ${isScrolled ? styles.scrolledHeader : ""}`;
   const websiteCheckOpensNewTab = websiteCheckHref.startsWith("/markets/");
+  const handleWebsiteCheck = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (canCheckWebsite) return;
+    event.preventDefault();
+    window.alert("아직 웹사이트가 생성되지 않았습니다.");
+  };
 
   if (variant === "builder") {
     const displayName = user?.displayName || user?.email?.split("@")[0] || "사용자";
@@ -95,6 +104,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
               <Link href={websiteHref}>웹사이트 관리</Link>
               <Link
                 href={websiteCheckHref}
+                onClick={handleWebsiteCheck}
                 target={websiteCheckOpensNewTab ? "_blank" : undefined}
                 rel={websiteCheckOpensNewTab ? "noopener noreferrer" : undefined}
               >
@@ -150,6 +160,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
               <Link href={websiteHref}>웹사이트 관리</Link>
               <Link
                 href={websiteCheckHref}
+                onClick={handleWebsiteCheck}
                 target={websiteCheckOpensNewTab ? "_blank" : undefined}
                 rel={websiteCheckOpensNewTab ? "noopener noreferrer" : undefined}
               >

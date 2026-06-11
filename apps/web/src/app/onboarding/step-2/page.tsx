@@ -4,7 +4,7 @@ import Image from "next/image";
 import Script from "next/script";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { saveOnboardingData } from "@/lib/onboarding-store";
+import { getOnboardingData, saveOnboardingData } from "@/lib/onboarding-store";
 import Header from "@/components/layout/Header";
 import StepIndicator from "@/components/ui/StepIndicator";
 import styles from "../onboarding.module.css";
@@ -37,9 +37,10 @@ declare global {
 
 export default function OnboardingStepTwoPage() {
   const router = useRouter();
-  const [address, setAddress] = useState("");
-  const [detailAddress, setDetailAddress] = useState("");
-  const [zonecode, setZonecode] = useState("");
+  const [savedData] = useState(getOnboardingData);
+  const [address, setAddress] = useState(savedData.address ?? "");
+  const [detailAddress, setDetailAddress] = useState(savedData.detailAddress ?? "");
+  const [zonecode, setZonecode] = useState(savedData.zonecode ?? "");
   const [isPostcodeOpen, setIsPostcodeOpen] = useState(false);
 
   function openAddressSearch() {

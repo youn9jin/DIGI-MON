@@ -2,7 +2,10 @@
 
 import Image from "next/image";
 import TemplateGenerationActions from "./TemplateGenerationActions";
-import type { TemplateStore } from "@/lib/template-store-data";
+import {
+  getDefaultStoreImage,
+  type TemplateStore,
+} from "@/lib/template-store-data";
 import {
   EditorialFooter,
   EditorialHeader,
@@ -32,7 +35,10 @@ export default function EditorialMarketStoreDetailTemplate({
   publicBasePath,
 }: EditorialMarketStoreDetailTemplateProps) {
   const { t } = useTemplateLanguage();
-  const representativeImageUrl = store.storeImageUrls[0] ?? heroImageUrl;
+  const representativeImageUrl =
+    store.storeImageUrls[0] ??
+    getDefaultStoreImage(store.category) ??
+    heroImageUrl;
   const menuImageUrls = Array.from(
     new Set([...store.menuImageUrls, ...store.productImageUrls]),
   ).slice(0, 2);

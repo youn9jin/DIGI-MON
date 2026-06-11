@@ -6,13 +6,14 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/layout/Header";
 import StepIndicator from "@/components/ui/StepIndicator";
 import styles from "../onboarding.module.css";
-import { saveOnboardingData } from "@/lib/onboarding-store";
+import { getOnboardingData, saveOnboardingData } from "@/lib/onboarding-store";
 import { submitOnboarding, type OnboardingError } from "@/lib/api/onboarding";
 
 export default function OnboardingStepTenPage() {
   const router = useRouter();
-  const [managerName, setManagerName] = useState("");
-  const [managerRole, setManagerRole] = useState("");
+  const [savedData] = useState(getOnboardingData);
+  const [managerName, setManagerName] = useState(savedData.managerName ?? "");
+  const [managerRole, setManagerRole] = useState(savedData.managerRole ?? "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 

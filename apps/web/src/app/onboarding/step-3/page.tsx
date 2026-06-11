@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { saveOnboardingData } from "@/lib/onboarding-store";
+import { getOnboardingData, saveOnboardingData } from "@/lib/onboarding-store";
 import Header from "@/components/layout/Header";
 import StepIndicator from "@/components/ui/StepIndicator";
 import styles from "../onboarding.module.css";
@@ -12,7 +12,9 @@ const MARKET_TYPES = ["전통시장", "상점가", "복합시장"];
 
 export default function OnboardingStepThreePage() {
   const router = useRouter();
-  const [selectedType, setSelectedType] = useState("");
+  const [selectedType, setSelectedType] = useState(
+    () => getOnboardingData().marketType ?? "",
+  );
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

@@ -3,14 +3,16 @@
 import Image from "next/image";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { saveOnboardingData } from "@/lib/onboarding-store";
+import { getOnboardingData, saveOnboardingData } from "@/lib/onboarding-store";
 import Header from "@/components/layout/Header";
 import StepIndicator from "@/components/ui/StepIndicator";
 import styles from "../onboarding.module.css";
 
 export default function OnboardingStepEightPage() {
   const router = useRouter();
-  const [contactNumber, setContactNumber] = useState("");
+  const [contactNumber, setContactNumber] = useState(
+    () => getOnboardingData().contactNumber ?? "",
+  );
 
   function formatPhoneNumber(value: string) {
     const digits = value.replace(/\D/g, "").slice(0, 11);

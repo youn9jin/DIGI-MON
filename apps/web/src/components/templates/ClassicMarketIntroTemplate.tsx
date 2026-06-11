@@ -17,6 +17,7 @@ import {
 
 interface ClassicMarketIntroTemplateProps {
   marketName?: string;
+  logoImageUrl?: string;
   totalStores?: string;
   address?: string;
   contact?: string;
@@ -32,6 +33,7 @@ const categories = ["농/수산물", "먹거리", "의류", "생활용품", "기
 
 export default function ClassicMarketIntroTemplate({
   marketName = "Market Name",
+  logoImageUrl,
   totalStores = "NN",
   address = "상세주소 text",
   contact = "TELEPHONENUM",
@@ -98,8 +100,11 @@ export default function ClassicMarketIntroTemplate({
       </header>
 
       <section className={styles.storeHero} aria-label="시장 가게 안내">
-        <div className={styles.storeLogoBox}>
-          <strong>{marketName}</strong>
+        <div
+          className={`${styles.storeLogoBox} ${logoImageUrl ? styles.storeLogoBoxImage : ""}`}
+          style={logoImageUrl ? { backgroundImage: `url(${logoImageUrl})` } : undefined}
+        >
+          {!logoImageUrl && <strong>{marketName}</strong>}
         </div>
         <p>
           {language === "en"

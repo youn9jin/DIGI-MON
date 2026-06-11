@@ -14,6 +14,7 @@ import {
 import { getStore } from "@/lib/api/stores";
 import {
   mapStoreToTemplateStore,
+  preferUploadedStoreImages,
   type TemplateStore,
 } from "@/lib/template-store-data";
 import { getTemplateRouteSlug } from "@/lib/market-page-template-data";
@@ -44,10 +45,10 @@ function mergeStoreImages(
 
   return {
     ...publicStore,
-    storeImageUrls:
-      publicStore.storeImageUrls.length > 0
-        ? publicStore.storeImageUrls
-        : ownerStore.storeImageUrls,
+    storeImageUrls: preferUploadedStoreImages(
+      publicStore.storeImageUrls,
+      ownerStore.storeImageUrls,
+    ),
     menuImageUrls:
       publicStore.menuImageUrls.length > 0
         ? publicStore.menuImageUrls
