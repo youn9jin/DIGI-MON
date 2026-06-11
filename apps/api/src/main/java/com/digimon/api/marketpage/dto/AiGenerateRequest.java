@@ -52,7 +52,7 @@ public class AiGenerateRequest {
         private String totalStores;
 
         @JsonProperty("operating_hours")
-        private String operatingHours;
+        private OperatingHoursDto operatingHours;
 
         @JsonProperty("target_customers")
         private String targetCustomers;

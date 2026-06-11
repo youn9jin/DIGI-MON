@@ -177,30 +177,17 @@ public class MarketPageGenerationService {
 
     /**
      * markets.operating_hours 는 {"weekday":...,"weekend":...} JSON 문자열로 저장되어 있다.
-     * FastAPI 는 문자열을 기대하므로 OperatingHoursDto 로 확인 후 사람이 읽는 문장으로 변환한다.
+     * 이를 OperatingHoursDto 로 역직렬화한다. null/blank/파싱 실패 시 null 반환(NPE 방지).
      */
-    private String parseOperatingHours(String operatingHoursJson) {
+    private AiGenerateRequest.OperatingHoursDto parseOperatingHours(String operatingHoursJson) {
         if (operatingHoursJson == null || operatingHoursJson.isBlank()) {
             return null;
         }
         try {
-            AiGenerateRequest.OperatingHoursDto dto =
-                    objectMapper.readValue(operatingHoursJson, AiGenerateRequest.OperatingHoursDto.class);
-            String weekday = dto.getWeekday();
-            String weekend = dto.getWeekend();
-            if (weekday != null && weekend != null) {
-                return "평일 " + weekday + ", 주말 " + weekend;
-            }
-            if (weekday != null) {
-                return "평일 " + weekday;
-            }
-            if (weekend != null) {
-                return "주말 " + weekend;
-            }
-            return null;
+            return objectMapper.readValue(operatingHoursJson, AiGenerateRequest.OperatingHoursDto.class);
         } catch (Exception e) {
-            log.warn("operating_hours 파싱 실패, 원본 문자열로 처리: {}", safeMessage(e.getMessage()));
-            return operatingHoursJson;
+            log.warn("operating_hours 파싱 실패, null 로 처리: {}", safeMessage(e.getMessage()));
+            return null;
         }
     }
 
