@@ -3,6 +3,7 @@
 import Link from "next/link";
 import TemplateGenerationActions from "./TemplateGenerationActions";
 import TemplateLanguageToggle, {
+  TemplateTourComingSoon,
   useTemplateLanguage,
 } from "./TemplateLanguageToggle";
 import styles from "./ModernMarketTemplate.module.css";
@@ -72,7 +73,6 @@ export default function ModernMarketTemplate({
   const navItems = [
     { label: t("marketIntro"), href: "/templates/modern" },
     { label: t("storeGuide"), href: "/templates/modern/stores" },
-    { label: t("tourInfoSpaced"), href: "#tour" },
   ];
 
   return (
@@ -87,6 +87,7 @@ export default function ModernMarketTemplate({
               {item.label}
             </Link>
           ))}
+          <TemplateTourComingSoon spaced />
           <TemplateLanguageToggle />
         </nav>
       </header>
@@ -159,7 +160,7 @@ export default function ModernMarketTemplate({
         <nav aria-label="하단 메뉴">
           <Link href={getHref("/templates/modern#intro")}>{t("marketIntro")}</Link>
           <Link href={getHref("/templates/modern/stores")}>{t("shopGuide")}</Link>
-          <Link href={getHref("/templates/modern#tour")}>{t("tourInfo")}</Link>
+          <TemplateTourComingSoon />
           <Link href={getHref("/templates/modern#map")}>{t("directions")}</Link>
         </nav>
         <div className={styles.footerInfo}>

@@ -22,7 +22,7 @@ export default function DashboardOperationPending({ type }: DashboardOperationPe
 
   return (
     <main className={`${styles.page} ${styles.operationPage}`}>
-      <Header variant="builder" />
+      <Header variant="operation" />
       <div className={styles.operationBackground} aria-hidden="true">
         <Image
           alt=""

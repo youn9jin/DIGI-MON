@@ -5,6 +5,7 @@ import styles from "./ClassicMarketTemplate.module.css";
 import GoogleMapEmbed from "./GoogleMapEmbed";
 import TemplateGenerationActions from "./TemplateGenerationActions";
 import TemplateLanguageToggle, {
+  TemplateTourComingSoon,
   useTemplateLanguage,
 } from "./TemplateLanguageToggle";
 
@@ -78,7 +79,7 @@ export default function ClassicMarketTemplate({
         <nav className={styles.bannerNav}>
           <Link href={getHref("/templates/classic#intro")}>{t("marketIntro")}</Link>
           <Link href={getHref("/templates/classic/stores")}>{t("storeInfo")}</Link>
-          <Link href={getHref("/templates/classic#tour")}>{t("tourInfo")}</Link>
+          <TemplateTourComingSoon />
           <TemplateLanguageToggle />
         </nav>
       </header>
@@ -140,7 +141,7 @@ export default function ClassicMarketTemplate({
         <nav className={styles.footerNav} aria-label="하단 메뉴">
           <Link href={getHref("/templates/classic#intro")}>{t("marketIntro")}</Link>
           <Link href={getHref("/templates/classic/stores")}>{t("shopGuide")}</Link>
-          <Link href={getHref("/templates/classic#tour")}>{t("tourInfo")}</Link>
+          <TemplateTourComingSoon />
           <Link href={getHref("/templates/classic#map")}>{t("directions")}</Link>
         </nav>
 

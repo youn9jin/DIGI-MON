@@ -10,6 +10,7 @@ import {
   updateMarketPageTemplate,
 } from "@/lib/api/market-page";
 import { publishDashboardOperationToast } from "@/lib/dashboard-operation-toast";
+import { waitForMinimumPendingTime } from "@/lib/minimum-pending";
 import styles from "../manage.module.css";
 
 const setupStorageKey = "market_page_setup_draft";
@@ -106,6 +107,7 @@ export default function TemplateChangePage() {
   }, [previewTemplate]);
 
   async function handleSaveTemplate() {
+    const pendingStartedAt = Date.now();
     setIsSaving(true);
     setSaveMessage("");
     setSaveError("");
@@ -114,12 +116,14 @@ export default function TemplateChangePage() {
       const result = await updateMarketPageTemplate({ templateType: selectedTemplate });
       setCurrentTemplate(result.templateType);
       updateSetupDraftTemplate(result.templateType);
+      await waitForMinimumPendingTime(pendingStartedAt);
       publishDashboardOperationToast("template");
       setSaveMessage("선택한 템플릿으로 교체했어요.");
     } catch (error) {
       const apiError = error as Partial<MarketPageApiError>;
       setSaveError(apiError.message ?? "템플릿 교체에 실패했습니다.");
     } finally {
+      await waitForMinimumPendingTime(pendingStartedAt);
       setIsSaving(false);
     }
   }

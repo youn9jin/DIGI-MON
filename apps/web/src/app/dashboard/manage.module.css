@@ -25,17 +25,17 @@
 }
 
 .operationPage {
-  min-height: 100svh;
+  min-height: max(100svh, 540px);
   padding-bottom: 0;
   overflow: hidden;
 }
 
 .operationBackground {
   position: absolute;
-  top: clamp(120px, 15.74vw, 170px);
+  top: clamp(100px, 15.741svh, 170px);
   left: 50%;
-  width: min(80.73vw, 1550px);
-  height: min(41.2vw, 791px);
+  width: min(80.729vw, 1550px);
+  height: min(73.241svh, 791px);
   opacity: 0.15;
   pointer-events: none;
   transform: translateX(-50%);
@@ -46,9 +46,9 @@
 }
 
 .operationHero {
-  position: relative;
+  position: absolute;
+  inset: 0;
   z-index: 1;
-  min-height: calc(100svh - 84px);
   width: 100%;
   margin: 0;
   padding: 0;
@@ -56,9 +56,9 @@
 
 .operationCopy {
   position: absolute;
-  top: clamp(300px, 45.05vw, 487px);
+  top: clamp(244px, 45.093svh, 487px);
   left: clamp(72px, 11.2vw, 215px);
-  max-width: min(55vw, 980px);
+  max-width: min(57vw, 1090px);
 }
 
 .operationCopy h1 {
@@ -72,7 +72,7 @@
 }
 
 .operationCopy p {
-  margin: clamp(12px, 1.46vw, 28px) 0 0;
+  margin: clamp(8px, 0.926svh, 10px) 0 0;
   color: #000;
   font-size: clamp(18px, 1.56vw, 30px);
   font-weight: 600;
@@ -83,7 +83,7 @@
 
 .operationLogo {
   position: absolute;
-  top: clamp(292px, 37.87vw, 409px);
+  top: clamp(205px, 37.87svh, 409px);
   left: clamp(760px, 65.16vw, 1251px);
   width: min(23.28vw, 447px);
   aspect-ratio: 447 / 314;
@@ -91,6 +91,35 @@
 
 .operationLogo img {
   object-fit: contain;
+}
+
+.notCreatedCopy {
+  top: clamp(235px, 44.259svh, 478px);
+  left: clamp(72px, 10.417vw, 200px);
+}
+
+.notCreatedButton {
+  position: absolute;
+  top: clamp(248px, 46.019svh, 497px);
+  left: clamp(720px, 65.677vw, 1261px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: min(34vw, 459px);
+  min-height: clamp(58px, 8.611svh, 93px);
+  padding: 0 clamp(40px, 4.167vw, 80px);
+  border-radius: clamp(20px, 1.667vw, 32px);
+  background: #ffefb4;
+  color: #000;
+  font-size: clamp(18px, 1.563vw, 30px);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.notCreatedButton:hover {
+  background: #ffe69a;
 }
 
 .titleBlock {
@@ -766,6 +795,7 @@
   }
 
   .operationHero {
+    position: relative;
     min-height: calc(100svh - 76px);
     padding: 0;
     text-align: center;
@@ -785,6 +815,15 @@
     left: auto;
     width: min(58vw, 340px);
     margin: 40px auto 0;
+  }
+
+  .notCreatedButton {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: fit-content;
+    min-width: 0;
+    margin: 36px auto 0;
   }
 }
 

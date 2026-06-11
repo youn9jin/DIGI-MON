@@ -25,6 +25,7 @@ import {
   type StoreUpdateRequest,
 } from "@/lib/api/stores";
 import { publishDashboardOperationToast } from "@/lib/dashboard-operation-toast";
+import { waitForMinimumPendingTime } from "@/lib/minimum-pending";
 import { uploadMarketPageImage } from "@/lib/firebase-storage";
 import styles from "../manage.module.css";
 
@@ -631,6 +632,7 @@ export default function InfoEditPage() {
       return;
     }
 
+    const pendingStartedAt = Date.now();
     setIsSavingStore(true);
     setStoreError("");
     setStoreSaveMessage("");
@@ -656,11 +658,13 @@ export default function InfoEditPage() {
           ),
         ),
       );
+      await waitForMinimumPendingTime(pendingStartedAt);
       publishDashboardOperationToast("detail");
       setStoreSaveMessage("가게 정보를 저장했어요.");
     } catch (error) {
       setStoreError(error instanceof Error ? error.message : "가게 정보 저장에 실패했습니다.");
     } finally {
+      await waitForMinimumPendingTime(pendingStartedAt);
       setIsSavingStore(false);
     }
   }
@@ -685,18 +689,21 @@ export default function InfoEditPage() {
       return;
     }
 
+    const pendingStartedAt = Date.now();
     setIsSaving(true);
     setSaveError("");
     setSaveMessage("");
 
     try {
       await updateMarketPageText(payload);
+      await waitForMinimumPendingTime(pendingStartedAt);
       publishDashboardOperationToast("detail");
       setSaveMessage("수정한 문구를 저장했어요.");
     } catch (error) {
       const apiError = error as Partial<MarketPageApiError>;
       setSaveError(apiError.message ?? "문구 저장에 실패했습니다.");
     } finally {
+      await waitForMinimumPendingTime(pendingStartedAt);
       setIsSaving(false);
     }
   }

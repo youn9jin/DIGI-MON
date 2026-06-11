@@ -9,7 +9,7 @@ import { getMe, hasGeneratedMarketPage } from "@/lib/api/me";
 import styles from "./Header.module.css";
 
 interface HeaderProps {
-  variant?: "default" | "builder";
+  variant?: "default" | "builder" | "operation";
 }
 
 export default function Header({ variant = "default" }: HeaderProps) {
@@ -17,7 +17,9 @@ export default function Header({ variant = "default" }: HeaderProps) {
   const [ready, setReady] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [websiteHref, setWebsiteHref] =
-    useState<"/intro" | "/onboarding" | "/templates" | "/dashboard">("/intro");
+    useState<
+      "/intro" | "/onboarding" | "/dashboard/not-created" | "/dashboard"
+    >("/intro");
   const [websiteCheckHref, setWebsiteCheckHref] = useState("/intro");
   const [canCheckWebsite, setCanCheckWebsite] = useState(false);
 
@@ -40,7 +42,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
           ? "/onboarding"
           : hasPage
             ? "/dashboard"
-            : "/templates";
+            : "/dashboard/not-created";
         setWebsiteHref(entryPath);
         setCanCheckWebsite(hasPage && me.marketId != null);
         setWebsiteCheckHref(
@@ -76,8 +78,9 @@ export default function Header({ variant = "default" }: HeaderProps) {
     window.alert("아직 웹사이트가 생성되지 않았습니다.");
   };
 
-  if (variant === "builder") {
+  if (variant === "builder" || variant === "operation") {
     const displayName = user?.displayName || user?.email?.split("@")[0] || "사용자";
+    const isOperationHeader = variant === "operation";
 
     return (
       <header className={`${headerClassName} ${styles.builderHeader}`}>
@@ -99,22 +102,25 @@ export default function Header({ variant = "default" }: HeaderProps) {
             </div>
 
             <nav className={styles.primaryNav} aria-label="주요 메뉴">
-              <a href="#">사용방법</a>
-              <a href="#">커뮤니티</a>
+              <Link href="/#withon-guide">사용방법</Link>
               <Link href={websiteHref}>웹사이트 관리</Link>
-              <Link
-                href={websiteCheckHref}
-                onClick={handleWebsiteCheck}
-                target={websiteCheckOpensNewTab ? "_blank" : undefined}
-                rel={websiteCheckOpensNewTab ? "noopener noreferrer" : undefined}
-              >
-                웹사이트 확인
-              </Link>
+              {!isOperationHeader && (
+                <Link
+                  href={websiteCheckHref}
+                  onClick={handleWebsiteCheck}
+                  target={websiteCheckOpensNewTab ? "_blank" : undefined}
+                  rel={websiteCheckOpensNewTab ? "noopener noreferrer" : undefined}
+                >
+                  웹사이트 확인
+                </Link>
+              )}
             </nav>
           </div>
 
           <nav className={styles.authNav} aria-label="사용자 메뉴">
-            {ready && user && <span className={styles.userName}>{displayName}님</span>}
+            {!isOperationHeader && ready && user && (
+              <span className={styles.userName}>{displayName}님</span>
+            )}
             <a href="/mypage">마이페이지</a>
           </nav>
         </div>
@@ -155,8 +161,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
             </div>
 
             <nav className={styles.primaryNav} aria-label="주요 메뉴">
-              <a href="#">사용방법</a>
-              <a href="#">커뮤니티</a>
+              <Link href="/#withon-guide">사용방법</Link>
               <Link href={websiteHref}>웹사이트 관리</Link>
               <Link
                 href={websiteCheckHref}
@@ -205,8 +210,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
           </div>
 
           <nav className={styles.primaryNav} aria-label="주요 메뉴">
-            <a href="#">사용방법</a>
-            <a href="#">커뮤니티</a>
+            <Link href="/#withon-guide">사용방법</Link>
           </nav>
         </div>
 
