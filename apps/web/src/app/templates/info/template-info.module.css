@@ -256,9 +256,12 @@
 }
 
 .templateDownloadButton {
+  display: inline-flex;
   flex: 0 0 auto;
   min-width: 174px;
   height: 42px;
+  align-items: center;
+  justify-content: center;
   border: 0;
   border-radius: 14px;
   background: rgba(255, 242, 197, 0.9);
@@ -268,6 +271,7 @@
   font-family: inherit;
   font-size: 15px;
   font-weight: 500;
+  text-decoration: none;
 }
 
 .fileUpload {
@@ -298,6 +302,21 @@
   color: #4f4f4f;
   font-size: 15px;
   line-height: 1.5;
+}
+
+.saveErrorMessage {
+  width: min(100%, 760px);
+  margin: 34px auto 0;
+  white-space: pre-line;
+  border: 1px solid rgba(196, 43, 43, 0.22);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.76);
+  color: #a12a2a;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.55;
+  padding: 14px 18px;
+  text-align: center;
 }
 
 .actions {

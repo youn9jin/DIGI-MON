@@ -1,0 +1,1296 @@
+.page {
+  min-height: 100svh;
+  background: #fff;
+  color: #000;
+  font-family: Pretendard, "Noto Sans KR", sans-serif;
+}
+
+.loading {
+  display: flex;
+  min-height: 100svh;
+  align-items: center;
+  justify-content: center;
+  color: #777;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.figmaViewport {
+  width: 100%;
+  height: calc(var(--mypage-height, 1370px) * var(--mypage-scale));
+  overflow: hidden;
+}
+
+.figmaCanvas {
+  position: relative;
+  width: 1920px;
+  height: var(--mypage-height, 1370px);
+  transform: scale(var(--mypage-scale));
+  transform-origin: left top;
+}
+
+.figmaPageTitle {
+  position: absolute;
+  top: 170px;
+  left: 68px;
+  margin: 0;
+  color: #000;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.figmaSidebar {
+  position: absolute;
+  top: 265px;
+  left: 61px;
+  display: grid;
+  width: 283px;
+  gap: 13px;
+}
+
+.figmaSideButton {
+  display: flex;
+  width: 283px;
+  height: 68px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 30px;
+  background: rgba(255, 242, 197, 0.77);
+  color: #000;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 20px;
+  text-decoration: none;
+}
+
+.figmaSideActive {
+  background: rgba(255, 242, 197, 0.77);
+  font-weight: 700;
+}
+
+.figmaLogout {
+  position: absolute;
+  top: 703px;
+  left: 12px;
+  background: rgba(255, 248, 222, 0.77);
+}
+
+.figmaWithdraw {
+  position: absolute;
+  top: 784px;
+  left: 12px;
+  background: rgba(255, 248, 222, 0.77);
+  color: #d33b32;
+}
+
+.figmaSectionTitle {
+  position: absolute;
+  top: 217px;
+  left: 405px;
+  margin: 0;
+  color: #000;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+}
+
+.figmaDescription {
+  position: absolute;
+  top: 263px;
+  left: 405px;
+  margin: 0;
+  color: #000;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.figmaProfileTitle,
+.figmaMarketTitle,
+.figmaLinkTitle,
+.figmaManageTitle {
+  position: absolute;
+  margin: 0;
+  color: #000;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 30px;
+}
+
+.figmaProfileTitle {
+  top: 345px;
+  left: 412px;
+}
+
+.figmaMarketTitle {
+  top: 345px;
+  left: 906px;
+}
+
+.figmaProfileCard,
+.figmaMarketCard,
+.figmaLinkBox {
+  position: absolute;
+  background: #fff;
+  border-radius: 50px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.figmaProfileCard {
+  top: 406px;
+  left: 405px;
+  width: 451px;
+  height: 407px;
+}
+
+.figmaAvatar {
+  position: absolute;
+  top: 41px;
+  left: 35px;
+  width: 123px;
+  height: 123px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #fff7db;
+}
+
+.figmaAvatar img {
+  object-fit: cover;
+}
+
+.figmaProfileCard strong {
+  position: absolute;
+  top: 204px;
+  left: 37px;
+  color: #000;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 26px;
+  white-space: nowrap;
+}
+
+.figmaProfileCard p {
+  position: absolute;
+  top: 276px;
+  left: 37px;
+  margin: 0;
+  color: #000;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.figmaProfileButton,
+.figmaMarketButton,
+.figmaManageButton {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 30px;
+  background: rgba(255, 247, 219, 0.77);
+  color: #000;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 20px;
+  text-decoration: none;
+}
+
+.figmaProfileButton {
+  top: 326px;
+  left: 84px;
+  width: 283px;
+  height: 56px;
+}
+
+.figmaMarketCard {
+  top: 406px;
+  left: 887px;
+  width: 951px;
+  height: 407px;
+}
+
+.figmaMarketImage {
+  position: absolute;
+  top: 44px;
+  left: 49px;
+  width: 301px;
+  height: 240px;
+  overflow: hidden;
+  background: #d9d9d9;
+}
+
+.figmaMarketImage::after {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9f9f9f;
+  content: "대표 이미지";
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.figmaMarketImage:has(img)::after {
+  content: "";
+}
+
+.figmaMarketImage img {
+  object-fit: cover;
+}
+
+.figmaMarketText {
+  position: absolute;
+  top: 44px;
+  left: 398px;
+  width: 500px;
+  color: #000;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 30px;
+  word-break: keep-all;
+}
+
+.figmaMarketText strong {
+  display: block;
+  margin-bottom: 19px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.figmaMarketText b {
+  display: block;
+  margin-bottom: 25px;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.figmaMarketText p {
+  margin: 0;
+}
+
+.figmaMarketButton {
+  top: 326px;
+  left: 334px;
+  width: 283px;
+  height: 56px;
+}
+
+.figmaWebsiteTitle {
+  position: absolute;
+  top: 870px;
+  left: 412px;
+  margin: 0;
+  color: #000;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+}
+
+.figmaCanvasWebsiteOnly .figmaWebsiteTitle {
+  top: 217px;
+}
+
+.figmaCanvasWebsiteOnly .figmaLinkTitle {
+  top: 345px;
+}
+
+.figmaCanvasWebsiteOnly .figmaLinkBox {
+  top: 406px;
+}
+
+.figmaCanvasWebsiteOnly .figmaManageTitle {
+  top: 575px;
+}
+
+.figmaCanvasWebsiteOnly .figmaManageDescription {
+  top: 625px;
+}
+
+.figmaCanvasWebsiteOnly .figmaManageButton {
+  top: 599px;
+}
+
+.figmaCanvasProfileOnly .figmaSectionTitle {
+  top: 217px;
+}
+
+.figmaCanvasProfileOnly .figmaDescription {
+  top: 263px;
+}
+
+.figmaCanvasProfileOnly .figmaProfileTitle,
+.figmaCanvasProfileOnly .figmaMarketTitle {
+  top: 345px;
+}
+
+.figmaCanvasProfileOnly .figmaProfileCard,
+.figmaCanvasProfileOnly .figmaMarketCard {
+  top: 406px;
+}
+
+.figmaLinkTitle {
+  top: 980px;
+  left: 412px;
+}
+
+.figmaLinkBox {
+  top: 1033px;
+  left: 405px;
+  display: flex;
+  width: 1433px;
+  height: 98px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 60px 0 40px;
+}
+
+.figmaLinkBox span {
+  min-width: 0;
+  overflow: hidden;
+  color: #9f9f9f;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 45px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.figmaLinkBox button {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: #131313;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 45px;
+}
+
+.figmaLinkBox button:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.figmaManageTitle {
+  top: 1194px;
+  left: 412px;
+}
+
+.figmaManageDescription {
+  position: absolute;
+  top: 1244px;
+  left: 412px;
+  width: 471px;
+  margin: 0;
+  color: #000;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 30px;
+}
+
+.figmaManageButton {
+  top: 1218px;
+  left: 1472px;
+  width: 366px;
+  height: 68px;
+  background: rgba(255, 242, 197, 0.77);
+  font-size: 18px;
+}
+
+.figmaDeleteMessage {
+  position: absolute;
+  top: 1314px;
+  left: 405px;
+  width: 1433px;
+  margin: 0;
+  color: #d33b32;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.layout {
+  width: min(100%, 1920px);
+  margin: 0 auto;
+  overflow-x: hidden;
+  padding: 168px clamp(24px, 3.542vw, 68px) 96px;
+}
+
+.bodyGrid {
+  display: grid;
+  grid-template-columns: clamp(210px, 14.74vw, 283px) minmax(0, 1fr);
+  gap: clamp(28px, 2.813vw, 54px);
+  align-items: start;
+}
+
+.sidebar {
+  position: sticky;
+  top: 112px;
+  display: flex;
+  min-height: calc(100svh - 180px);
+  flex-direction: column;
+  gap: 13px;
+}
+
+.sidebarButton {
+  display: flex;
+  width: 100%;
+  min-height: clamp(48px, 3.542vw, 68px);
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: clamp(16px, 0.938vw, 18px);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.sidebarButton:hover,
+.sidebarButton:focus-visible {
+  background: rgba(255, 242, 197, 0.48);
+}
+
+.active {
+  background: rgba(255, 242, 197, 0.77);
+}
+
+.logout {
+  margin-top: auto;
+  background: #fff8de;
+}
+
+.content {
+  min-width: 0;
+}
+
+.pageTitle {
+  margin: 0 0 32px;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.infoSection h2,
+.websiteSection h2,
+.editIntro h2 {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.infoSection > p,
+.editIntro p {
+  margin: 7px 0 0;
+  color: #000;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.35;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: minmax(320px, 451px) minmax(0, 951px);
+  gap: clamp(20px, 1.615vw, 31px);
+  width: 100%;
+  max-width: 100%;
+  margin-top: 82px;
+  align-items: stretch;
+}
+
+.cardColumn {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.cardTitle {
+  margin: 0 0 9px 7px;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.profileCard,
+.marketCard,
+.editPanel {
+  background: #fff;
+  border-radius: 50px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.profileCard {
+  display: flex;
+  min-height: 407px;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 41px 35px 25px;
+  text-align: left;
+}
+
+.marketCard {
+  display: flex;
+  min-height: 407px;
+  width: 100%;
+  overflow: hidden;
+  flex-direction: column;
+  padding: 44px 48px 25px;
+}
+
+.avatar {
+  display: flex;
+  width: 123px;
+  height: 123px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 35px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  color: #173f70;
+  font-size: 44px;
+  font-weight: 800;
+}
+
+.profileName {
+  display: block;
+  color: #000;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.profileEmail {
+  margin: 18px 0 0;
+  color: #000;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 16px;
+}
+
+.profileList {
+  margin: 0;
+}
+
+.profileList div {
+  display: grid;
+  grid-template-columns: minmax(88px, 110px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  text-align: left;
+}
+
+.profileList div + div {
+  margin-top: 13px;
+}
+
+.profileList dt {
+  color: #666;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.profileList dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: break-word;
+  word-break: keep-all;
+  color: #000;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.marketBody {
+  display: grid;
+  grid-template-columns: minmax(220px, 301px) minmax(0, 1fr);
+  gap: clamp(28px, 3.906vw, 75px);
+  align-items: start;
+  margin-top: 0;
+}
+
+.marketText {
+  min-width: 0;
+  color: #000;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 30px;
+  overflow-wrap: break-word;
+  word-break: keep-all;
+}
+
+.marketText strong {
+  display: block;
+  margin-bottom: 19px;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 30px;
+}
+
+.marketText p {
+  margin: 0;
+}
+
+.marketName {
+  margin-bottom: 25px !important;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.marketImage {
+  position: relative;
+  display: flex;
+  width: 100%;
+  aspect-ratio: 301 / 240;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #e7e7e7;
+  color: #9a9a9a;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.marketList div {
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 37px;
+}
+
+.marketImage img {
+  object-fit: cover;
+}
+
+.secondaryButton,
+.manageShortcut a,
+.saveButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: #fff2c5;
+  color: #000;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: clamp(16px, 1.302vw, 25px);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.12);
+}
+
+.secondaryButton {
+  min-height: clamp(46px, 2.917vw, 56px);
+  margin-top: auto;
+  padding: 0 24px;
+  font-size: 15px;
+}
+
+.profileCard .secondaryButton {
+  width: min(100%, 240px);
+  margin: auto auto 0;
+}
+
+.marketCard .secondaryButton {
+  width: min(100%, 240px);
+  margin: auto auto 0;
+}
+
+.websiteSection {
+  margin-top: clamp(74px, 4.635vw, 89px);
+}
+
+.linkBlock {
+  margin-top: clamp(42px, 4.271vw, 82px);
+}
+
+.linkBlock h3,
+.manageShortcut h3 {
+  margin: 0 0 17px;
+  font-size: clamp(24px, 1.563vw, 30px);
+  font-weight: 700;
+}
+
+.linkRow {
+  display: flex;
+  min-height: 98px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.19);
+  padding: 0 clamp(30px, 3.125vw, 60px);
+}
+
+.linkRow span {
+  min-width: 0;
+  overflow: hidden;
+  color: #8f8f8f;
+  font-size: clamp(20px, 1.563vw, 30px);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.linkRow button {
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  color: #000;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: clamp(18px, 1.563vw, 30px);
+  font-weight: 600;
+}
+
+.linkRow button:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.manageShortcut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  margin-top: clamp(74px, 5.052vw, 97px);
+}
+
+.manageShortcut p {
+  margin: 0;
+  font-size: clamp(18px, 1.302vw, 25px);
+  font-weight: 500;
+}
+
+.manageShortcut a {
+  min-width: 320px;
+  min-height: 68px;
+  padding: 0 32px;
+}
+
+.editIntro {
+  margin-bottom: 53px;
+}
+
+.editPanel {
+  width: min(100%, 1320px);
+  padding: clamp(46px, 4.323vw, 83px) clamp(48px, 5.469vw, 105px)
+    clamp(56px, 5.677vw, 109px);
+}
+
+.fieldGroup,
+.choiceGroup {
+  display: grid;
+  gap: 18px;
+  margin: 0 0 50px;
+  border: 0;
+  padding: 0;
+}
+
+.fieldGroup > span,
+.fieldGroup legend,
+.choiceGroup legend {
+  margin: 0;
+  padding: 0;
+  color: #000;
+  font-size: clamp(22px, 1.563vw, 30px);
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.fieldGroup label {
+  display: grid;
+  gap: 10px;
+}
+
+.fieldGroup label span {
+  color: #000;
+  font-size: clamp(18px, 1.25vw, 24px);
+  font-weight: 500;
+}
+
+.fieldGroup input,
+.fieldGroup textarea {
+  width: 100%;
+  border: 2px solid #a3a3a3;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  font-family: inherit;
+  font-size: clamp(19px, 1.563vw, 30px);
+  font-weight: 500;
+  outline: none;
+  padding: 0 38px;
+}
+
+.fieldGroup input {
+  height: 82px;
+}
+
+.fieldGroup textarea {
+  min-height: 230px;
+  resize: vertical;
+  border-radius: 42px;
+  padding-top: 26px;
+  line-height: 1.45;
+}
+
+.fieldGroup input::placeholder,
+.fieldGroup textarea::placeholder {
+  color: #a0a0a0;
+}
+
+.choiceGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 20px;
+}
+
+.storeRangeGrid {
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+}
+
+.choiceBox {
+  display: flex;
+  min-height: 82px;
+  align-items: center;
+  gap: 17px;
+  border: 2px solid #a3a3a3;
+  border-radius: 999px;
+  color: #000;
+  cursor: pointer;
+  font-size: clamp(18px, 1.354vw, 26px);
+  font-weight: 500;
+  padding: 0 28px;
+}
+
+.choiceBox input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choiceBox span {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e7e7e7;
+}
+
+.choiceBox input:checked + span {
+  background: #ffc107;
+  box-shadow: 0 0 0 9px #e7e7e7;
+}
+
+.checkboxRow {
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  gap: 12px !important;
+  color: #000;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.checkboxRow input {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  accent-color: #ffc107;
+}
+
+.saveMessage {
+  margin: -12px 0 28px;
+  color: #777;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.saveButton {
+  width: min(100%, 379px);
+  min-height: 77px;
+  margin: 10px auto 0;
+}
+
+.editFigmaViewport {
+  width: 100%;
+  height: calc(var(--mypage-edit-height, 3010px) * var(--mypage-edit-scale));
+  overflow: hidden;
+}
+
+.editFigmaCanvas {
+  position: relative;
+  width: 1920px;
+  height: var(--mypage-edit-height, 3010px);
+  transform: scale(var(--mypage-edit-scale));
+  transform-origin: left top;
+}
+
+.editFigmaPageTitle {
+  position: absolute;
+  top: 168px;
+  left: 68px;
+  margin: 0;
+  color: #000;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 48px;
+}
+
+.editFigmaTitle {
+  position: absolute;
+  top: 217px;
+  left: 405px;
+  margin: 0;
+  color: #000;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+}
+
+.editFigmaDescription {
+  position: absolute;
+  top: 263px;
+  left: 407px;
+  margin: 0;
+  color: #000;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 22px;
+}
+
+.editFigmaPanel {
+  position: absolute;
+  top: 333px;
+  left: 440px;
+  width: 1320px;
+  height: 2590px;
+  border-radius: 100px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.associationFigmaPanel {
+  position: absolute;
+  top: 333px;
+  left: 440px;
+  width: 1320px;
+  height: 1052px;
+  border-radius: 100px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+.editFigmaLabel,
+.editFigmaSubLabel,
+.editFigmaTimeTitle,
+.editFigmaTimeText {
+  position: absolute;
+  z-index: 1;
+  color: #000;
+  font-family: inherit;
+}
+
+.editFigmaLabel {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.editFigmaLabel span {
+  font-weight: 400;
+}
+
+.editFigmaSubLabel {
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 25px;
+}
+
+.editFigmaInput,
+.editFigmaChoice {
+  position: absolute;
+  z-index: 1;
+  width: 1155px;
+  height: 82px;
+  border: 1.5px solid #a1a1a1;
+  border-radius: 30px;
+  background: #fff;
+  color: #1f1f1f;
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 45px;
+  outline: none;
+}
+
+.editFigmaInput {
+  padding: 0 33px;
+}
+
+.editFigmaInput::placeholder,
+.editFigmaTextarea::placeholder {
+  color: #9f9f9f;
+}
+
+.editFigmaTextarea {
+  height: 188px;
+  resize: none;
+  padding-top: 14px;
+  line-height: 32px;
+}
+
+.editFigmaChoice {
+  display: flex;
+  align-items: center;
+  gap: 31px;
+  cursor: pointer;
+  padding: 0 31px;
+}
+
+.editFigmaChoice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.editFigmaDot {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #e7e7e7;
+}
+
+.editFigmaDotSelected::after {
+  position: absolute;
+  top: 7px;
+  left: 7px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e32d25;
+  content: "";
+}
+
+.editFigmaTimeTitle,
+.editFigmaTimeText {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 45px;
+}
+
+.editFigmaTimeInput {
+  position: absolute;
+  z-index: 1;
+  width: 200px;
+  height: 64px;
+  border: 1.2px solid #a1a1a1;
+  border-radius: 20px;
+  background: #fff;
+  color: #1f1f1f;
+  font-family: inherit;
+  font-size: 16px;
+  outline: none;
+  padding: 0 16px;
+}
+
+.editFigmaTimeInput::placeholder {
+  color: #9f9f9f;
+}
+
+.editFigmaTimeInput:disabled {
+  background: #f2f2f2;
+  color: #a1a1a1;
+  cursor: not-allowed;
+}
+
+.editFigmaCheckbox {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #000;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 20px;
+}
+
+.editFigmaCheckbox input {
+  width: 21px;
+  height: 21px;
+  margin: 0;
+  accent-color: #ffc107;
+}
+
+.editFigmaSaveButton {
+  position: absolute;
+  z-index: 1;
+  top: 2773px;
+  left: 884px;
+  display: flex;
+  width: 379px;
+  height: 77px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 30px;
+  background: rgba(255, 242, 197, 0.77);
+  color: #000;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 45px;
+}
+
+.editFigmaSaveButton:disabled {
+  color: #8f8f8f;
+  cursor: not-allowed;
+}
+
+.editFigmaSaveMessage {
+  position: absolute;
+  z-index: 1;
+  top: 2855px;
+  left: 680px;
+  width: 750px;
+  margin: 0;
+  color: #777;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.associationFigmaSaveButton {
+  position: absolute;
+  z-index: 1;
+  top: 1256px;
+  left: 910px;
+  display: flex;
+  width: 379px;
+  height: 77px;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 30px;
+  background: rgba(255, 242, 197, 0.77);
+  color: #000;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 45px;
+}
+
+.associationFigmaSaveButton:disabled {
+  color: #8f8f8f;
+  cursor: not-allowed;
+}
+
+.associationFigmaSaveMessage {
+  position: absolute;
+  z-index: 1;
+  top: 1214px;
+  left: 658px;
+  width: 780px;
+  margin: 0;
+  color: #777;
+  font-size: 18px;
+  font-weight: 500;
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .bodyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    min-height: auto;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .logout {
+    margin-top: 0;
+  }
+
+  .cardGrid,
+  .marketBody {
+    grid-template-columns: 1fr;
+  }
+
+  .marketCard .secondaryButton {
+    float: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .layout {
+    padding: 96px 20px 56px;
+  }
+
+  .sidebar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cardGrid {
+    gap: 20px;
+  }
+
+  .profileCard,
+  .marketCard,
+  .editPanel {
+    border-radius: 28px;
+    padding: 28px 22px;
+  }
+
+  .profileList div,
+  .marketList div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .linkRow,
+  .manageShortcut {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .linkRow {
+    min-height: auto;
+    border-radius: 28px;
+    padding: 24px;
+  }
+
+  .manageShortcut a {
+    min-width: 0;
+  }
+
+  .choiceGrid,
+  .storeRangeGrid {
+    grid-template-columns: 1fr;
+  }
+}

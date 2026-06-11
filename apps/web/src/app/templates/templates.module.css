@@ -138,7 +138,9 @@
 }
 
 .classicImage {
-  height: 96.72% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  object-position: top center !important;
 }
 
 .previewLink {

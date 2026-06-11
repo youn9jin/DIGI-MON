@@ -2,12 +2,14 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import DashboardOperationPending from "@/components/dashboard/DashboardOperationPending";
 import Header from "@/components/layout/Header";
 import {
   type MarketPageApiError,
   type TemplateType,
   updateMarketPageTemplate,
 } from "@/lib/api/market-page";
+import { publishDashboardOperationToast } from "@/lib/dashboard-operation-toast";
 import styles from "../manage.module.css";
 
 const setupStorageKey = "market_page_setup_draft";
@@ -31,7 +33,7 @@ const templates = [
     id: "TEMPLATE_3" as const,
     href: "/templates/classic",
     label: "클래식 시장형",
-    image: "/images/dashboard/manage-template-3.png",
+    image: "/images/templates/template-classic-gradient.png",
     thumbClassName: styles.templateThree,
   },
 ];
@@ -112,6 +114,7 @@ export default function TemplateChangePage() {
       const result = await updateMarketPageTemplate({ templateType: selectedTemplate });
       setCurrentTemplate(result.templateType);
       updateSetupDraftTemplate(result.templateType);
+      publishDashboardOperationToast("template");
       setSaveMessage("선택한 템플릿으로 교체했어요.");
     } catch (error) {
       const apiError = error as Partial<MarketPageApiError>;
@@ -119,6 +122,10 @@ export default function TemplateChangePage() {
     } finally {
       setIsSaving(false);
     }
+  }
+
+  if (isSaving) {
+    return <DashboardOperationPending type="template" />;
   }
 
   return (

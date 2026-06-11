@@ -6,6 +6,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import ClassicMarketStoreDetailTemplate from "@/components/templates/ClassicMarketStoreDetailTemplate";
 import { getClassicStore } from "@/components/templates/classicStoreData";
 import { auth } from "@/lib/firebase";
+import { mapStoreToTemplateStore } from "@/lib/template-store-data";
 
 interface PreviewData {
   address?: string;
@@ -14,7 +15,7 @@ interface PreviewData {
 export default function ClassicTemplateStoreDetailPage() {
   const params = useParams<{ storeId: string }>();
   const [previewData, setPreviewData] = useState<PreviewData>({});
-  const store = getClassicStore(params.storeId);
+  const store = mapStoreToTemplateStore(getClassicStore(params.storeId));
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {

@@ -1,9 +1,10 @@
 .viewport {
-  width: 100vw;
+  width: 100%;
   min-height: 100svh;
   overflow-x: hidden;
   overflow-y: auto;
   background: #fff;
+  scroll-behavior: smooth;
 }
 
 .canvas {
@@ -180,6 +181,7 @@
   align-items: center;
   justify-content: center;
   animation: bounce 1.8s ease-in-out infinite;
+  cursor: pointer;
 }
 
 .scrollArrow svg {
@@ -190,6 +192,105 @@
 @keyframes bounce {
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50%       { transform: translateX(-50%) translateY(8px); }
+}
+
+.guideSection {
+  position: relative;
+  background: linear-gradient(180deg, #fff 0%, #fffaf0 16%, #fff2bd 100%);
+  color: #111;
+  font-family: Pretendard, "Noto Sans KR", Inter, Arial, sans-serif;
+  scroll-margin-top: 80px;
+}
+
+.guideInner {
+  width: min(100% - 48px, 1540px);
+  margin: 0 auto;
+  padding: 150px 0 180px;
+}
+
+.introRows {
+  display: grid;
+  gap: 140px;
+}
+
+.introRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.78fr);
+  align-items: center;
+  gap: 88px;
+}
+
+.introCopy h2,
+.guideHeader h2 {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.38;
+}
+
+.introCopy p,
+.guideHeader p,
+.guideStep p {
+  margin: 22px 0 0;
+  font-size: 18px;
+  line-height: 1.75;
+}
+
+.introScreenshot {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+}
+
+.guideHeader {
+  margin: 170px 0 70px;
+}
+
+.guideStep {
+  margin-top: 100px;
+}
+
+.guideStep h3 {
+  margin: 0;
+  font-size: 27px;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.threeShotGrid,
+.twoShotGrid {
+  display: grid;
+  align-items: start;
+  gap: 38px;
+  margin-top: 46px;
+}
+
+.threeShotGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.twoShotGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: min(100%, 1080px);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.threeShotGrid img,
+.twoShotGrid img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
+}
+
+.threeShotGrid img {
+  display: block;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: center;
 }
 
 /* ════════════════════════════════════════════════════
@@ -265,6 +366,47 @@
     margin-top: 32px;
     animation: bounceY 1.8s ease-in-out infinite;
   }
+
+  .guideInner {
+    width: min(100% - 36px, 720px);
+    padding: 88px 0 110px;
+  }
+
+  .introRows {
+    gap: 84px;
+  }
+
+  .introRow {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .introCopy h2,
+  .guideHeader h2 {
+    font-size: 28px;
+  }
+
+  .introCopy p,
+  .guideHeader p,
+  .guideStep p {
+    font-size: 16px;
+  }
+
+  .guideHeader {
+    margin: 110px 0 56px;
+  }
+
+  .guideStep {
+    margin-top: 76px;
+  }
+
+  .guideStep h3 {
+    font-size: 23px;
+  }
+
+  .threeShotGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @keyframes bounceY {
@@ -275,5 +417,22 @@
 @media (max-width: 767px) {
   .canvas {
     padding: 80px 20px 48px;
+  }
+
+  .guideInner {
+    width: min(100% - 28px, 520px);
+  }
+
+  .introCopy h2,
+  .guideHeader h2 {
+    font-size: 24px;
+  }
+
+  .guideStep h3 {
+    font-size: 21px;
+  }
+
+  .twoShotGrid {
+    grid-template-columns: 1fr;
   }
 }

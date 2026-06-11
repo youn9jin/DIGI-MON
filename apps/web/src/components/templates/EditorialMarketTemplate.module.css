@@ -40,7 +40,8 @@
   gap: clamp(24px, 3.96vw, 76px);
 }
 
-.header nav a {
+.header nav a,
+.header nav button {
   color: #fff;
   font-size: clamp(16px, 1.46vw, 28px);
   font-weight: 500;
@@ -206,6 +207,30 @@
 .mapBox > div,
 .mapBox iframe {
   min-height: clamp(360px, 34.01vw, 653px);
+}
+
+.directionsInfo {
+  display: grid;
+  width: min(calc(100% - 88px), 1722px);
+  gap: 18px;
+  margin: clamp(40px, 3.13vw, 60px) auto 0;
+  color: #000;
+  font-size: clamp(18px, 1.46vw, 28px);
+  line-height: 1.55;
+}
+
+.directionsInfo div {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 12px;
+}
+
+.directionsInfo dt {
+  font-weight: 800;
+}
+
+.directionsInfo dd {
+  margin: 0;
 }
 
 .footer {
@@ -499,10 +524,35 @@
   gap: clamp(36px, 2.14vw, 41px);
 }
 
+.singleMenuImage,
+.menuImages:has(.menuImagePlaceholder) {
+  grid-template-columns: minmax(0, 804px);
+}
+
 .menuImages img {
   width: 100%;
   height: auto;
   object-fit: cover;
+}
+
+.dynamicMenuImage {
+  display: block;
+  width: 100%;
+  aspect-ratio: 804 / 1058;
+  background-color: #f5efe4;
+  background-position: center;
+  background-size: cover;
+}
+
+.menuImagePlaceholder {
+  display: grid;
+  width: 100%;
+  min-height: 360px;
+  place-items: center;
+  border: 1px solid #ddd4c8;
+  background: #f5efe4;
+  color: #7d746a;
+  font-size: clamp(18px, 1.25vw, 24px);
 }
 
 .signatureSection {
@@ -525,6 +575,8 @@
   width: 100%;
   aspect-ratio: 712 / 594;
   background: #d9d9d9;
+  background-position: center;
+  background-size: cover;
 }
 
 .signatureGrid h3 {
@@ -574,7 +626,8 @@
     gap: 14px;
   }
 
-  .header nav a {
+  .header nav a,
+  .header nav button {
     font-size: 15px;
   }
 
@@ -668,5 +721,14 @@
 
   .storeInfoList {
     font-size: 18px;
+  }
+
+  .directionsInfo {
+    width: min(calc(100% - 40px), 720px);
+  }
+
+  .directionsInfo div {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 }

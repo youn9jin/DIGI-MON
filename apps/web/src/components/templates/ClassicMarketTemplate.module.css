@@ -8,57 +8,36 @@
 
 .topBanner {
   display: flex;
-  width: 100%;
-  height: clamp(72px, 7.5vw, 144px);
-  overflow: hidden;
-}
-
-.bannerPiece {
-  position: relative;
-  flex: 1 0 48px;
-  min-width: 34px;
-  height: 100%;
-  border-radius: 0 0 18px 18px;
-}
-
-.bannerLabel {
-  position: absolute;
-  top: 9%;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  width: 1em;
-  height: 78%;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  width: 100%;
+  height: clamp(64px, 5.57vw, 107px);
+  overflow: hidden;
+  background: linear-gradient(47deg, #123768 6.5%, #f9c305 28.6%, #077a3d 60.9%, #c72f27 90.9%);
+}
+
+.bannerNav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(28px, 5.2vw, 100px);
+  width: 100%;
+  height: 100%;
+  padding: 0 clamp(22px, 3.85vw, 74px);
+}
+
+.bannerNav a,
+.bannerNav span,
+.bannerNav button {
   color: #fff;
-  font-size: clamp(8px, 1.04vw, 20px);
+  font-size: clamp(14px, 1.3vw, 25px);
   font-weight: 500;
-  line-height: 1.35;
+  letter-spacing: 0.06em;
+  line-height: 1;
   text-align: center;
   text-decoration: none;
   word-break: keep-all;
-  writing-mode: vertical-rl;
-}
-
-.blue {
-  background: #123a6d;
-}
-
-.yellow {
-  background: #ffc400;
-}
-
-.red {
-  background: #d3362d;
-}
-
-.green {
-  background: #087a3b;
-}
-
-.light {
-  background: #e4e7e8;
+  white-space: nowrap;
 }
 
 .logoIntro {
@@ -281,11 +260,31 @@
   line-height: 1.2;
 }
 
-.previewActions {
+.previewActionGroup {
   position: fixed;
   right: 24px;
   bottom: 24px;
   z-index: 10;
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+}
+
+.previewFeedback {
+  max-width: min(420px, calc(100vw - 48px));
+  margin: 0;
+  border: 1px solid rgba(196, 43, 43, 0.2);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #a12a2a;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.45;
+  padding: 11px 14px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14);
+}
+
+.previewActions {
   display: flex;
   gap: 10px;
 }
@@ -589,6 +588,8 @@
   width: 100%;
   min-height: clamp(420px, 46.88vw, 900px);
   background: #d9d9d9;
+  background-position: center;
+  background-size: cover;
 }
 
 .storeInfoList {
@@ -631,6 +632,8 @@
 .detailPhotos div {
   min-height: clamp(360px, 34.9vw, 670px);
   background: #d9d9d9;
+  background-position: center;
+  background-size: cover;
 }
 
 @media (max-width: 900px) {
@@ -660,10 +663,19 @@
     text-align: left;
   }
 
-  .previewActions {
+  .previewActionGroup {
     right: 16px;
     bottom: 16px;
     left: 16px;
+    justify-items: stretch;
+  }
+
+  .previewFeedback {
+    max-width: none;
+  }
+
+  .previewActions {
+    width: 100%;
   }
 
   .previewActions a,

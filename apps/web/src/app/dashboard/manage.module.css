@@ -24,6 +24,75 @@
   object-fit: contain;
 }
 
+.operationPage {
+  min-height: 100svh;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+
+.operationBackground {
+  position: absolute;
+  top: clamp(120px, 15.74vw, 170px);
+  left: 50%;
+  width: min(80.73vw, 1550px);
+  height: min(41.2vw, 791px);
+  opacity: 0.15;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.operationBackground img {
+  object-fit: contain;
+}
+
+.operationHero {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100svh - 84px);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.operationCopy {
+  position: absolute;
+  top: clamp(300px, 45.05vw, 487px);
+  left: clamp(72px, 11.2vw, 215px);
+  max-width: min(55vw, 980px);
+}
+
+.operationCopy h1 {
+  margin: 0;
+  color: #131313;
+  font-size: clamp(34px, 2.86vw, 55px);
+  font-weight: 800;
+  line-height: 1.16;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.operationCopy p {
+  margin: clamp(12px, 1.46vw, 28px) 0 0;
+  color: #000;
+  font-size: clamp(18px, 1.56vw, 30px);
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.operationLogo {
+  position: absolute;
+  top: clamp(292px, 37.87vw, 409px);
+  left: clamp(760px, 65.16vw, 1251px);
+  width: min(23.28vw, 447px);
+  aspect-ratio: 447 / 314;
+}
+
+.operationLogo img {
+  object-fit: contain;
+}
+
 .titleBlock {
   position: relative;
   z-index: 1;
@@ -279,14 +348,62 @@
 }
 
 .storeEditor {
-  padding: 22px 12px 0;
+  padding: 20px 18px 0;
 }
 
-.storeEditorGrid {
+.storeSearch {
+  display: block;
+  width: min(100%, 330px);
+  margin: 0 auto 18px;
+}
+
+.storeSearch input {
+  width: 100%;
+  height: 35px;
+  border: 0.8px solid #686868;
+  border-radius: 10px;
+  padding: 0 38px 0 16px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #131313;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.storeCategoryFilter {
   display: grid;
-  grid-template-columns: minmax(180px, 260px) minmax(0, 1fr);
+  grid-template-columns: repeat(6, minmax(92px, 1fr));
   gap: 18px;
-  min-height: 360px;
+  width: min(100%, 840px);
+  margin: 0 auto 18px;
+}
+
+.categoryChip {
+  height: 35px;
+  border: 0;
+  border-radius: 10px;
+  background: #fff5d2;
+  color: #000;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.activeCategoryChip {
+  box-shadow: inset 0 0 0 1.2px #131313;
+  font-weight: 700;
+}
+
+.storeCardGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 11px 18px;
+  width: min(100%, 820px);
+  max-height: 318px;
+  margin: 0 auto;
+  overflow-y: auto;
+  padding: 0 4px 10px;
 }
 
 .storeList {
@@ -301,27 +418,30 @@
 .storeListItem {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
   align-items: flex-start;
   width: 100%;
-  border: 1.5px solid #d6d6d6;
-  border-radius: 16px;
-  padding: 13px 15px;
-  background: rgba(255, 255, 255, 0.65);
+  min-height: 54px;
+  border: 0.8px solid #131313;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #f3f3f3;
   color: #131313;
   cursor: pointer;
   text-align: left;
 }
 
 .storeListItem strong {
-  font-size: 15px;
+  font-size: 12px;
   font-weight: 700;
+  line-height: 13px;
 }
 
 .storeListItem span {
-  color: #777;
-  font-size: 13px;
+  color: #131313;
+  font-size: 10px;
   font-weight: 500;
+  line-height: 13px;
 }
 
 .activeStoreItem {
@@ -373,11 +493,157 @@
 
 .storeDetailEmpty {
   display: grid;
-  min-height: 300px;
+  min-height: 160px;
+  grid-column: 1 / -1;
   place-items: center;
   margin: 0;
   color: #777;
   font-size: 15px;
+}
+
+.storeForm {
+  position: relative;
+  width: min(100%, 820px);
+  margin: 0 auto;
+  padding-top: 28px;
+}
+
+.storeBackButton {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  width: 20px;
+  height: 22px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.storeBackButton::before,
+.storeBackButton::after {
+  position: absolute;
+  left: 8px;
+  width: 12px;
+  height: 1.2px;
+  background: #000;
+  content: "";
+}
+
+.storeBackButton::before {
+  top: 7px;
+  transform: rotate(-45deg);
+}
+
+.storeBackButton::after {
+  top: 15px;
+  transform: rotate(45deg);
+}
+
+.storeFormTitle {
+  margin: 0 0 24px;
+  color: #000;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  text-align: center;
+}
+
+.storeFormFields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.storeFormField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.storeFormField span {
+  color: #000;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+}
+
+.storeFormField input,
+.storeFormField select,
+.storeFormField textarea {
+  width: 100%;
+  border: 1.2px solid #a1a1a1;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #131313;
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+}
+
+.storeFormField input,
+.storeFormField select {
+  height: 45px;
+  padding: 0 18px;
+}
+
+.storeFilePicker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 45px;
+  border: 1.2px solid #a1a1a1;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+}
+
+.storeFilePicker:focus-within {
+  border-color: #131313;
+}
+
+.storeFormField .storeFileInput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.storeFilePlaceholder {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  padding: 0 18px;
+  color: #9f9f9f;
+  font-size: 15px;
+  line-height: 43px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.storeFormField textarea {
+  min-height: 86px;
+  padding: 14px 18px;
+  resize: vertical;
+}
+
+.storeFormField input::placeholder,
+.storeFormField textarea::placeholder {
+  color: #9f9f9f;
+}
+
+.storeFormTemplateOne .storeFormFields {
+  gap: 11px;
+}
+
+.storeFormTextareaField textarea {
+  min-height: 106px;
 }
 
 .previewOverlay {
@@ -486,8 +752,39 @@
     width: min(100%, 360px);
   }
 
-  .storeEditorGrid {
-    grid-template-columns: 1fr;
+  .storeCategoryFilter {
+    grid-template-columns: repeat(3, minmax(92px, 1fr));
+    gap: 10px;
+  }
+
+  .storeCardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .storeForm {
+    width: 100%;
+  }
+
+  .operationHero {
+    min-height: calc(100svh - 76px);
+    padding: 0;
+    text-align: center;
+  }
+
+  .operationCopy {
+    position: relative;
+    top: auto;
+    left: auto;
+    max-width: calc(100vw - 40px);
+    margin: 180px auto 0;
+  }
+
+  .operationLogo {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: min(58vw, 340px);
+    margin: 40px auto 0;
   }
 }
 
@@ -550,5 +847,38 @@
 
   .largePreview {
     width: 100%;
+  }
+
+  .storeCategoryFilter,
+  .storeCardGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .storeCardGrid {
+    max-height: 360px;
+  }
+
+  .storeFormField input,
+  .storeFormField select {
+    height: 44px;
+  }
+
+  .operationHero {
+    padding: 0 22px 40px;
+  }
+
+  .operationCopy h1 {
+    font-size: 30px;
+    white-space: normal;
+  }
+
+  .operationCopy p {
+    margin-top: 18px;
+    font-size: 16px;
+    white-space: normal;
+  }
+
+  .operationLogo {
+    width: min(70vw, 280px);
   }
 }

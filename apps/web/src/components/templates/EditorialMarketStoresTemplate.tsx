@@ -4,7 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import TemplateGenerationActions from "./TemplateGenerationActions";
+import TemplateLanguageToggle, {
+  translateStoreCategory,
+  useTemplateLanguage,
+} from "./TemplateLanguageToggle";
 import { classicStores } from "./classicStoreData";
+import {
+  getUniqueTemplateStores,
+  mapStoreToTemplateStore,
+  type TemplateStore,
+} from "@/lib/template-store-data";
 import styles from "./EditorialMarketTemplate.module.css";
 
 const heroImage = "/images/templates/preview/editorial-store-hero.png";
@@ -13,6 +22,8 @@ interface EditorialMarketStoresTemplateProps {
   marketName?: string;
   address?: string;
   contact?: string;
+  stores?: TemplateStore[];
+  heroImageUrl?: string;
   previewMode?: boolean;
   publicBasePath?: string;
 }
@@ -23,25 +34,47 @@ export default function EditorialMarketStoresTemplate({
   marketName = "Market Name",
   address = "상세주소 text",
   contact = "TELEPHONENUM",
+  stores: storeItems,
+  heroImageUrl,
   previewMode = false,
   publicBasePath,
 }: EditorialMarketStoresTemplateProps) {
+  const { language, t } = useTemplateLanguage();
   const [selectedCategory, setSelectedCategory] = useState("전체");
   const [searchTerm, setSearchTerm] = useState("");
 
+  const sourceStores = useMemo(
+    () =>
+      getUniqueTemplateStores(
+        storeItems ??
+          classicStores.map((store, index) =>
+            mapStoreToTemplateStore(store, index),
+          ),
+      ),
+    [storeItems],
+  );
   const stores = useMemo(() => {
-    return classicStores.filter((store) => {
+    return sourceStores.filter((store) => {
       const matchesCategory =
         selectedCategory === "전체" || store.category === selectedCategory;
+      const keyword = searchTerm.trim();
       const matchesSearch =
-        !searchTerm.trim() ||
-        store.name.includes(searchTerm.trim()) ||
-        store.category.includes(searchTerm.trim());
+        !keyword ||
+        store.name.includes(keyword) ||
+        store.category.includes(keyword) ||
+        store.intro.includes(keyword) ||
+        store.menu.includes(keyword);
 
       return matchesCategory && matchesSearch;
     });
-  }, [searchTerm, selectedCategory]);
+  }, [searchTerm, selectedCategory, sourceStores]);
   const previewSuffix = publicBasePath ? "?preview=design" : "";
+  const getStoreHref = (storeId: string) => {
+    if (publicBasePath?.startsWith("/markets/")) {
+      return `${publicBasePath}/stores/${encodeURIComponent(storeId)}`;
+    }
+    return `/templates/editorial/stores/${encodeURIComponent(storeId)}${previewSuffix}`;
+  };
 
   return (
     <main className={styles.page}>
@@ -51,21 +84,29 @@ export default function EditorialMarketStoresTemplate({
       />
 
       <section className={styles.storeHero} aria-label="점포 찾기">
-        <Image
-          alt=""
-          className={styles.heroImage}
-          fill
-          priority
-          sizes="100vw"
-          src={heroImage}
-        />
+        {heroImageUrl ? (
+          <span
+            className={styles.dynamicHeroImage}
+            style={{ backgroundImage: `url(${heroImageUrl})` }}
+            aria-hidden="true"
+          />
+        ) : (
+          <Image
+            alt=""
+            className={styles.heroImage}
+            fill
+            priority
+            sizes="100vw"
+            src={heroImage}
+          />
+        )}
         <div className={styles.heroOverlay} />
         <div className={styles.storeHeroTitle}>
-          <h1>점포 찾기</h1>
+          <h1>{t("findStorePoint")}</h1>
           <span />
         </div>
         <label className={styles.searchBox}>
-          {!searchTerm && <span>찾고싶은 가게 이름을 입력하세요</span>}
+          {!searchTerm && <span>{t("searchStoreName")}</span>}
           <input
             aria-label="가게 이름 검색"
             value={searchTerm}
@@ -76,8 +117,8 @@ export default function EditorialMarketStoresTemplate({
       </section>
 
       <section className={styles.categorySection} aria-label="카테고리">
-        <h2>CATEGORY</h2>
-        <p>카테고리를 선택하시면 해당하는 가게를 확인하실 수 있습니다.</p>
+        <h2>{language === "en" ? "CATEGORY" : "카테고리"}</h2>
+        <p>{t("categoryDescription")}</p>
         <div className={styles.categoryButtons}>
           {categories.map((category) => (
             <button
@@ -86,7 +127,7 @@ export default function EditorialMarketStoresTemplate({
               type="button"
               onClick={() => setSelectedCategory(category)}
             >
-              {category}
+              {translateStoreCategory(category, language)}
             </button>
           ))}
         </div>
@@ -96,10 +137,10 @@ export default function EditorialMarketStoresTemplate({
         {stores.map((store) => (
           <Link
             className={styles.editorialStoreCard}
-            href={`/templates/editorial/stores/${store.id}${previewSuffix}`}
+            href={getStoreHref(store.id)}
             key={store.id}
           >
-            <strong>{store.category}</strong>
+            <strong>{translateStoreCategory(store.category, language)}</strong>
             <span>{store.name}</span>
           </Link>
         ))}
@@ -143,16 +184,21 @@ export function EditorialHeaderWithBasePath({
   marketName: string;
   publicBasePath?: string;
 }) {
+  const { t } = useTemplateLanguage();
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
-    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    if (href.includes("/stores")) {
+      return publicBasePath.startsWith("/markets/")
+        ? `${publicBasePath}/stores`
+        : `/templates/editorial/stores?preview=design`;
+    }
     const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
     return `${publicBasePath}${hash}`;
   };
   const navItems = [
-    { label: "정보 안내", href: "/templates/editorial#intro" },
-    { label: "점포 안내", href: "/templates/editorial/stores" },
-    { label: "관광 정보", href: "/templates/editorial#culture" },
+    { label: t("information"), href: "/templates/editorial#intro" },
+    { label: t("storeGuide"), href: "/templates/editorial/stores" },
+    { label: t("tourInfoSpaced"), href: "/templates/editorial#culture" },
   ];
 
   return (
@@ -166,6 +212,7 @@ export function EditorialHeaderWithBasePath({
             {item.label}
           </Link>
         ))}
+        <TemplateLanguageToggle />
       </nav>
     </header>
   );
@@ -180,9 +227,14 @@ export function EditorialFooter({
   contact: string;
   publicBasePath?: string;
 }) {
+  const { t } = useTemplateLanguage();
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
-    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    if (href.includes("/stores")) {
+      return publicBasePath.startsWith("/markets/")
+        ? `${publicBasePath}/stores`
+        : `/templates/editorial/stores?preview=design`;
+    }
     const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
     return `${publicBasePath}${hash}`;
   };
@@ -190,23 +242,23 @@ export function EditorialFooter({
   return (
     <footer className={styles.footer}>
       <nav aria-label="하단 메뉴">
-        <Link href={getHref("/templates/editorial#intro")}>시장소개</Link>
-        <Link href={getHref("/templates/editorial/stores")}>가게안내</Link>
-        <Link href={getHref("/templates/editorial#culture")}>관광정보</Link>
-        <Link href={getHref("/templates/editorial#map")}>찾아오시는 길</Link>
+        <Link href={getHref("/templates/editorial#intro")}>{t("marketIntro")}</Link>
+        <Link href={getHref("/templates/editorial/stores")}>{t("shopGuide")}</Link>
+        <Link href={getHref("/templates/editorial#culture")}>{t("tourInfo")}</Link>
+        <Link href={getHref("/templates/editorial#map")}>{t("directions")}</Link>
       </nav>
       <div className={styles.footerInfo}>
         <div>
-          <h3>주소</h3>
+          <h3>{t("address")}</h3>
           <p>{address}</p>
         </div>
         <div>
-          <h3>문의</h3>
+          <h3>{t("contact")}</h3>
           <p>TEL : {contact}</p>
           <p>FAX : FAXNUM</p>
         </div>
         <div>
-          <h3>이메일</h3>
+          <h3>{t("email")}</h3>
           <p>이메일1</p>
           <p>이메일2</p>
         </div>

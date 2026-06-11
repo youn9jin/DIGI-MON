@@ -19,10 +19,13 @@ export interface StoreCreateItem {
   yearsOfOperation?: string;
   contact?: string;
   description?: string;
+  storeImageUrls?: string[];
+  menuImageUrls?: string[];
+  productImageUrls?: string[];
 }
 
 export interface CreateStoresResponse {
-  requestedCount: number;
+  requestedCount?: number;
   successCount: number;
   failedCount?: number;
   successStoreIds: Array<string | number>;
@@ -43,6 +46,9 @@ export interface StoreSummary {
   yearsOfOperation?: string | null;
   contact?: string | null;
   description?: string | null;
+  storeImageUrls?: string[] | null;
+  menuImageUrls?: string[] | null;
+  productImageUrls?: string[] | null;
 }
 
 export interface StoreDetail extends StoreSummary {
@@ -50,9 +56,48 @@ export interface StoreDetail extends StoreSummary {
   updatedAt?: string | null;
 }
 
+export type StoreUpdateRequest = {
+  name?: string;
+  category?: string;
+  items?: string | null;
+  operatingHours?: string | null;
+  yearsOfOperation?: string | null;
+  contact?: string | null;
+  description?: string | null;
+  storeImageUrls?: string[] | null;
+  menuImageUrls?: string[] | null;
+  productImageUrls?: string[] | null;
+};
+
 export interface StoreListResponse {
   total: number;
   stores: StoreSummary[];
+}
+
+function normalizeStoreIdentity(value?: string | null): string {
+  return value?.trim().replace(/\s+/g, " ").toLowerCase() ?? "";
+}
+
+function getUniqueStoreSummaries(stores: StoreSummary[]): StoreSummary[] {
+  const seenIds = new Set<string>();
+  const seenStores = new Set<string>();
+
+  return stores.filter((store) => {
+    const id = String(store.storeId ?? "").trim();
+    const contentKey = [
+      normalizeStoreIdentity(store.category),
+      normalizeStoreIdentity(store.name),
+      normalizeStoreIdentity(store.contact),
+    ].join("|");
+
+    if ((id && seenIds.has(id)) || seenStores.has(contentKey)) {
+      return false;
+    }
+
+    if (id) seenIds.add(id);
+    seenStores.add(contentKey);
+    return true;
+  });
 }
 
 async function getAuthenticatedUser(): Promise<User> {
@@ -115,7 +160,14 @@ export async function getStores(): Promise<StoreListResponse> {
     headers: authHeader,
   });
 
-  return parseEnvelope<StoreListResponse>(response);
+  const result = await parseEnvelope<StoreListResponse>(response);
+  const stores = getUniqueStoreSummaries(result.stores ?? []);
+
+  return {
+    ...result,
+    total: stores.length,
+    stores,
+  };
 }
 
 export async function getStore(storeId: string | number): Promise<StoreDetail> {
@@ -123,6 +175,24 @@ export async function getStore(storeId: string | number): Promise<StoreDetail> {
   const authHeader = await getAuthorizationHeader();
   const response = await fetch(`${baseUrl}/api/stores/${encodeURIComponent(String(storeId))}`, {
     headers: authHeader,
+  });
+
+  return parseEnvelope<StoreDetail>(response);
+}
+
+export async function updateStore(
+  storeId: string | number,
+  store: StoreUpdateRequest,
+): Promise<StoreDetail> {
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const authHeader = await getAuthorizationHeader();
+  const response = await fetch(`${baseUrl}/api/stores/${encodeURIComponent(String(storeId))}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeader,
+    },
+    body: JSON.stringify(store),
   });
 
   return parseEnvelope<StoreDetail>(response);

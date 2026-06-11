@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import DashboardOperationToast from "@/components/dashboard/DashboardOperationToast";
 import GenerationCompletionWatcher from "@/components/templates/GenerationCompletionWatcher";
 
 const geistSans = Geist({
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DIGI-MON",
-  description: "DIGI-MON frontend",
+  title: "WithOn",
+  description: "WithOn 전통시장 웹사이트",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         {children}
         <GenerationCompletionWatcher />
+        <DashboardOperationToast />
       </body>
     </html>
   );

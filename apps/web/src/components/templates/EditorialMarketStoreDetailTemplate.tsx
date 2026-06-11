@@ -2,22 +2,22 @@
 
 import Image from "next/image";
 import TemplateGenerationActions from "./TemplateGenerationActions";
-import type { ClassicStore } from "./classicStoreData";
+import type { TemplateStore } from "@/lib/template-store-data";
 import {
   EditorialFooter,
   EditorialHeader,
 } from "./EditorialMarketStoresTemplate";
 import styles from "./EditorialMarketTemplate.module.css";
+import { useTemplateLanguage } from "./TemplateLanguageToggle";
 
 const heroImage = "/images/templates/preview/editorial-store-hero.png";
-const menuImage1 = "/images/templates/preview/editorial-menu-1.png";
-const menuImage2 = "/images/templates/preview/editorial-menu-2.png";
 
 interface EditorialMarketStoreDetailTemplateProps {
-  store: ClassicStore;
+  store: TemplateStore;
   marketName?: string;
   address?: string;
   contact?: string;
+  heroImageUrl?: string;
   previewMode?: boolean;
   publicBasePath?: string;
 }
@@ -27,22 +27,38 @@ export default function EditorialMarketStoreDetailTemplate({
   marketName = "Market Name",
   address = "상세주소 text",
   contact = "TELEPHONENUM",
+  heroImageUrl,
   previewMode = false,
   publicBasePath,
 }: EditorialMarketStoreDetailTemplateProps) {
+  const { t } = useTemplateLanguage();
+  const representativeImageUrl = store.storeImageUrls[0] ?? heroImageUrl;
+  const menuImageUrls = Array.from(
+    new Set([...store.menuImageUrls, ...store.productImageUrls]),
+  ).slice(0, 2);
+  const signatureImageUrl = store.productImageUrls[0] ?? store.storeImageUrls[0];
+
   return (
     <main className={`${styles.page} ${styles.detailPage}`}>
       <EditorialHeader marketName={marketName} publicBasePath={publicBasePath} />
 
       <section className={styles.detailHero} aria-label="가게 상세">
-        <Image
-          alt=""
-          className={styles.heroImage}
-          fill
-          priority
-          sizes="100vw"
-          src={heroImage}
-        />
+        {representativeImageUrl ? (
+          <span
+            className={styles.dynamicHeroImage}
+            style={{ backgroundImage: `url(${representativeImageUrl})` }}
+            aria-hidden="true"
+          />
+        ) : (
+          <Image
+            alt=""
+            className={styles.heroImage}
+            fill
+            priority
+            sizes="100vw"
+            src={heroImage}
+          />
+        )}
         <div className={styles.heroOverlay} />
         <div className={styles.detailHeroTitle}>
           <span>{store.category}</span>
@@ -52,36 +68,50 @@ export default function EditorialMarketStoreDetailTemplate({
         <p>{store.intro}</p>
       </section>
 
-      <div className={styles.detailActions}>
-        <button type="button">수정</button>
-        <button type="button">삭제</button>
-      </div>
-
       <section className={styles.menuSection} aria-label="메뉴">
         <h2>MENU</h2>
-        <div className={styles.menuImages}>
-          <Image alt="메뉴판 예시 1" width={804} height={1058} src={menuImage1} />
-          <Image alt="메뉴판 예시 2" width={804} height={1058} src={menuImage2} />
+        <div
+          className={`${styles.menuImages} ${
+            menuImageUrls.length === 1 ? styles.singleMenuImage : ""
+          }`}
+        >
+          {menuImageUrls.length > 0 ? (
+            menuImageUrls.map((menuImageUrl, index) => (
+              <span
+                key={menuImageUrl}
+                className={styles.dynamicMenuImage}
+                style={{ backgroundImage: `url(${menuImageUrl})` }}
+                aria-label={`메뉴판 이미지 ${index + 1}`}
+              />
+            ))
+          ) : (
+            <div className={styles.menuImagePlaceholder}>
+              메뉴판 이미지 준비 중
+            </div>
+          )}
         </div>
       </section>
 
       <section className={styles.signatureSection} aria-label="대표 음식">
-        <h2>대표 음식</h2>
+        <h2>{t("featuredFoodShort")}</h2>
         <div className={styles.signatureGrid}>
-          <div className={styles.signaturePhoto} />
+          <div
+            className={styles.signaturePhoto}
+            style={
+              signatureImageUrl
+                ? { backgroundImage: `url(${signatureImageUrl})` }
+                : undefined
+            }
+          />
           <article>
-            <h3>{store.menu} 이름</h3>
-            <p>
-              대통령은 헌법과 법률이 정하는 바에 의하여 공무원을 임면한다. 근로조건의
-              기준은 인간의 존엄성을 보장하도록 법률로 정한다. 국무총리는 국회의 동의를
-              얻어 대통령이 임명한다.
-            </p>
+            <h3>{store.menu}</h3>
+            <p>{store.description}</p>
           </article>
         </div>
         <ul className={styles.storeInfoList}>
-          <li>영업 시간 : {store.hours}</li>
-          <li>가게 연락처 : {store.phone}</li>
-          <li>가게 위치 : (구글맵 링크)</li>
+          <li>{t("businessHours")} : {store.hours}</li>
+          <li>{t("storeContact")} : {store.phone}</li>
+          <li>{t("storeLocation")} : (Google Maps)</li>
         </ul>
       </section>
 

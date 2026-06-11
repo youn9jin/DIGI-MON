@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { type FormEvent, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import DashboardOperationPending from "@/components/dashboard/DashboardOperationPending";
 import Header from "@/components/layout/Header";
 import { auth } from "@/lib/firebase";
 import {
@@ -15,7 +16,16 @@ import {
   updateMarketPageText,
 } from "@/lib/api/market-page";
 import { getMe } from "@/lib/api/me";
-import { getStore, getStores, type StoreDetail, type StoreSummary } from "@/lib/api/stores";
+import {
+  getStore,
+  getStores,
+  updateStore,
+  type StoreDetail,
+  type StoreSummary,
+  type StoreUpdateRequest,
+} from "@/lib/api/stores";
+import { publishDashboardOperationToast } from "@/lib/dashboard-operation-toast";
+import { uploadMarketPageImage } from "@/lib/firebase-storage";
 import styles from "../manage.module.css";
 
 const setupStorageKey = "market_page_setup_draft";
@@ -32,6 +42,113 @@ type MarketField = {
 
 type SetupDraft = {
   templateType?: TemplateType | string | null;
+};
+
+type StoreFormValues = {
+  name: string;
+  category: string;
+  description: string;
+  operatingHours: string;
+  contact: string;
+  yearsOfOperation: string;
+  items: string;
+};
+
+type StoreUploadField = {
+  label: string;
+  placeholder: string;
+  imageKey: "storeImageUrls" | "menuImageUrls" | "productImageUrls";
+  slot: "store" | "menu" | "product";
+  maxFiles: number;
+};
+
+const storeCategories = ["전체보기", "농수산물", "먹거리", "의류", "생활용품", "기타"] as const;
+
+const emptyStoreFormValues: StoreFormValues = {
+  name: "",
+  category: "기타",
+  description: "",
+  operatingHours: "",
+  contact: "",
+  yearsOfOperation: "",
+  items: "",
+};
+
+function getUniqueStores(stores: StoreSummary[]): StoreSummary[] {
+  const seen = new Set<string>();
+
+  return stores.filter((store) => {
+    const contentKey = [
+      store.category?.trim() ?? "",
+      store.name?.trim() ?? "",
+      store.contact?.trim() ?? "",
+    ]
+      .filter(Boolean)
+      .join("|");
+    const uniqueKey = contentKey || String(store.storeId ?? "");
+
+    if (seen.has(uniqueKey)) return false;
+    seen.add(uniqueKey);
+    return true;
+  });
+}
+
+const storeUploadFieldsByTemplate: Record<TemplateType, StoreUploadField[]> = {
+  TEMPLATE_1: [
+    {
+      label: "6. 가게 사진 등록하기(최대 3개)",
+      placeholder: "대표 사진을 마우스로 끌어와주세요",
+      imageKey: "storeImageUrls",
+      slot: "store",
+      maxFiles: 3,
+    },
+    {
+      label: "7. 가게 메뉴판 사진 등록하기(최대 2개)",
+      placeholder: "메뉴판 사진을 선택하거나 마우스로 끌어와주세요",
+      imageKey: "menuImageUrls",
+      slot: "menu",
+      maxFiles: 2,
+    },
+  ],
+  TEMPLATE_2: [
+    {
+      label: "6. 가게 대표 음식 사진 등록하기(최대 4개)",
+      placeholder: "대표 메뉴 사진을 마우스로 끌어와주세요",
+      imageKey: "productImageUrls",
+      slot: "product",
+      maxFiles: 4,
+    },
+    {
+      label: "7. 가게 메뉴판 사진 등록하기(최대 2개)",
+      placeholder: "메뉴판 사진을 마우스로 끌어와주세요",
+      imageKey: "menuImageUrls",
+      slot: "menu",
+      maxFiles: 2,
+    },
+    {
+      label: "8. 가게 대표 사진 등록하기",
+      placeholder: "가게 대표 사진을 마우스로 끌어와주세요",
+      imageKey: "storeImageUrls",
+      slot: "store",
+      maxFiles: 1,
+    },
+  ],
+  TEMPLATE_3: [
+    {
+      label: "6. 가게 대표 음식 사진 등록하기",
+      placeholder: "대표 메뉴 사진을 마우스로 끌어와주세요",
+      imageKey: "productImageUrls",
+      slot: "product",
+      maxFiles: 1,
+    },
+    {
+      label: "7. 가게 대표 사진 등록하기",
+      placeholder: "가게 대표 사진을 마우스로 끌어와주세요",
+      imageKey: "storeImageUrls",
+      slot: "store",
+      maxFiles: 1,
+    },
+  ],
 };
 
 const marketFieldsByTemplate: Record<TemplateType, MarketField[]> = {
@@ -230,6 +347,41 @@ function getValuesFromContent(
   }, {});
 }
 
+function getStoreValues(store: StoreDetail): StoreFormValues {
+  return {
+    name: store.name ?? "",
+    category: store.category ?? "기타",
+    description: store.description ?? "",
+    operatingHours: store.operatingHours ?? "",
+    contact: store.contact ?? "",
+    yearsOfOperation: store.yearsOfOperation ?? "",
+    items: store.items ?? "",
+  };
+}
+
+function getStoreSearchText(store: StoreSummary) {
+  return `${store.name} ${store.category} ${store.items ?? ""}`.toLowerCase();
+}
+
+function toNullableValue(value: string) {
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+}
+
+function appendChangedValue<T extends keyof StoreUpdateRequest>(
+  payload: StoreUpdateRequest,
+  key: T,
+  nextValue: StoreUpdateRequest[T],
+  previousValue?: string | number | null,
+) {
+  const normalizedPrevious = previousValue == null ? null : String(previousValue).trim();
+  const normalizedNext = nextValue == null ? null : String(nextValue).trim();
+
+  if (normalizedNext !== normalizedPrevious) {
+    payload[key] = nextValue;
+  }
+}
+
 async function getContentByMyMarket() {
   const user = await getCurrentUser();
   if (!user) {
@@ -268,9 +420,16 @@ export default function InfoEditPage() {
   const [contentError, setContentError] = useState("");
   const [stores, setStores] = useState<StoreSummary[]>([]);
   const [selectedStore, setSelectedStore] = useState<StoreDetail | null>(null);
+  const [storeValues, setStoreValues] = useState<StoreFormValues>(emptyStoreFormValues);
+  const [storeCategory, setStoreCategory] = useState<(typeof storeCategories)[number]>("전체보기");
+  const [storeSearch, setStoreSearch] = useState("");
   const [isLoadingStores, setIsLoadingStores] = useState(false);
   const [isLoadingStoreDetail, setIsLoadingStoreDetail] = useState(false);
+  const [isSavingStore, setIsSavingStore] = useState(false);
   const [storeError, setStoreError] = useState("");
+  const [storeSaveMessage, setStoreSaveMessage] = useState("");
+  const [storeFileNames, setStoreFileNames] = useState<Record<string, string>>({});
+  const [storeFiles, setStoreFiles] = useState<Record<string, File[]>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
   const [saveError, setSaveError] = useState("");
@@ -282,6 +441,18 @@ export default function InfoEditPage() {
 
   const marketFields = marketFieldsByTemplate[templateType];
   const apiFieldByFieldId = useMemo(() => textApiFieldByTemplate[templateType], [templateType]);
+  const storeUploadFields = storeUploadFieldsByTemplate[templateType];
+  const filteredStores = useMemo(() => {
+    const normalizedSearch = storeSearch.trim().toLowerCase();
+
+    return stores.filter((store) => {
+      const matchesCategory = storeCategory === "전체보기" || store.category === storeCategory;
+      const matchesSearch =
+        normalizedSearch.length === 0 || getStoreSearchText(store).includes(normalizedSearch);
+
+      return matchesCategory && matchesSearch;
+    });
+  }, [storeCategory, storeSearch, stores]);
 
   useEffect(() => {
     let isMounted = true;
@@ -325,8 +496,12 @@ export default function InfoEditPage() {
       try {
         const result = await getStores();
         if (!isMounted) return;
-        setStores(result.stores);
+        setStores(getUniqueStores(result.stores));
         setSelectedStore(null);
+        setStoreValues(emptyStoreFormValues);
+        setStoreFileNames({});
+        setStoreFiles({});
+        setStoreSaveMessage("");
       } catch (error) {
         if (!isMounted) return;
         const apiError = error as Partial<MarketPageApiError>;
@@ -352,6 +527,10 @@ export default function InfoEditPage() {
     try {
       const detail = await getStore(storeId);
       setSelectedStore(detail);
+      setStoreValues(getStoreValues(detail));
+      setStoreFileNames({});
+      setStoreFiles({});
+      setStoreSaveMessage("");
     } catch (error) {
       const apiError = error as Partial<MarketPageApiError>;
       setStoreError(apiError.message ?? "점포 상세 정보를 불러오지 못했습니다.");
@@ -367,6 +546,123 @@ export default function InfoEditPage() {
     }));
     setSaveMessage("");
     setSaveError("");
+  }
+
+  function updateStoreField(field: keyof StoreFormValues, value: string) {
+    setStoreValues((current) => ({
+      ...current,
+      [field]: value,
+    }));
+    setStoreSaveMessage("");
+    setStoreError("");
+  }
+
+  function handleBackToStoreList() {
+    setSelectedStore(null);
+    setStoreValues(emptyStoreFormValues);
+    setStoreFileNames({});
+    setStoreFiles({});
+    setStoreSaveMessage("");
+    setStoreError("");
+  }
+
+  function handleStoreFileChange(field: StoreUploadField, files: FileList | null) {
+    const selectedFiles = Array.from(files ?? [])
+      .filter((file) => file.type.startsWith("image/"))
+      .slice(0, field.maxFiles);
+    setStoreFileNames((current) => ({
+      ...current,
+      [field.label]:
+        selectedFiles.length > 0
+          ? selectedFiles.map((file) => file.name).join(", ")
+          : "",
+    }));
+    setStoreFiles((current) => ({
+      ...current,
+      [field.label]: selectedFiles,
+    }));
+    setStoreSaveMessage("");
+    setStoreError("");
+  }
+
+  async function handleSaveStore(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!selectedStore) return;
+
+    const name = storeValues.name.trim();
+    if (!name) {
+      setStoreError("가게 이름을 입력해주세요.");
+      setStoreSaveMessage("");
+      return;
+    }
+
+    const payload: StoreUpdateRequest = {};
+    appendChangedValue(payload, "name", name, selectedStore.name);
+    appendChangedValue(payload, "category", storeValues.category, selectedStore.category);
+    appendChangedValue(
+      payload,
+      "description",
+      toNullableValue(storeValues.description),
+      selectedStore.description,
+    );
+    appendChangedValue(
+      payload,
+      "operatingHours",
+      toNullableValue(storeValues.operatingHours),
+      selectedStore.operatingHours,
+    );
+    appendChangedValue(payload, "contact", toNullableValue(storeValues.contact), selectedStore.contact);
+    appendChangedValue(
+      payload,
+      "yearsOfOperation",
+      toNullableValue(storeValues.yearsOfOperation),
+      selectedStore.yearsOfOperation,
+    );
+    appendChangedValue(payload, "items", toNullableValue(storeValues.items), selectedStore.items);
+
+    const selectedUploadFields = storeUploadFields.filter(
+      (field) => (storeFiles[field.label]?.length ?? 0) > 0,
+    );
+
+    if (Object.keys(payload).length === 0 && selectedUploadFields.length === 0) {
+      setStoreError("수정할 내용을 입력해주세요.");
+      setStoreSaveMessage("");
+      return;
+    }
+
+    setIsSavingStore(true);
+    setStoreError("");
+    setStoreSaveMessage("");
+
+    try {
+      for (const field of selectedUploadFields) {
+        const files = storeFiles[field.label] ?? [];
+        const urls = await Promise.all(
+          files.map((file) => uploadMarketPageImage(file, field.slot)),
+        );
+        payload[field.imageKey] = urls;
+      }
+
+      const updatedStore = await updateStore(selectedStore.storeId, payload);
+      setSelectedStore(updatedStore);
+      setStoreValues(getStoreValues(updatedStore));
+      setStoreFiles({});
+      setStoreFileNames({});
+      setStores((currentStores) =>
+        getUniqueStores(
+          currentStores.map((store) =>
+            store.storeId === updatedStore.storeId ? { ...store, ...updatedStore } : store,
+          ),
+        ),
+      );
+      publishDashboardOperationToast("detail");
+      setStoreSaveMessage("가게 정보를 저장했어요.");
+    } catch (error) {
+      setStoreError(error instanceof Error ? error.message : "가게 정보 저장에 실패했습니다.");
+    } finally {
+      setIsSavingStore(false);
+    }
   }
 
   async function handleSaveMarketText(event: FormEvent<HTMLFormElement>) {
@@ -395,6 +691,7 @@ export default function InfoEditPage() {
 
     try {
       await updateMarketPageText(payload);
+      publishDashboardOperationToast("detail");
       setSaveMessage("수정한 문구를 저장했어요.");
     } catch (error) {
       const apiError = error as Partial<MarketPageApiError>;
@@ -402,6 +699,10 @@ export default function InfoEditPage() {
     } finally {
       setIsSaving(false);
     }
+  }
+
+  if (isSaving || isSavingStore) {
+    return <DashboardOperationPending type="detail" />;
   }
 
   return (
@@ -485,61 +786,147 @@ export default function InfoEditPage() {
             {storeError ? <p className={styles.formError}>{storeError}</p> : null}
             {!isLoadingStores && stores.length === 0 ? (
               <div className={styles.storePlaceholder}>등록된 점포가 없습니다.</div>
+            ) : selectedStore ? (
+              <form
+                className={`${styles.storeForm} ${
+                  templateType === "TEMPLATE_1" ? styles.storeFormTemplateOne : ""
+                }`}
+                onSubmit={handleSaveStore}
+              >
+                <button
+                  className={styles.storeBackButton}
+                  type="button"
+                  aria-label="점포 목록으로 돌아가기"
+                  onClick={handleBackToStoreList}
+                />
+                <h2 className={styles.storeFormTitle}>{selectedStore.name}</h2>
+                <div className={styles.storeFormFields}>
+                  <label className={styles.storeFormField}>
+                    <span>1. 가게 한 줄 소개 수정하기(50자 이내)</span>
+                    <input
+                      maxLength={50}
+                      placeholder="(기존 한 줄 소개 내용)"
+                      value={storeValues.description}
+                      onChange={(event) => updateStoreField("description", event.target.value)}
+                    />
+                  </label>
+                  <label className={styles.storeFormField}>
+                    <span>2. 가게 영업 시간 수정하기(50자 이내)</span>
+                    <input
+                      maxLength={50}
+                      placeholder="예) 평일 09:00~18:00 / 주말 10:00~17:00"
+                      value={storeValues.operatingHours}
+                      onChange={(event) => updateStoreField("operatingHours", event.target.value)}
+                    />
+                  </label>
+                  <label className={styles.storeFormField}>
+                    <span>3. 가게 전화번호 수정하기</span>
+                    <input
+                      maxLength={20}
+                      placeholder="(기존 전화번호 내용)"
+                      value={storeValues.contact}
+                      onChange={(event) => updateStoreField("contact", event.target.value)}
+                    />
+                  </label>
+                  <label className={styles.storeFormField}>
+                    <span>4. 가게 위치 수정하기</span>
+                    <input
+                      maxLength={20}
+                      placeholder="(기존 위치 내용)"
+                      value={storeValues.yearsOfOperation}
+                      onChange={(event) => updateStoreField("yearsOfOperation", event.target.value)}
+                    />
+                  </label>
+                  <label className={styles.storeFormField}>
+                    <span>5. 가게 대표 음식 수정하기</span>
+                    <input
+                      maxLength={255}
+                      placeholder="(기존 대표 음식 내용)"
+                      value={storeValues.items}
+                      onChange={(event) => updateStoreField("items", event.target.value)}
+                    />
+                  </label>
+                  {templateType === "TEMPLATE_1" ? (
+                    null
+                  ) : templateType === "TEMPLATE_3" ? (
+                    <label className={`${styles.storeFormField} ${styles.storeFormTextareaField}`}>
+                      <span>5. 가게 대표 음식 소개 수정하기(200자 이내)</span>
+                      <textarea
+                        maxLength={200}
+                        placeholder="(기존 대표 음식 소개 내용)"
+                        value={storeValues.description}
+                        onChange={(event) => updateStoreField("description", event.target.value)}
+                      />
+                    </label>
+                  ) : null}
+                  {storeUploadFields.map((field) => (
+                    <label className={styles.storeFormField} key={field.label}>
+                      <span>{field.label}</span>
+                      <span className={styles.storeFilePicker}>
+                        <input
+                          className={styles.storeFileInput}
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          multiple={field.maxFiles > 1}
+                          onChange={(event) =>
+                            handleStoreFileChange(field, event.currentTarget.files)
+                          }
+                        />
+                        <span className={styles.storeFilePlaceholder}>
+                          {storeFileNames[field.label] || field.placeholder}
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                {storeSaveMessage ? <p className={styles.formMessage}>{storeSaveMessage}</p> : null}
+                <button className={styles.saveButton} type="submit" disabled={isSavingStore}>
+                  {isSavingStore ? "저장 중" : "저장하기"}
+                </button>
+              </form>
             ) : (
-              <div className={styles.storeEditorGrid}>
-                <div className={styles.storeList} aria-label="점포 목록">
-                  {stores.map((store) => (
+              <>
+                <label className={styles.storeSearch} aria-label="점포 검색">
+                  <input
+                    placeholder="원하는 매장을 검색해보세요"
+                    value={storeSearch}
+                    onChange={(event) => setStoreSearch(event.target.value)}
+                  />
+                </label>
+                <div className={styles.storeCategoryFilter} aria-label="카테고리">
+                  {storeCategories.map((category) => (
                     <button
-                      className={`${styles.storeListItem} ${
-                        selectedStore?.storeId === store.storeId ? styles.activeStoreItem : ""
+                      className={`${styles.categoryChip} ${
+                        storeCategory === category ? styles.activeCategoryChip : ""
                       }`}
+                      key={category}
+                      type="button"
+                      onClick={() => setStoreCategory(category)}
+                    >
+                      {category === "농수산물" ? "농/수산물" : category}
+                    </button>
+                  ))}
+                </div>
+                {isLoadingStoreDetail ? (
+                  <p className={styles.formMessage}>점포 상세 정보를 불러오는 중입니다.</p>
+                ) : null}
+                <div className={styles.storeCardGrid} aria-label="점포 목록">
+                  {filteredStores.map((store) => (
+                    <button
+                      className={styles.storeListItem}
                       key={store.storeId}
                       type="button"
                       onClick={() => handleSelectStore(store.storeId)}
                     >
-                      <strong>{store.name}</strong>
-                      <span>{store.category}</span>
+                      <strong>{store.category === "농수산물" ? "농/수산물" : store.category}</strong>
+                      <span>{store.name}</span>
                     </button>
                   ))}
+                  {filteredStores.length === 0 ? (
+                    <p className={styles.storeDetailEmpty}>검색 결과가 없습니다.</p>
+                  ) : null}
                 </div>
-                <div className={styles.storeDetail} aria-label="점포 상세 정보">
-                  {isLoadingStoreDetail ? (
-                    <p className={styles.formMessage}>점포 상세 정보를 불러오는 중입니다.</p>
-                  ) : selectedStore ? (
-                    <>
-                      <h3>{selectedStore.name}</h3>
-                      <dl>
-                        <div>
-                          <dt>카테고리</dt>
-                          <dd>{selectedStore.category}</dd>
-                        </div>
-                        <div>
-                          <dt>취급 품목</dt>
-                          <dd>{selectedStore.items || "-"}</dd>
-                        </div>
-                        <div>
-                          <dt>영업시간</dt>
-                          <dd>{selectedStore.operatingHours || "-"}</dd>
-                        </div>
-                        <div>
-                          <dt>운영연수</dt>
-                          <dd>{selectedStore.yearsOfOperation || "-"}</dd>
-                        </div>
-                        <div>
-                          <dt>연락처</dt>
-                          <dd>{selectedStore.contact || "-"}</dd>
-                        </div>
-                        <div>
-                          <dt>소개</dt>
-                          <dd>{selectedStore.description || "-"}</dd>
-                        </div>
-                      </dl>
-                    </>
-                  ) : (
-                    <p className={styles.storeDetailEmpty}>왼쪽에서 점포를 선택해주세요.</p>
-                  )}
-                </div>
-              </div>
+              </>
             )}
           </section>
         )}

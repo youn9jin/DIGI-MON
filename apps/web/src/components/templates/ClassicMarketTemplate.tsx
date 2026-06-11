@@ -2,8 +2,11 @@
 
 import Link from "next/link";
 import styles from "./ClassicMarketTemplate.module.css";
-import OpenStreetMapEmbed from "./OpenStreetMapEmbed";
+import GoogleMapEmbed from "./GoogleMapEmbed";
 import TemplateGenerationActions from "./TemplateGenerationActions";
+import TemplateLanguageToggle, {
+  useTemplateLanguage,
+} from "./TemplateLanguageToggle";
 
 export interface ClassicMarketTemplateData {
   marketName: string;
@@ -42,31 +45,6 @@ const DEFAULT_DATA: ClassicMarketTemplateData = {
     "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.",
 };
 
-const bannerItems = [
-  { color: "blue" },
-  { color: "yellow" },
-  { color: "red" },
-  { color: "green" },
-  { color: "light" },
-  { color: "blue" },
-  { color: "yellow" },
-  { color: "red" },
-  { color: "green" },
-  { color: "light" },
-  { color: "blue" },
-  { color: "yellow" },
-  { color: "red" },
-  { color: "green", label: "시장소개", href: "/templates/classic" },
-  { color: "light" },
-  { color: "blue", label: "가게정보", href: "/templates/classic/stores" },
-  { color: "yellow" },
-  { color: "red", label: "관광정보", href: "/templates/classic#tour" },
-  { color: "green" },
-  { color: "light" },
-  { color: "blue", label: "EN / KR" },
-  { color: "yellow" },
-];
-
 interface ClassicMarketTemplateProps {
   data?: Partial<ClassicMarketTemplateData>;
   previewMode?: boolean;
@@ -78,12 +56,18 @@ export default function ClassicMarketTemplate({
   previewMode = false,
   publicBasePath,
 }: ClassicMarketTemplateProps) {
+  const { t } = useTemplateLanguage();
   const content = { ...DEFAULT_DATA, ...data };
   const introImageUrls = content.introImageUrls ?? [];
   const secondIntroImageUrl = introImageUrls[1] ?? introImageUrls[0];
   const getHref = (href: string) => {
     if (!publicBasePath) return href;
-    if (href.includes("/stores")) return `${publicBasePath}#stores`;
+    const isPublicMarketPage = publicBasePath.startsWith("/markets/");
+    if (href.includes("/stores")) {
+      return isPublicMarketPage
+        ? `${publicBasePath}/stores`
+        : "/templates/classic/stores?preview=design";
+    }
     const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "#intro";
     return `${publicBasePath}${hash}`;
   };
@@ -91,20 +75,12 @@ export default function ClassicMarketTemplate({
   return (
     <main className={styles.page}>
       <header className={styles.topBanner} aria-label="템플릿 메뉴">
-        {bannerItems.map((item, index) => (
-          <div
-            className={`${styles.bannerPiece} ${styles[item.color]}`}
-            key={`${item.color}-${index}`}
-          >
-            {item.label && item.href ? (
-              <Link className={styles.bannerLabel} href={getHref(item.href)}>
-                {item.label}
-              </Link>
-            ) : item.label ? (
-              <span className={styles.bannerLabel}>{item.label}</span>
-            ) : null}
-          </div>
-        ))}
+        <nav className={styles.bannerNav}>
+          <Link href={getHref("/templates/classic#intro")}>{t("marketIntro")}</Link>
+          <Link href={getHref("/templates/classic/stores")}>{t("storeInfo")}</Link>
+          <Link href={getHref("/templates/classic#tour")}>{t("tourInfo")}</Link>
+          <TemplateLanguageToggle />
+        </nav>
       </header>
 
       <section className={styles.logoIntro} id="intro" aria-label="시장 소개">
@@ -156,30 +132,30 @@ export default function ClassicMarketTemplate({
       </section>
 
       <section className={styles.mapSection} id="map" aria-label="찾아오시는 길">
-        <h2>찾아오시는 길</h2>
-        <OpenStreetMapEmbed address={content.address} label={content.marketName} />
+        <h2>{t("directions")}</h2>
+        <GoogleMapEmbed address={content.address} label={content.marketName} />
       </section>
 
       <footer className={styles.footer}>
         <nav className={styles.footerNav} aria-label="하단 메뉴">
-          <Link href={getHref("/templates/classic#intro")}>시장소개</Link>
-          <Link href={getHref("/templates/classic/stores")}>가게안내</Link>
-          <Link href={getHref("/templates/classic#tour")}>관광정보</Link>
-          <Link href={getHref("/templates/classic#map")}>찾아오시는 길</Link>
+          <Link href={getHref("/templates/classic#intro")}>{t("marketIntro")}</Link>
+          <Link href={getHref("/templates/classic/stores")}>{t("shopGuide")}</Link>
+          <Link href={getHref("/templates/classic#tour")}>{t("tourInfo")}</Link>
+          <Link href={getHref("/templates/classic#map")}>{t("directions")}</Link>
         </nav>
 
         <div className={styles.footerInfo}>
           <div>
-            <h3>주소</h3>
+            <h3>{t("address")}</h3>
             <p>{content.address}</p>
           </div>
           <div>
-            <h3>문의</h3>
+            <h3>{t("contact")}</h3>
             <p>TEL : {content.contact}</p>
             <p>FAX : {content.fax}</p>
           </div>
           <div>
-            <h3>이메일</h3>
+            <h3>{t("email")}</h3>
             <p>{content.emailPrimary}</p>
             <p>{content.emailSecondary}</p>
           </div>

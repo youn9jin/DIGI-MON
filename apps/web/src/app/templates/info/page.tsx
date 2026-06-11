@@ -66,7 +66,12 @@ interface SetupDraft {
   selectedSections: MarketPageSection[];
 }
 
-const storeHeaderMap: Record<keyof StoreCreateItem, string[]> = {
+type StoreExcelField = Exclude<
+  keyof StoreCreateItem,
+  "storeImageUrls" | "menuImageUrls" | "productImageUrls"
+>;
+
+const storeHeaderMap: Record<StoreExcelField, string[]> = {
   name: ["name", "점포명", "가게명", "상호명", "상호"],
   category: ["category", "업종", "카테고리", "분류"],
   items: ["items", "취급품목", "취급 품목", "대표메뉴", "대표 메뉴", "품목"],
@@ -74,26 +79,6 @@ const storeHeaderMap: Record<keyof StoreCreateItem, string[]> = {
   yearsOfOperation: ["years_of_operation", "yearsOfOperation", "운영연수", "운영 연수"],
   contact: ["contact", "연락처", "전화번호", "대표 연락처"],
   description: ["description", "점포소개", "점포 소개", "소개"],
-};
-
-const storeTemplateHeaders: Array<keyof StoreCreateItem> = [
-  "name",
-  "category",
-  "items",
-  "operatingHours",
-  "yearsOfOperation",
-  "contact",
-  "description",
-];
-
-const storeTemplateHeaderLabels: Record<keyof StoreCreateItem, string> = {
-  name: "점포명",
-  category: "category",
-  items: "대표메뉴/취급품목",
-  operatingHours: "영업시간",
-  yearsOfOperation: "운영연수",
-  contact: "연락처",
-  description: "점포 소개",
 };
 
 const previewConfigs: Record<TemplateType, Record<PreviewTarget, PreviewConfig>> = {
@@ -349,7 +334,7 @@ function getSaveErrorMessage(error: unknown): string {
   return message || "웹페이지 생성 설정 저장에 실패했습니다.";
 }
 
-function getCell(row: Record<string, unknown>, field: keyof StoreCreateItem): string {
+function getCell(row: Record<string, unknown>, field: StoreExcelField): string {
   const aliases = storeHeaderMap[field].map(normalizeHeader);
   const entry = Object.entries(row).find(([key]) => aliases.includes(normalizeHeader(key)));
   const value = entry?.[1];
@@ -392,24 +377,6 @@ async function parseStoreSheet(file: File): Promise<StoreCreateItem[]> {
   });
 }
 
-function downloadStoreTemplate() {
-  const worksheet = XLSX.utils.aoa_to_sheet([
-    storeTemplateHeaders.map((header) => storeTemplateHeaderLabels[header]),
-    [
-      "예시상회",
-      "먹거리",
-      "떡볶이, 김밥",
-      "09:00-18:00",
-      "10년",
-      "010-0000-0000",
-      "시장 입구에 있는 분식 점포입니다.",
-    ],
-  ]);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "점포등록");
-  XLSX.writeFile(workbook, "DIGI-MON_점포등록_양식.xlsx");
-}
-
 export default function TemplateInfoPage() {
   const router = useRouter();
   const [setupDraft] = useState<SetupDraft>(getSetupDraft);
@@ -426,6 +393,7 @@ export default function TemplateInfoPage() {
   const [representativeFileMessage, setRepresentativeFileMessage] = useState("");
   const [storeFileName, setStoreFileName] = useState("");
   const [storeUploadMessage, setStoreUploadMessage] = useState("");
+  const [saveErrorMessage, setSaveErrorMessage] = useState("");
   const [stores, setStores] = useState<StoreCreateItem[]>([]);
   const needsStoreFile = setupDraft.selectedSections.includes("stores");
   const previewConfig = previewTarget
@@ -517,12 +485,13 @@ export default function TemplateInfoPage() {
     if (isSaving || !isInfoComplete) return;
 
     setIsSaving(true);
+    setSaveErrorMessage("");
     try {
       if (stores.length > 0) {
         const result = await createStores(stores);
         if (result.failedItems?.length > 0) {
           const firstFailed = result.failedItems[0];
-          window.alert(
+          setSaveErrorMessage(
             `${result.successCount}개 등록, ${result.failedItems.length}개 실패했습니다.\n${firstFailed.name ?? "점포"}: ${firstFailed.reason}`,
           );
           setIsSaving(false);
@@ -548,11 +517,12 @@ export default function TemplateInfoPage() {
         introImageUrls,
       });
       window.sessionStorage.removeItem(generatedPageIdStorageKey);
+      window.sessionStorage.removeItem("generated_market_public_market_id");
       window.sessionStorage.setItem(generationVersionStorageKey, String(Date.now()));
       window.sessionStorage.setItem(generationInProgressStorageKey, "true");
       router.push("/templates/generating");
     } catch (error) {
-      window.alert(getSaveErrorMessage(error));
+      setSaveErrorMessage(getSaveErrorMessage(error));
       setIsSaving(false);
     }
   }
@@ -683,15 +653,15 @@ export default function TemplateInfoPage() {
             </div>
             <div className={styles.uploadGuide}>
               <p className={styles.uploadHint}>
-                DIGI-MON 공식 양식 파일을 사용해주세요. category는 농수산물/먹거리/의류/생활용품/기타 중 하나로 입력해야 하며, 해당하지 않는 경우 자동으로 기타로 분류됩니다.
+                WithOn 공식 양식 파일을 사용해주세요. category는 농수산물/먹거리/의류/생활용품/기타 중 하나로 입력해야 하며, 해당하지 않는 경우 자동으로 기타로 분류됩니다.
               </p>
-              <button
+              <a
                 className={styles.templateDownloadButton}
-                type="button"
-                onClick={downloadStoreTemplate}
+                href="/downloads/WithOn_점포등록_공식양식.xlsx"
+                download="WithOn_점포등록_공식양식.xlsx"
               >
                 양식 파일 다운로드
-              </button>
+              </a>
             </div>
             <label className={styles.fileUpload}>
               <input
@@ -706,6 +676,12 @@ export default function TemplateInfoPage() {
             )}
           </section>
         </form>
+
+        {saveErrorMessage && (
+          <p className={styles.saveErrorMessage} role="status" aria-live="polite">
+            {saveErrorMessage}
+          </p>
+        )}
 
         <div className={styles.actions}>
           <button

@@ -100,9 +100,10 @@ export function mapEditorialMarketPageContent(
     heroImageUrl: content.heroImageUrl ?? undefined,
     logoImageUrl: content.logoImageUrl ?? undefined,
     introImageUrls: optionalImageUrls(content.introImageUrls),
-    intro: firstText(content.intro?.content, content.hero?.description),
-    foodText: firstText(firstStore.highlight, firstFeature.description, content.hero?.subtitle),
-    cultureText: firstText(secondFeature.description, firstFeature.title),
+    intro: firstText(content.introText, content.intro?.content, content.hero?.description),
+    foodText: firstText(firstStore.highlight, firstFeature.description, content.historyText, content.hero?.subtitle),
+    cultureText: firstText(secondFeature.description, secondFeature.title, firstFeature.title),
+    directionsText: firstText(content.directionsText),
   };
 }
 

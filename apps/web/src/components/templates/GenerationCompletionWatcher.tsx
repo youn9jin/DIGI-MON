@@ -8,6 +8,7 @@ import {
   subscribeMarketPageStatus,
   type MarketPageApiError,
 } from "@/lib/api/market-page";
+import { getGenerationErrorMessage } from "@/lib/generation-error";
 import { getGeneratedMarketPageHref } from "@/lib/market-page-template-data";
 import styles from "./GenerationCompletionWatcher.module.css";
 
@@ -59,12 +60,15 @@ export default function GenerationCompletionWatcher() {
         window.sessionStorage.removeItem(generationInProgressStorageKey);
         setError({
           status: 0,
-          message: result.error ?? "웹사이트 생성에 실패했습니다.",
+          message: getGenerationErrorMessage(result.error),
         });
       },
       onError: (nextError) => {
         if (!isMounted) return;
-        setError(nextError);
+        setError({
+          ...nextError,
+          message: getGenerationErrorMessage(nextError.message),
+        });
       },
     })
       .then((nextUnsubscribe) => {
@@ -72,7 +76,10 @@ export default function GenerationCompletionWatcher() {
       })
       .catch((nextError: MarketPageApiError) => {
         if (!isMounted) return;
-        setError(nextError);
+        setError({
+          ...nextError,
+          message: getGenerationErrorMessage(nextError.message),
+        });
       });
 
     return () => {
