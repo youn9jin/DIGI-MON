@@ -43,6 +43,8 @@ public class MarketPageGenerationService {
 
     private static final Logger log = LoggerFactory.getLogger(MarketPageGenerationService.class);
     private static final String GENERATE_PATH = "/generate";
+    private static final int FASTAPI_ERROR_BODY_LOG_LIMIT = 2_000;
+    private static final String AI_TEMPLATE_FALLBACK = "TEMPLATE_1";
 
     private final WebClient aiWebClient;
     private final MarketRepository marketRepository;
@@ -110,7 +112,8 @@ public class MarketPageGenerationService {
 
         } catch (WebClientResponseException e) {
             String reason = "FastAPI " + e.getStatusCode().value() + " " + safeMessage(e.getMessage());
-            log.warn("market page generation failed (pageId={}): {}", pageId, reason);
+            log.warn("market page generation failed (pageId={}): {} responseBody={}",
+                    pageId, reason, safeMessage(e.getResponseBodyAsString(), FASTAPI_ERROR_BODY_LOG_LIMIT));
             self.markFailed(pageId);
             sseEmitterManager.sendFailed(pageId, reason);
         } catch (Exception e) {
@@ -169,10 +172,23 @@ public class MarketPageGenerationService {
         return AiGenerateRequest.builder()
                 .market(marketDto)
                 .stores(storeDtos)
-                .templateType(config.getTemplateType())
+                .templateType(toAiTemplateType(config.getTemplateType(), marketId))
                 .selectedSections(config.getSelectedSections())
                 .userContent(buildUserContent(config))
                 .build();
+    }
+
+    /**
+     * FastAPI 운영 버전은 TEMPLATE_1 / TEMPLATE_2 만 허용한다.
+     * DB 와 공개 페이지의 templateType 은 그대로 TEMPLATE_3 을 유지하고, AI 카피 생성 요청에서만 임시 호환값을 보낸다.
+     */
+    private String toAiTemplateType(String templateType, Long marketId) {
+        if ("TEMPLATE_3".equals(templateType)) {
+            log.info("FastAPI template compatibility fallback: marketId={} originalTemplateType={} aiTemplateType={}",
+                    marketId, templateType, AI_TEMPLATE_FALLBACK);
+            return AI_TEMPLATE_FALLBACK;
+        }
+        return templateType;
     }
 
     /**
@@ -236,9 +252,13 @@ public class MarketPageGenerationService {
     }
 
     private static String safeMessage(String message) {
+        return safeMessage(message, 200);
+    }
+
+    private static String safeMessage(String message, int limit) {
         if (message == null) {
             return "";
         }
-        return message.length() > 200 ? message.substring(0, 200) : message;
+        return message.length() > limit ? message.substring(0, limit) : message;
     }
 }
