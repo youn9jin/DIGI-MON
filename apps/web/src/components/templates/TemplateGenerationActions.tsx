@@ -72,7 +72,9 @@ export default function TemplateGenerationActions({
     } catch (error) {
       setIsGenerating(false);
       const apiError = error as MarketPageApiError;
-      setFeedbackMessage(getGenerationErrorMessage(apiError.message));
+      setFeedbackMessage(
+        getGenerationErrorMessage(apiError.message, apiError.status),
+      );
     }
   }
 
@@ -87,7 +89,9 @@ export default function TemplateGenerationActions({
     } catch (error) {
       setIsGenerating(false);
       const apiError = error as MarketPageApiError;
-      setFeedbackMessage(getGenerationErrorMessage(apiError.message));
+      setFeedbackMessage(
+        getGenerationErrorMessage(apiError.message, apiError.status),
+      );
     }
   }
 

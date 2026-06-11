@@ -67,7 +67,10 @@ export default function GenerationCompletionWatcher() {
         if (!isMounted) return;
         setError({
           ...nextError,
-          message: getGenerationErrorMessage(nextError.message),
+          message: getGenerationErrorMessage(
+            nextError.message,
+            nextError.status,
+          ),
         });
       },
     })
@@ -78,7 +81,10 @@ export default function GenerationCompletionWatcher() {
         if (!isMounted) return;
         setError({
           ...nextError,
-          message: getGenerationErrorMessage(nextError.message),
+          message: getGenerationErrorMessage(
+            nextError.message,
+            nextError.status,
+          ),
         });
       });
 

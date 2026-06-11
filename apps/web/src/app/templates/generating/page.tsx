@@ -24,6 +24,7 @@ const setupStorageKey = "market_page_setup_draft";
 const generationVersionStorageKey = "market_page_generation_version";
 let createMarketPagePromise: ReturnType<typeof createMarketPage> | null = null;
 let createMarketPagePromiseKey: string | null = null;
+type GenerationViewStatus = MarketPageStatus | "CONNECTION_LOST";
 
 function getGenerationRequestKey(): string {
   if (typeof window === "undefined") return "server";
@@ -38,7 +39,7 @@ function getGenerationRequestKey(): string {
 export default function TemplateGeneratingPage() {
   const hasStarted = useRef(false);
   const unsubscribeRef = useRef<(() => void) | null>(null);
-  const [status, setStatus] = useState<MarketPageStatus>("PENDING");
+  const [status, setStatus] = useState<GenerationViewStatus>("PENDING");
   const [errorMessage, setErrorMessage] = useState("");
   const [pageId, setPageId] = useState<string | number | null>(null);
   const [publicMarketId, setPublicMarketId] = useState<string | number | null>(null);
@@ -86,12 +87,9 @@ export default function TemplateGeneratingPage() {
           if (!isMounted) return;
           createMarketPagePromise = null;
           createMarketPagePromiseKey = null;
-          window.sessionStorage.removeItem(generatedPageIdStorageKey);
-          window.sessionStorage.removeItem(generatedPublicMarketIdStorageKey);
-          window.sessionStorage.removeItem(generationInProgressStorageKey);
-          setStatus("FAILED");
+          setStatus("CONNECTION_LOST");
           setShowCompletionAlert(false);
-          setErrorMessage(getGenerationErrorMessage(error.message));
+          setErrorMessage(getGenerationErrorMessage(error.message, error.status));
         },
       });
     }
@@ -145,7 +143,9 @@ export default function TemplateGeneratingPage() {
         window.sessionStorage.removeItem(generationInProgressStorageKey);
         setStatus("FAILED");
         setShowCompletionAlert(false);
-        setErrorMessage(getGenerationErrorMessage(apiError.message));
+        setErrorMessage(
+          getGenerationErrorMessage(apiError.message, apiError.status),
+        );
       }
     }
 
@@ -216,18 +216,22 @@ export default function TemplateGeneratingPage() {
         <h1>
           {status === "DONE"
             ? "우리 시장 맞춤 웹페이지 생성 완료"
-            : status === "FAILED"
+            : status === "CONNECTION_LOST"
+              ? "생성 상태 확인이 잠시 끊겼어요"
+              : status === "FAILED"
               ? "웹페이지 생성에 실패했어요"
               : "우리 시장 맞춤 웹페이지 만드는 중"}
         </h1>
         <p>
-          {status === "FAILED"
+          {status === "FAILED" || status === "CONNECTION_LOST"
             ? errorMessage
             : "입력해주신 정보를 바탕으로 웹사이트를 만들고 있어요"}
           <br />
           {status === "DONE"
             ? "웹페이지 관리 화면에서 결과를 확인해보세요"
-            : "기다리시는 동안 웹페이지 관리 방법을 확인해보세요"}
+            : status === "CONNECTION_LOST"
+              ? "웹사이트 관리 화면에서 생성 결과를 다시 확인해주세요"
+              : "기다리시는 동안 웹페이지 관리 방법을 확인해보세요"}
         </p>
         {status === "DONE" && pageId && (
           <span className={styles.pageId}>생성 요청 번호 {pageId}</span>
@@ -238,6 +242,10 @@ export default function TemplateGeneratingPage() {
         <button className={styles.guideButton} type="button" onClick={handleRetry}>
           다시 생성하기
         </button>
+      ) : status === "CONNECTION_LOST" ? (
+        <Link className={styles.guideButton} href="/dashboard">
+          웹사이트 관리로 이동
+        </Link>
       ) : status === "DONE" && generatedHrefId ? (
         <Link
           className={`${styles.guideButton} ${styles.doneButton}`}
