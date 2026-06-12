@@ -44,7 +44,6 @@ public class MarketPageGenerationService {
     private static final Logger log = LoggerFactory.getLogger(MarketPageGenerationService.class);
     private static final String GENERATE_PATH = "/generate";
     private static final int FASTAPI_ERROR_BODY_LOG_LIMIT = 2_000;
-    private static final String AI_TEMPLATE_FALLBACK = "TEMPLATE_1";
 
     private final WebClient aiWebClient;
     private final MarketRepository marketRepository;
@@ -89,6 +88,7 @@ public class MarketPageGenerationService {
                 log.warn("request logging failed", e);
             }
 
+            // FastAPI /generate 단일 호출 — Gemini retry는 FastAPI 내부(gemini_api.py)에서 처리
             String responseJson = aiWebClient.post()
                     .uri(GENERATE_PATH)
                     .contentType(MediaType.APPLICATION_JSON)
@@ -96,8 +96,6 @@ public class MarketPageGenerationService {
                     .bodyValue(body)
                     .retrieve()
                     .bodyToMono(String.class)
-                    // WebClient.block 은 자체 타임아웃 인자를 받지 않더라도
-                    // ReactorClientHttpConnector 의 responseTimeout(60s) 이 그대로 적용된다.
                     .block();
 
             // HTTP 는 성공(2xx)이지만 바디가 비어있는 경우(예: 빈 응답/204). AI 응답 없음으로 간주 → FAILED.
@@ -108,7 +106,8 @@ public class MarketPageGenerationService {
             }
 
             self.markDone(pageId, responseJson);
-            sseEmitterManager.sendDone(pageId);
+            // marketId는 generateAsync() 파라미터로 이미 보유
+            sseEmitterManager.sendDone(pageId, marketId);
 
         } catch (WebClientResponseException e) {
             String reason = "FastAPI " + e.getStatusCode().value() + " " + safeMessage(e.getMessage());
@@ -172,22 +171,13 @@ public class MarketPageGenerationService {
         return AiGenerateRequest.builder()
                 .market(marketDto)
                 .stores(storeDtos)
-                .templateType(toAiTemplateType(config.getTemplateType(), marketId))
+                .templateType(toAiTemplateType(config.getTemplateType()))
                 .selectedSections(config.getSelectedSections())
                 .userContent(buildUserContent(config))
                 .build();
     }
 
-    /**
-     * FastAPI 운영 버전은 TEMPLATE_1 / TEMPLATE_2 만 허용한다.
-     * DB 와 공개 페이지의 templateType 은 그대로 TEMPLATE_3 을 유지하고, AI 카피 생성 요청에서만 임시 호환값을 보낸다.
-     */
-    private String toAiTemplateType(String templateType, Long marketId) {
-        if ("TEMPLATE_3".equals(templateType)) {
-            log.info("FastAPI template compatibility fallback: marketId={} originalTemplateType={} aiTemplateType={}",
-                    marketId, templateType, AI_TEMPLATE_FALLBACK);
-            return AI_TEMPLATE_FALLBACK;
-        }
+    private String toAiTemplateType(String templateType) {
         return templateType;
     }
 

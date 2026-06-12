@@ -42,9 +42,11 @@ public class SseEmitterManager {
      * 이벤트명은 프론트 EventSource.addEventListener('done', ...) 기준 소문자.
      * data 의 status 는 명세대로 대문자 enum 값 유지.
      */
-    public void sendDone(Long pageId) {
+    // done 이벤트에 marketId 포함 — 프론트 라우팅에 사용됨
+    public void sendDone(Long pageId, Long marketId) {
         sendAndComplete(pageId, "done", Map.of(
                 "pageId", pageId,
+                "marketId", marketId,
                 "status", "DONE"
         ));
     }
