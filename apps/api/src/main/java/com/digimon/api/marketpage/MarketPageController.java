@@ -53,9 +53,10 @@ public class MarketPageController {
     public ResponseEntity<?> createMarketPage(
             @RequestHeader(value = "Authorization", required = false) String authorization) {
         return withAuthenticatedUser(authorization, user -> {
-            Long pageId = marketPageService.startGeneration(user);
+            MarketPageService.StartGenerationResult result = marketPageService.startGeneration(user);
             Map<String, Object> data = new LinkedHashMap<>();
-            data.put("pageId", pageId);
+            data.put("pageId", result.pageId());
+            data.put("marketId", result.marketId()); // 프론트 라우팅에 사용됨
             data.put("status", "PENDING");
             data.put("message", "웹페이지 생성이 시작되었습니다.");
             return ResponseEntity.status(HttpStatus.ACCEPTED).body(ResponseWrapper.success(data));

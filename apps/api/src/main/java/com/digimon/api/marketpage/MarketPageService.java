@@ -61,8 +61,11 @@ public class MarketPageService {
     /**
      * @return 생성된(또는 재사용되는) market_pages.page_id
      */
+    // POST /api/market/page 응답에 pageId + marketId를 함께 전달하기 위한 내부 record
+    record StartGenerationResult(Long pageId, Long marketId) {}
+
     @Transactional
-    public Long startGeneration(User user) {
+    public StartGenerationResult startGeneration(User user) {
         Market market = marketRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new MarketPageMarketNotFoundException(
                         "등록된 시장이 없습니다. 먼저 온보딩을 완료해주세요."));
@@ -105,7 +108,8 @@ public class MarketPageService {
         // template_type / selected_sections / user_content 는 generateAsync 가 config 에서 다시 읽는다.
         generationService.generateAsync(pageId, market.getId());
 
-        return pageId;
+        // market.getId()는 이미 이 메서드 내에서 사용 중인 값
+        return new StartGenerationResult(pageId, market.getId());
     }
 
     /**
@@ -146,7 +150,8 @@ public class MarketPageService {
         }
 
         if (status == MarketPageStatus.DONE) {
-            sseEmitterManager.sendDone(pageId);
+            // pageMarketId는 이미 위에서 page.getMarket().getId()로 선언되어 있음
+            sseEmitterManager.sendDone(pageId, pageMarketId);
         } else if (status == MarketPageStatus.FAILED) {
             sseEmitterManager.sendFailed(pageId, FAILED_MESSAGE);
         }

@@ -100,7 +100,8 @@ public class MarketPageGenerationService {
             }
 
             self.markDone(pageId, responseJson);
-            sseEmitterManager.sendDone(pageId);
+            // marketId는 generateAsync() 파라미터로 이미 보유
+            sseEmitterManager.sendDone(pageId, marketId);
 
         } catch (WebClientResponseException e) {
             String reason = "FastAPI " + e.getStatusCode().value() + " " + safeMessage(e.getMessage());
