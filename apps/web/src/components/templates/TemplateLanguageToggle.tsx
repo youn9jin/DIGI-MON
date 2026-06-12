@@ -197,20 +197,25 @@ export function TemplateTourComingSoon({
   const { t } = useTemplateLanguage();
 
   return (
-    <span
-      aria-disabled="true"
+    <button
+      aria-label={`${t(spaced ? "tourInfoSpaced" : "tourInfo")} - ${t("openingSoon")}`}
+      onClick={() => window.alert("관광정보는 오픈 예정입니다.")}
       title={t("openingSoon")}
       style={{
+        appearance: "none",
+        background: "none",
+        border: 0,
         color: "inherit",
-        cursor: "default",
+        cursor: "pointer",
         font: "inherit",
-        opacity: 0.58,
+        padding: 0,
         textDecoration: "none",
         whiteSpace: "nowrap",
       }}
+      type="button"
     >
-      {t(spaced ? "tourInfoSpaced" : "tourInfo")} ({t("openingSoon")})
-    </span>
+      {t(spaced ? "tourInfoSpaced" : "tourInfo")}
+    </button>
   );
 }
 

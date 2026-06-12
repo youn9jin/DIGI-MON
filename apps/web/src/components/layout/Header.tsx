@@ -19,7 +19,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
   const [websiteHref, setWebsiteHref] =
     useState<
       "/intro" | "/onboarding" | "/dashboard/not-created" | "/dashboard"
-    >("/intro");
+    >("/dashboard/not-created");
   const [websiteCheckHref, setWebsiteCheckHref] = useState("/intro");
   const [canCheckWebsite, setCanCheckWebsite] = useState(false);
 
@@ -38,11 +38,7 @@ export default function Header({ variant = "default" }: HeaderProps) {
       try {
         const me = await getMe(currentUser);
         const hasPage = await hasGeneratedMarketPage(me);
-        const entryPath = !me.marketId
-          ? "/onboarding"
-          : hasPage
-            ? "/dashboard"
-            : "/dashboard/not-created";
+        const entryPath = hasPage ? "/dashboard" : "/dashboard/not-created";
         setWebsiteHref(entryPath);
         setCanCheckWebsite(hasPage && me.marketId != null);
         setWebsiteCheckHref(
@@ -51,8 +47,8 @@ export default function Header({ variant = "default" }: HeaderProps) {
             : entryPath,
         );
       } catch {
-        setWebsiteHref("/onboarding");
-        setWebsiteCheckHref("/onboarding");
+        setWebsiteHref("/dashboard/not-created");
+        setWebsiteCheckHref("/dashboard/not-created");
         setCanCheckWebsite(false);
       }
 

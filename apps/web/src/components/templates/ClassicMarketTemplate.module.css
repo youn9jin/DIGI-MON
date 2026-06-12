@@ -223,7 +223,8 @@
 }
 
 .footerNav a,
-.footerNav span {
+.footerNav span,
+.footerNav button {
   color: #000;
   font-size: clamp(15px, 1.15vw, 22px);
   line-height: 1;

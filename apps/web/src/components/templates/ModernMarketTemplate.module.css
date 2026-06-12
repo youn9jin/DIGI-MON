@@ -201,7 +201,8 @@
 }
 
 .footer nav a,
-.footer nav span {
+.footer nav span,
+.footer nav button {
   color: #fff;
   font-size: clamp(15px, 1.15vw, 22px);
   line-height: 1;
