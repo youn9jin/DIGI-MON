@@ -119,6 +119,7 @@ export interface MarketPageContentResponse {
   marketName?: string | null;
   address?: string | null;
   contact?: string | null;
+  operatingHours?: unknown;
   heroImageUrl?: string | null;
   logoImageUrl?: string | null;
   introImageUrls?: string[] | null;

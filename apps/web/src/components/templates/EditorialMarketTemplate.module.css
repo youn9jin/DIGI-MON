@@ -44,6 +44,11 @@
   background-size: contain;
 }
 
+.logoWithImage {
+  background: transparent;
+  padding: 0;
+}
+
 .header nav {
   display: flex;
   align-items: center;

@@ -21,6 +21,7 @@ interface EditorialMarketStoreDetailTemplateProps {
   logoImageUrl?: string;
   address?: string;
   contact?: string;
+  operatingHours?: string;
   heroImageUrl?: string;
   previewMode?: boolean;
   publicBasePath?: string;
@@ -32,6 +33,7 @@ export default function EditorialMarketStoreDetailTemplate({
   logoImageUrl,
   address = "상세주소 text",
   contact = "TELEPHONENUM",
+  operatingHours,
   heroImageUrl,
   previewMode = false,
   publicBasePath,
@@ -130,6 +132,7 @@ export default function EditorialMarketStoreDetailTemplate({
       <EditorialFooter
         address={address}
         contact={contact}
+        operatingHours={operatingHours}
         publicBasePath={publicBasePath}
       />
 
