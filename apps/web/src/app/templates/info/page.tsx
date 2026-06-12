@@ -46,6 +46,7 @@ const setupStorageKey = "market_page_setup_draft";
 const generatedPageIdStorageKey = "generated_market_page_id";
 const generationVersionStorageKey = "market_page_generation_version";
 const generationInProgressStorageKey = "market_page_generation_in_progress";
+const savedInfoStorageKey = "market_page_saved_info";
 const maxStoresPerMarket = 150;
 
 type PreviewTarget = "intro" | "history" | "stores";
@@ -69,6 +70,17 @@ interface PreviewConfig {
 interface SetupDraft {
   templateType: TemplateType;
   selectedSections: MarketPageSection[];
+}
+
+interface SavedMarketInfo {
+  marketContent: {
+    introText: string;
+    historyText: string;
+    directionsText: string;
+  };
+  heroImageUrl: string | null;
+  logoImageUrl: string | null;
+  introImageUrls: string[];
 }
 
 type StoreExcelField = Exclude<
@@ -281,6 +293,45 @@ function getSetupDraft(): SetupDraft {
   };
 }
 
+function getSavedMarketInfo(): SavedMarketInfo {
+  const emptyInfo: SavedMarketInfo = {
+    marketContent: {
+      introText: "",
+      historyText: "",
+      directionsText: "",
+    },
+    heroImageUrl: null,
+    logoImageUrl: null,
+    introImageUrls: [],
+  };
+
+  if (typeof window === "undefined") {
+    return emptyInfo;
+  }
+
+  const stored = window.sessionStorage.getItem(savedInfoStorageKey);
+  if (!stored) {
+    return emptyInfo;
+  }
+
+  try {
+    const parsed = JSON.parse(stored) as Partial<SavedMarketInfo>;
+    return {
+      marketContent: {
+        introText: parsed.marketContent?.introText ?? "",
+        historyText: parsed.marketContent?.historyText ?? "",
+        directionsText: parsed.marketContent?.directionsText ?? "",
+      },
+      heroImageUrl: parsed.heroImageUrl ?? null,
+      logoImageUrl: parsed.logoImageUrl ?? null,
+      introImageUrls: (parsed.introImageUrls ?? []).filter(Boolean),
+    };
+  } catch {
+    window.sessionStorage.removeItem(savedInfoStorageKey);
+    return emptyInfo;
+  }
+}
+
 function getPreviewConfig(_templateType: TemplateType, target: PreviewTarget): PreviewConfig {
   return previewConfigs[_templateType][target];
 }
@@ -385,16 +436,19 @@ async function parseStoreSheet(file: File): Promise<StoreCreateItem[]> {
 export default function TemplateInfoPage() {
   const router = useRouter();
   const [setupDraft] = useState<SetupDraft>(getSetupDraft);
-  const [marketContent, setMarketContent] = useState({
-    introText: "",
-    historyText: "",
-    directionsText: "",
-  });
+  const [savedInfo] = useState<SavedMarketInfo>(getSavedMarketInfo);
+  const [marketContent, setMarketContent] = useState(savedInfo.marketContent);
   const [previewTarget, setPreviewTarget] = useState<PreviewTarget | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoFileName, setLogoFileName] = useState("");
+  const [existingLogoImageUrl, setExistingLogoImageUrl] = useState(
+    savedInfo.logoImageUrl,
+  );
   const [representativeFiles, setRepresentativeFiles] = useState<File[]>([]);
+  const [existingIntroImageUrls, setExistingIntroImageUrls] = useState(
+    savedInfo.introImageUrls,
+  );
   const [representativeFileMessage, setRepresentativeFileMessage] = useState("");
   const [storeFileName, setStoreFileName] = useState("");
   const [storeUploadMessage, setStoreUploadMessage] = useState("");
@@ -411,8 +465,8 @@ export default function TemplateInfoPage() {
     marketContent.introText.trim().length > 0 &&
     marketContent.historyText.trim().length > 0 &&
     marketContent.directionsText.trim().length > 0 &&
-    logoFile != null &&
-    representativeFiles.length > 0 &&
+    (logoFile != null || existingLogoImageUrl != null) &&
+    (representativeFiles.length > 0 || existingIntroImageUrls.length > 0) &&
     (!needsStoreFile || hasStoreData);
 
   useEffect(() => {
@@ -496,6 +550,7 @@ export default function TemplateInfoPage() {
 
     setLogoFile(file);
     setLogoFileName(file.name);
+    setExistingLogoImageUrl(null);
   }
 
   function handleRepresentativeFilesChange(fileList: FileList | null) {
@@ -560,12 +615,16 @@ export default function TemplateInfoPage() {
         }
       }
 
-      const [logoImageUrl, ...uploadedIntroImageUrls] = await Promise.all([
+      const [uploadedLogoImageUrl, ...uploadedIntroImageUrls] = await Promise.all([
         logoFile ? uploadMarketPageImage(logoFile, "logo") : Promise.resolve(null),
         ...representativeFiles.map((file) => uploadMarketPageImage(file, "intro")),
       ]);
-      const introImageUrls = uploadedIntroImageUrls.filter(
-        (url): url is string => Boolean(url),
+      const logoImageUrl = uploadedLogoImageUrl ?? existingLogoImageUrl;
+      const introImageUrls = Array.from(
+        new Set([
+          ...existingIntroImageUrls,
+          ...uploadedIntroImageUrls.filter((url): url is string => Boolean(url)),
+        ]),
       );
       const heroImageUrl = introImageUrls[0] ?? null;
 
@@ -577,6 +636,18 @@ export default function TemplateInfoPage() {
         logoImageUrl,
         introImageUrls,
       });
+      const nextSavedInfo: SavedMarketInfo = {
+        marketContent,
+        heroImageUrl,
+        logoImageUrl,
+        introImageUrls,
+      };
+      window.sessionStorage.setItem(
+        savedInfoStorageKey,
+        JSON.stringify(nextSavedInfo),
+      );
+      setExistingLogoImageUrl(logoImageUrl);
+      setExistingIntroImageUrls(introImageUrls);
       window.sessionStorage.removeItem(generatedPageIdStorageKey);
       window.sessionStorage.removeItem("generated_market_public_market_id");
       window.sessionStorage.setItem(generationVersionStorageKey, String(Date.now()));
@@ -652,7 +723,12 @@ export default function TemplateInfoPage() {
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={handleLogoDrop}
                   >
-                    <span>{logoFileName || "시장 로고를 마우스로 끌어와주세요"}</span>
+                    <span>
+                      {logoFileName ||
+                        (existingLogoImageUrl
+                          ? "저장된 시장 로고가 있습니다"
+                          : "시장 로고를 마우스로 끌어와주세요")}
+                    </span>
                   </div>
                   <label className={styles.imageFileButton}>
                     파일 추가하기
@@ -677,8 +753,10 @@ export default function TemplateInfoPage() {
                   >
                     <span>
                       {representativeFiles.length > 0
-                        ? `${representativeFiles.length}개 사진 선택됨`
-                        : "시장 대표 사진을 마우스로 끌어와주세요"}
+                        ? `새 사진 ${representativeFiles.length}개 선택됨`
+                        : existingIntroImageUrls.length > 0
+                          ? `저장된 시장 대표 사진 ${existingIntroImageUrls.length}개`
+                          : "시장 대표 사진을 마우스로 끌어와주세요"}
                     </span>
                   </div>
                   <label className={styles.imageFileButton}>
