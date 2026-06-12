@@ -144,6 +144,7 @@ export default function PublicEditorialStoreDetailPage() {
       const commonProps = {
         store,
         marketName: content.marketName ?? "Market Name",
+        logoImageUrl: content.logoImageUrl ?? undefined,
         address: content.address ?? "상세주소 text",
         contact: content.contact ?? "TELEPHONENUM",
         heroImageUrl: content.heroImageUrl ?? content.introImageUrls?.[0] ?? undefined,

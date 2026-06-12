@@ -153,6 +153,7 @@ export default function PublicEditorialStoresPage() {
     (() => {
       const commonProps = {
         marketName: content.marketName ?? "Market Name",
+        logoImageUrl: content.logoImageUrl ?? undefined,
         address: content.address ?? "상세주소 text",
         contact: content.contact ?? "TELEPHONENUM",
         stores,
@@ -165,7 +166,7 @@ export default function PublicEditorialStoresPage() {
         return (
           <ClassicMarketIntroTemplate
             marketName={commonProps.marketName}
-            logoImageUrl={content.logoImageUrl ?? undefined}
+            logoImageUrl={commonProps.logoImageUrl}
             address={commonProps.address}
             contact={commonProps.contact}
             stores={stores}

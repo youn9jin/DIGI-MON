@@ -21,6 +21,7 @@ const heroImage = "/images/templates/preview/editorial-store-hero.png";
 
 interface EditorialMarketStoresTemplateProps {
   marketName?: string;
+  logoImageUrl?: string;
   address?: string;
   contact?: string;
   stores?: TemplateStore[];
@@ -33,6 +34,7 @@ const categories = ["농/수산물", "먹거리", "의류", "생활용품", "기
 
 export default function EditorialMarketStoresTemplate({
   marketName = "Market Name",
+  logoImageUrl,
   address = "상세주소 text",
   contact = "TELEPHONENUM",
   stores: storeItems,
@@ -80,6 +82,7 @@ export default function EditorialMarketStoresTemplate({
   return (
     <main className={styles.page}>
       <EditorialHeaderWithBasePath
+        logoImageUrl={logoImageUrl}
         marketName={marketName}
         publicBasePath={publicBasePath}
       />
@@ -164,14 +167,17 @@ export default function EditorialMarketStoresTemplate({
 }
 
 export function EditorialHeader({
+  logoImageUrl,
   marketName,
   publicBasePath,
 }: {
+  logoImageUrl?: string;
   marketName: string;
   publicBasePath?: string;
 }) {
   return (
     <EditorialHeaderWithBasePath
+      logoImageUrl={logoImageUrl}
       marketName={marketName}
       publicBasePath={publicBasePath}
     />
@@ -179,9 +185,11 @@ export function EditorialHeader({
 }
 
 export function EditorialHeaderWithBasePath({
+  logoImageUrl,
   marketName,
   publicBasePath,
 }: {
+  logoImageUrl?: string;
   marketName: string;
   publicBasePath?: string;
 }) {
@@ -204,7 +212,16 @@ export function EditorialHeaderWithBasePath({
   return (
     <header className={styles.header}>
       <Link className={styles.logo} href={publicBasePath ?? "/templates/editorial"}>
-        {marketName}
+        {logoImageUrl ? (
+          <span
+            aria-label={`${marketName} 로고`}
+            className={styles.logoImage}
+            role="img"
+            style={{ backgroundImage: `url(${logoImageUrl})` }}
+          />
+        ) : (
+          marketName
+        )}
       </Link>
       <nav aria-label="템플릿 메뉴">
         {navItems.map((item) => (

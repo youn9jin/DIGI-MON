@@ -99,6 +99,7 @@ export default function EditorialMarketTemplate({
   return (
     <main className={styles.page}>
       <EditorialHeaderWithBasePath
+        logoImageUrl={content.logoImageUrl}
         marketName={content.marketName}
         publicBasePath={publicBasePath}
       />
