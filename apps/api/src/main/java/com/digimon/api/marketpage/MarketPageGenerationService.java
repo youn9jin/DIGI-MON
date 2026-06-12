@@ -44,7 +44,6 @@ public class MarketPageGenerationService {
     private static final Logger log = LoggerFactory.getLogger(MarketPageGenerationService.class);
     private static final String GENERATE_PATH = "/generate";
     private static final int FASTAPI_ERROR_BODY_LOG_LIMIT = 2_000;
-    private static final String AI_TEMPLATE_FALLBACK = "TEMPLATE_1";
     private static final int MAX_AI_REQUEST_ATTEMPTS = 2;
     private static final long AI_RETRY_DELAY_MILLIS = 1_500L;
 
@@ -217,22 +216,13 @@ public class MarketPageGenerationService {
         return AiGenerateRequest.builder()
                 .market(marketDto)
                 .stores(storeDtos)
-                .templateType(toAiTemplateType(config.getTemplateType(), marketId))
+                .templateType(toAiTemplateType(config.getTemplateType()))
                 .selectedSections(config.getSelectedSections())
                 .userContent(buildUserContent(config))
                 .build();
     }
 
-    /**
-     * FastAPI 운영 버전은 TEMPLATE_1 / TEMPLATE_2 만 허용한다.
-     * DB 와 공개 페이지의 templateType 은 그대로 TEMPLATE_3 을 유지하고, AI 카피 생성 요청에서만 임시 호환값을 보낸다.
-     */
-    private String toAiTemplateType(String templateType, Long marketId) {
-        if ("TEMPLATE_3".equals(templateType)) {
-            log.info("FastAPI template compatibility fallback: marketId={} originalTemplateType={} aiTemplateType={}",
-                    marketId, templateType, AI_TEMPLATE_FALLBACK);
-            return AI_TEMPLATE_FALLBACK;
-        }
+    private String toAiTemplateType(String templateType) {
         return templateType;
     }
 
