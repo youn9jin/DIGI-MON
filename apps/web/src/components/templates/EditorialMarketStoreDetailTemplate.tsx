@@ -18,6 +18,7 @@ const heroImage = "/images/templates/preview/editorial-store-hero.png";
 interface EditorialMarketStoreDetailTemplateProps {
   store: TemplateStore;
   marketName?: string;
+  logoImageUrl?: string;
   address?: string;
   contact?: string;
   heroImageUrl?: string;
@@ -28,6 +29,7 @@ interface EditorialMarketStoreDetailTemplateProps {
 export default function EditorialMarketStoreDetailTemplate({
   store,
   marketName = "Market Name",
+  logoImageUrl,
   address = "상세주소 text",
   contact = "TELEPHONENUM",
   heroImageUrl,
@@ -46,7 +48,11 @@ export default function EditorialMarketStoreDetailTemplate({
 
   return (
     <main className={`${styles.page} ${styles.detailPage}`}>
-      <EditorialHeader marketName={marketName} publicBasePath={publicBasePath} />
+      <EditorialHeader
+        logoImageUrl={logoImageUrl}
+        marketName={marketName}
+        publicBasePath={publicBasePath}
+      />
 
       <section className={styles.detailHero} aria-label="가게 상세">
         {representativeImageUrl ? (

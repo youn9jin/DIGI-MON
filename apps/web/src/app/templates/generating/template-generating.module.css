@@ -91,10 +91,10 @@
 
 .heroLogo {
   position: absolute;
-  top: min(30.56vw, 330px);
-  left: min(64.9vw, 1246px);
+  top: clamp(205px, 37.87svh, 409px);
+  left: clamp(760px, 65.16vw, 1251px);
   width: min(23.28vw, 447px);
-  height: min(16.35vw, 314px);
+  aspect-ratio: 447 / 314;
 }
 
 .heroLogoImage {
@@ -104,14 +104,15 @@
 }
 
 .content {
-  position: relative;
+  position: absolute;
+  top: clamp(244px, 45.09svh, 487px);
+  left: clamp(72px, 11.2vw, 215px);
   z-index: 1;
-  width: min(80vw, 1000px);
-  padding: clamp(250px, 44.44svh, 480px) 0 0 min(11.77vw, 226px);
+  width: min(57vw, 1090px);
 }
 
 .doneContent {
-  padding-top: clamp(250px, 44.44svh, 480px);
+  top: clamp(244px, 45.09svh, 487px);
 }
 
 .content h1 {
@@ -142,7 +143,7 @@
 .guideButton {
   position: absolute;
   top: clamp(500px, 61.3svh, 662px);
-  left: min(65.31vw, 1254px);
+  left: clamp(760px, 65.31vw, 1254px);
   z-index: 1;
   display: flex;
   width: min(22.48vw, 432px);
@@ -174,7 +175,11 @@
   }
 
   .content {
+    position: relative;
+    top: auto;
+    left: auto;
     width: calc(100% - 48px);
+    margin: 0;
     padding: 230px 24px 0;
   }
 
@@ -213,7 +218,7 @@
   }
 
   .content {
-    padding-top: 330px;
+    top: 330px;
   }
 
   .guideButton {

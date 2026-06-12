@@ -568,19 +568,31 @@ export default function InfoEditPage() {
   }
 
   function handleStoreFileChange(field: StoreUploadField, files: FileList | null) {
-    const selectedFiles = Array.from(files ?? [])
-      .filter((file) => file.type.startsWith("image/"))
-      .slice(0, field.maxFiles);
+    const selectedFiles = Array.from(files ?? []).filter((file) =>
+      file.type.startsWith("image/"),
+    );
+    if (selectedFiles.length === 0) {
+      return;
+    }
+
+    const previousFiles =
+      field.maxFiles === 1 ? [] : (storeFiles[field.label] ?? []);
+    const mergedFiles = Array.from(
+      new Map(
+        [...previousFiles, ...selectedFiles].map((file) => [
+          `${file.name}:${file.size}:${file.lastModified}`,
+          file,
+        ]),
+      ).values(),
+    ).slice(0, field.maxFiles);
+
     setStoreFileNames((current) => ({
       ...current,
-      [field.label]:
-        selectedFiles.length > 0
-          ? selectedFiles.map((file) => file.name).join(", ")
-          : "",
+      [field.label]: mergedFiles.map((file) => file.name).join(", "),
     }));
     setStoreFiles((current) => ({
       ...current,
-      [field.label]: selectedFiles,
+      [field.label]: mergedFiles,
     }));
     setStoreSaveMessage("");
     setStoreError("");
@@ -658,13 +670,13 @@ export default function InfoEditPage() {
           ),
         ),
       );
-      await waitForMinimumPendingTime(pendingStartedAt);
+      await waitForMinimumPendingTime(pendingStartedAt, 2000);
       publishDashboardOperationToast("detail");
       setStoreSaveMessage("가게 정보를 저장했어요.");
     } catch (error) {
       setStoreError(error instanceof Error ? error.message : "가게 정보 저장에 실패했습니다.");
     } finally {
-      await waitForMinimumPendingTime(pendingStartedAt);
+      await waitForMinimumPendingTime(pendingStartedAt, 2000);
       setIsSavingStore(false);
     }
   }
@@ -696,14 +708,14 @@ export default function InfoEditPage() {
 
     try {
       await updateMarketPageText(payload);
-      await waitForMinimumPendingTime(pendingStartedAt);
+      await waitForMinimumPendingTime(pendingStartedAt, 2000);
       publishDashboardOperationToast("detail");
       setSaveMessage("수정한 문구를 저장했어요.");
     } catch (error) {
       const apiError = error as Partial<MarketPageApiError>;
       setSaveError(apiError.message ?? "문구 저장에 실패했습니다.");
     } finally {
-      await waitForMinimumPendingTime(pendingStartedAt);
+      await waitForMinimumPendingTime(pendingStartedAt, 2000);
       setIsSaving(false);
     }
   }
@@ -875,9 +887,10 @@ export default function InfoEditPage() {
                           type="file"
                           accept="image/png,image/jpeg,image/webp"
                           multiple={field.maxFiles > 1}
-                          onChange={(event) =>
-                            handleStoreFileChange(field, event.currentTarget.files)
-                          }
+                          onChange={(event) => {
+                            handleStoreFileChange(field, event.currentTarget.files);
+                            event.currentTarget.value = "";
+                          }}
                         />
                         <span className={styles.storeFilePlaceholder}>
                           {storeFileNames[field.label] || field.placeholder}
