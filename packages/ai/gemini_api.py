@@ -4,6 +4,7 @@ Gemini API 호출 래퍼 모듈 (최신 google-genai 버전)
 """
 
 import os
+import time
 from google import genai
 from typing import Optional
 
@@ -48,16 +49,19 @@ def generate_text(
         print("[Gemini API 오류] 클라이언트가 초기화되지 않았습니다.")
         return None
 
-    try:
-        response = client.models.generate_content(
-            model=model_name,
-            contents=prompt,
-            config={
-                'temperature': temperature,
-                'max_output_tokens': max_output_tokens,
-            }
-        )
-        return response.text.strip()
-    except Exception as e:
-        print(f"[Gemini API 오류] {e}")
-        return None
+    for attempt in range(3):
+        try:
+            response = client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+                config={
+                    'temperature': temperature,
+                    'max_output_tokens': max_output_tokens,
+                }
+            )
+            return response.text.strip()
+        except Exception as e:
+            print(f"[Gemini API 오류] attempt {attempt + 1}/3: {e}")
+            if attempt < 2:
+                time.sleep(2 ** attempt)
+    return None
