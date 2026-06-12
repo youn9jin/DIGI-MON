@@ -459,23 +459,15 @@ export default function TemplateInfoPage() {
     const files = Array.from(fileList ?? []).filter((file) =>
       file.type.startsWith("image/"),
     );
+    setRepresentativeFiles(files);
 
     if (files.length === 0) {
+      setRepresentativeFileMessage("");
       return;
     }
 
-    const mergedFiles = Array.from(
-      new Map(
-        [...representativeFiles, ...files].map((file) => [
-          `${file.name}:${file.size}:${file.lastModified}`,
-          file,
-        ]),
-      ).values(),
-    );
-
-    setRepresentativeFiles(mergedFiles);
     setRepresentativeFileMessage(
-      `${mergedFiles.length}개 사진을 선택했어요. 템플릿에는 앞의 사진부터 우선 표시됩니다.`,
+      `${files.length}개 사진을 선택했어요. 템플릿에는 앞의 사진부터 우선 표시됩니다.`,
     );
   }
 
@@ -634,10 +626,9 @@ export default function TemplateInfoPage() {
                       type="file"
                       multiple
                       accept="image/png,image/jpeg,image/webp"
-                      onChange={(event) => {
-                        handleRepresentativeFilesChange(event.target.files);
-                        event.currentTarget.value = "";
-                      }}
+                      onChange={(event) =>
+                        handleRepresentativeFilesChange(event.target.files)
+                      }
                     />
                   </label>
                   {representativeFileMessage && (

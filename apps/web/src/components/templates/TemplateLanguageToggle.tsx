@@ -205,8 +205,11 @@ export function TemplateTourComingSoon({
         appearance: "none",
         background: "none",
         border: 0,
+        color: "inherit",
         cursor: "pointer",
+        font: "inherit",
         padding: 0,
+        textDecoration: "none",
         whiteSpace: "nowrap",
       }}
       type="button"

@@ -45,8 +45,6 @@ public class MarketPageGenerationService {
     private static final String GENERATE_PATH = "/generate";
     private static final int FASTAPI_ERROR_BODY_LOG_LIMIT = 2_000;
     private static final String AI_TEMPLATE_FALLBACK = "TEMPLATE_1";
-    private static final int MAX_AI_REQUEST_ATTEMPTS = 2;
-    private static final long AI_RETRY_DELAY_MILLIS = 1_500L;
 
     private final WebClient aiWebClient;
     private final MarketRepository marketRepository;
@@ -91,7 +89,16 @@ public class MarketPageGenerationService {
                 log.warn("request logging failed", e);
             }
 
-            String responseJson = requestGenerationWithRetry(pageId, body);
+            String responseJson = aiWebClient.post()
+                    .uri(GENERATE_PATH)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .bodyValue(body)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    // WebClient.block 은 자체 타임아웃 인자를 받지 않더라도
+                    // ReactorClientHttpConnector 의 responseTimeout(60s) 이 그대로 적용된다.
+                    .block();
 
             // HTTP 는 성공(2xx)이지만 바디가 비어있는 경우(예: 빈 응답/204). AI 응답 없음으로 간주 → FAILED.
             if (responseJson == null || responseJson.isBlank()) {
@@ -114,58 +121,6 @@ public class MarketPageGenerationService {
             log.warn("market page generation failed (pageId={}): {}", pageId, reason);
             self.markFailed(pageId);
             sseEmitterManager.sendFailed(pageId, reason);
-        }
-    }
-
-    private String requestGenerationWithRetry(Long pageId, AiGenerateRequest body) {
-        RuntimeException lastException = null;
-
-        for (int attempt = 1; attempt <= MAX_AI_REQUEST_ATTEMPTS; attempt++) {
-            try {
-                return aiWebClient.post()
-                        .uri(GENERATE_PATH)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .bodyValue(body)
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        // ReactorClientHttpConnector 의 responseTimeout(60s) 이 적용된다.
-                        .block();
-            } catch (WebClientResponseException exception) {
-                boolean retryable = exception.getStatusCode().is5xxServerError()
-                        || exception.getStatusCode().value() == 429;
-                if (!retryable || attempt == MAX_AI_REQUEST_ATTEMPTS) {
-                    throw exception;
-                }
-                lastException = exception;
-            } catch (RuntimeException exception) {
-                if (attempt == MAX_AI_REQUEST_ATTEMPTS) {
-                    throw exception;
-                }
-                lastException = exception;
-            }
-
-            log.warn(
-                    "Transient AI generation request failure. pageId={}, attempt={}/{}",
-                    pageId,
-                    attempt,
-                    MAX_AI_REQUEST_ATTEMPTS,
-                    lastException
-            );
-            waitBeforeRetry();
-        }
-
-        throw lastException == null
-                ? new IllegalStateException("AI generation request failed without an exception")
-                : lastException;
-    }
-
-    private void waitBeforeRetry() {
-        try {
-            Thread.sleep(AI_RETRY_DELAY_MILLIS);
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("AI generation retry was interrupted", exception);
         }
     }
 
