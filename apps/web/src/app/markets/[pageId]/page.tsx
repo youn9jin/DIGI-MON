@@ -23,6 +23,7 @@ import {
   mapEditorialMarketPageContent,
   mapModernMarketPageContent,
 } from "@/lib/market-page-template-data";
+import { usePublicMarketOperatingHours } from "@/lib/use-public-market-operating-hours";
 
 export default function PublicMarketPage() {
   const params = useParams<{ pageId: string }>();
@@ -31,6 +32,10 @@ export default function PublicMarketPage() {
   const [content, setContent] = useState<MarketPageContentResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const operatingHours = usePublicMarketOperatingHours(
+    marketId,
+    content?.operatingHours,
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -100,5 +105,6 @@ export default function PublicMarketPage() {
 
   const data: Partial<EditorialMarketTemplateData> =
     mapEditorialMarketPageContent(content);
+  data.operatingHours = operatingHours;
   return <EditorialMarketTemplate data={data} publicBasePath={publicBasePath} />;
 }

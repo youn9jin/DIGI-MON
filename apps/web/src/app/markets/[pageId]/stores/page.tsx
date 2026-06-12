@@ -19,6 +19,7 @@ import {
   type TemplateStore,
 } from "@/lib/template-store-data";
 import { getTemplateRouteSlug } from "@/lib/market-page-template-data";
+import { usePublicMarketOperatingHours } from "@/lib/use-public-market-operating-hours";
 
 function getFallbackStores(content: MarketPageContentResponse): TemplateStore[] {
   const publicStores = content.stores ?? [];
@@ -76,6 +77,10 @@ export default function PublicEditorialStoresPage() {
   const [stores, setStores] = useState<TemplateStore[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const operatingHours = usePublicMarketOperatingHours(
+    marketId,
+    content?.operatingHours,
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -156,6 +161,7 @@ export default function PublicEditorialStoresPage() {
         logoImageUrl: content.logoImageUrl ?? undefined,
         address: content.address ?? "상세주소 text",
         contact: content.contact ?? "TELEPHONENUM",
+        operatingHours,
         stores,
         heroImageUrl: content.heroImageUrl ?? content.introImageUrls?.[0] ?? undefined,
         publicBasePath,

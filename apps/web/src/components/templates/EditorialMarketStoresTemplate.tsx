@@ -24,6 +24,7 @@ interface EditorialMarketStoresTemplateProps {
   logoImageUrl?: string;
   address?: string;
   contact?: string;
+  operatingHours?: string;
   stores?: TemplateStore[];
   heroImageUrl?: string;
   previewMode?: boolean;
@@ -37,6 +38,7 @@ export default function EditorialMarketStoresTemplate({
   logoImageUrl,
   address = "상세주소 text",
   contact = "TELEPHONENUM",
+  operatingHours,
   stores: storeItems,
   heroImageUrl,
   previewMode = false,
@@ -153,6 +155,7 @@ export default function EditorialMarketStoresTemplate({
       <EditorialFooter
         address={address}
         contact={contact}
+        operatingHours={operatingHours}
         publicBasePath={publicBasePath}
       />
 
@@ -211,7 +214,10 @@ export function EditorialHeaderWithBasePath({
 
   return (
     <header className={styles.header}>
-      <Link className={styles.logo} href={publicBasePath ?? "/templates/editorial"}>
+      <Link
+        className={`${styles.logo} ${logoImageUrl ? styles.logoWithImage : ""}`}
+        href={publicBasePath ?? "/templates/editorial"}
+      >
         {logoImageUrl ? (
           <span
             aria-label={`${marketName} 로고`}
@@ -239,10 +245,12 @@ export function EditorialHeaderWithBasePath({
 export function EditorialFooter({
   address,
   contact,
+  operatingHours,
   publicBasePath,
 }: {
   address: string;
   contact: string;
+  operatingHours?: string;
   publicBasePath?: string;
 }) {
   const { t } = useTemplateLanguage();
@@ -269,6 +277,11 @@ export function EditorialFooter({
         <div>
           <h3>{t("address")}</h3>
           <p>{address}</p>
+          {operatingHours && (
+            <p>
+              {t("businessHours")} : {operatingHours}
+            </p>
+          )}
         </div>
         <div>
           <h3>{t("contact")}</h3>

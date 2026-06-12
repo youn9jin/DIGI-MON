@@ -22,6 +22,7 @@ export interface EditorialMarketTemplateData {
   cultureText: string;
   address: string;
   contact: string;
+  operatingHours?: string;
   heroImageUrl?: string;
   logoImageUrl?: string;
   introImageUrls?: string[];
@@ -198,6 +199,7 @@ export default function EditorialMarketTemplate({
       <EditorialFooter
         address={content.address}
         contact={content.contact}
+        operatingHours={content.operatingHours}
         publicBasePath={publicBasePath}
       />
 
