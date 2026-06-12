@@ -580,7 +580,7 @@
 
 .hoursValidationMessage {
   position: absolute;
-  top: clamp(226px, 39.5svh, 427px);
+  top: clamp(246px, 42.9svh, 463px);
   left: clamp(42px, 4.063vw, 78px);
   margin: 0;
   color: #c43d31;
