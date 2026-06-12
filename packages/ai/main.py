@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import json
+import traceback
 from gemini_api import generate_text
 
 app = FastAPI()
@@ -179,7 +180,15 @@ async def generate_content(request: GenerateRequest):
         )
 
     # 프롬프트 생성 및 Gemini 호출
-    prompt = build_prompt(request)
+    try:
+        prompt = build_prompt(request)
+    except Exception as e:
+        # build_prompt 내부 예외는 기본적으로 로그 없이 FastAPI 500으로 떨어지므로 명시적으로 출력
+        print(f"[build_prompt 오류] {traceback.format_exc()}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"프롬프트 생성 실패: {str(e)}"
+        )
     
     try:
         raw_response = generate_text(prompt, temperature=0.7, max_output_tokens=4096)
