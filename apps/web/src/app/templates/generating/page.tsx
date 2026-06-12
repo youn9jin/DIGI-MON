@@ -194,70 +194,72 @@ export default function TemplateGeneratingPage() {
         </aside>
       )}
 
-      <div className={styles.backgroundMark} aria-hidden="true">
-        <Image alt="" width={1550} height={791} priority src={logoImage} />
-      </div>
+      <div className={styles.designStage}>
+        <div className={styles.backgroundMark} aria-hidden="true">
+          <Image alt="" width={1550} height={791} priority src={logoImage} />
+        </div>
 
-      <div className={styles.heroLogo} aria-hidden="true">
-        <Image
-          alt=""
-          width={447}
-          height={314}
-          priority
-          className={styles.heroLogoImage}
-          src={heroLogoImage}
-        />
-      </div>
+        <div className={styles.heroLogo} aria-hidden="true">
+          <Image
+            alt=""
+            width={447}
+            height={314}
+            priority
+            className={styles.heroLogoImage}
+            src={heroLogoImage}
+          />
+        </div>
 
-      <section
-        className={`${styles.content} ${status === "DONE" ? styles.doneContent : ""}`}
-        aria-label={status === "DONE" ? "웹페이지 생성 완료" : "웹페이지 생성 중"}
-      >
-        <h1>
-          {status === "DONE"
-            ? "우리 시장 맞춤 웹페이지 생성 완료"
-            : status === "CONNECTION_LOST"
-              ? "생성 상태 확인이 잠시 끊겼어요"
-              : status === "FAILED"
-              ? "웹페이지 생성에 실패했어요"
-              : "우리 시장 맞춤 웹페이지 만드는 중"}
-        </h1>
-        <p>
-          {status === "FAILED" || status === "CONNECTION_LOST"
-            ? errorMessage
-            : "입력해주신 정보를 바탕으로 웹사이트를 만들고 있어요"}
-          <br />
-          {status === "DONE"
-            ? "웹페이지 관리 화면에서 결과를 확인해보세요"
-            : status === "CONNECTION_LOST"
-              ? "웹사이트 관리 화면에서 생성 결과를 다시 확인해주세요"
-              : "기다리시는 동안 웹페이지 관리 방법을 확인해보세요"}
-        </p>
-        {status === "DONE" && pageId && (
-          <span className={styles.pageId}>생성 요청 번호 {pageId}</span>
-        )}
-      </section>
-
-      {status === "FAILED" ? (
-        <button className={styles.guideButton} type="button" onClick={handleRetry}>
-          다시 생성하기
-        </button>
-      ) : status === "CONNECTION_LOST" ? (
-        <Link className={styles.guideButton} href="/dashboard">
-          웹사이트 관리로 이동
-        </Link>
-      ) : status === "DONE" && generatedHrefId ? (
-        <Link
-          className={`${styles.guideButton} ${styles.doneButton}`}
-          href={getGeneratedMarketPageHref(generatedHrefId)}
+        <section
+          className={`${styles.content} ${status === "DONE" ? styles.doneContent : ""}`}
+          aria-label={status === "DONE" ? "웹페이지 생성 완료" : "웹페이지 생성 중"}
         >
-          생성된 웹페이지 확인하기
-        </Link>
-      ) : (
-        <Link className={styles.guideButton} href="/">
-          홈 화면에서 웹페이지 수정 방법 확인하기
-        </Link>
-      )}
+          <h1>
+            {status === "DONE"
+              ? "우리 시장 맞춤 웹페이지 생성 완료"
+              : status === "CONNECTION_LOST"
+                ? "생성 상태 확인이 잠시 끊겼어요"
+                : status === "FAILED"
+                ? "웹페이지 생성에 실패했어요"
+                : "우리 시장 맞춤 웹페이지 만드는 중"}
+          </h1>
+          <p>
+            {status === "FAILED" || status === "CONNECTION_LOST"
+              ? errorMessage
+              : "입력해주신 정보를 바탕으로 웹사이트를 만들고 있어요"}
+            <br />
+            {status === "DONE"
+              ? "웹페이지 관리 화면에서 결과를 확인해보세요"
+              : status === "CONNECTION_LOST"
+                ? "웹사이트 관리 화면에서 생성 결과를 다시 확인해주세요"
+                : "기다리시는 동안 웹페이지 관리 방법을 확인해보세요"}
+          </p>
+          {status === "DONE" && pageId && (
+            <span className={styles.pageId}>생성 요청 번호 {pageId}</span>
+          )}
+        </section>
+
+        {status === "FAILED" ? (
+          <button className={styles.guideButton} type="button" onClick={handleRetry}>
+            다시 생성하기
+          </button>
+        ) : status === "CONNECTION_LOST" ? (
+          <Link className={styles.guideButton} href="/dashboard">
+            웹사이트 관리로 이동
+          </Link>
+        ) : status === "DONE" && generatedHrefId ? (
+          <Link
+            className={`${styles.guideButton} ${styles.doneButton}`}
+            href={getGeneratedMarketPageHref(generatedHrefId)}
+          >
+            생성된 웹페이지 확인하기
+          </Link>
+        ) : (
+          <Link className={styles.guideButton} href="/">
+            홈 화면에서 웹페이지 수정 방법 확인하기
+          </Link>
+        )}
+      </div>
     </main>
   );
 }
