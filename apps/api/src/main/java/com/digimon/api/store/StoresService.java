@@ -82,9 +82,12 @@ public class StoresService {
                 .orElseThrow(() -> new MarketNotFoundException("등록된 시장이 없습니다. 먼저 온보딩을 완료해주세요."));
 
         List<StoreItemRequest> items = request.getStores();
-        long currentCount = storeRepository.countByMarketId(market.getId());
-        if (currentCount + items.size() > MAX_STORES_PER_MARKET) {
-            throw new TooManyStoresException(currentCount, items.size(), MAX_STORES_PER_MARKET);
+        // 재등록 시 기존 점포를 먼저 삭제하고 새 목록으로 교체한다
+        storeRepository.deleteByMarketId(market.getId());
+
+        // 삭제 후이므로 신규 등록 건수만 검사
+        if (items.size() > MAX_STORES_PER_MARKET) {
+            throw new TooManyStoresException(0L, items.size(), MAX_STORES_PER_MARKET);
         }
 
         List<Long> successStoreIds = new ArrayList<>();
