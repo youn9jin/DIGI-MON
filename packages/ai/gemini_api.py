@@ -39,7 +39,7 @@ def generate_text(
     prompt: str,
     model_name: str = "gemini-2.5-flash", 
     temperature: float = 0.5,
-    max_output_tokens: int = 256,
+    max_output_tokens: int = 2048,
 ) -> Optional[str]:
     """
     Gemini 모델을 사용해 텍스트 생성
