@@ -568,19 +568,29 @@ export default function InfoEditPage() {
   }
 
   function handleStoreFileChange(field: StoreUploadField, files: FileList | null) {
-    const selectedFiles = Array.from(files ?? [])
-      .filter((file) => file.type.startsWith("image/"))
-      .slice(0, field.maxFiles);
-    setStoreFileNames((current) => ({
-      ...current,
-      [field.label]:
-        selectedFiles.length > 0
-          ? selectedFiles.map((file) => file.name).join(", ")
-          : "",
-    }));
+    const selectedFiles = Array.from(files ?? []).filter((file) =>
+      file.type.startsWith("image/"),
+    );
+    if (selectedFiles.length === 0) {
+      return;
+    }
+
+    const mergedFiles = Array.from(
+      new Map(
+        [...(storeFiles[field.label] ?? []), ...selectedFiles].map((file) => [
+          `${file.name}:${file.size}:${file.lastModified}`,
+          file,
+        ]),
+      ).values(),
+    ).slice(0, field.maxFiles);
+
     setStoreFiles((current) => ({
       ...current,
-      [field.label]: selectedFiles,
+      [field.label]: mergedFiles,
+    }));
+    setStoreFileNames((current) => ({
+      ...current,
+      [field.label]: mergedFiles.map((file) => file.name).join(", "),
     }));
     setStoreSaveMessage("");
     setStoreError("");
@@ -875,9 +885,10 @@ export default function InfoEditPage() {
                           type="file"
                           accept="image/png,image/jpeg,image/webp"
                           multiple={field.maxFiles > 1}
-                          onChange={(event) =>
-                            handleStoreFileChange(field, event.currentTarget.files)
-                          }
+                          onChange={(event) => {
+                            handleStoreFileChange(field, event.currentTarget.files);
+                            event.currentTarget.value = "";
+                          }}
                         />
                         <span className={styles.storeFilePlaceholder}>
                           {storeFileNames[field.label] || field.placeholder}
