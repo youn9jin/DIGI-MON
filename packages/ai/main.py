@@ -1,4 +1,6 @@
 from fastapi import FastAPI, HTTPException, status
+from fastapi.exceptions import ResponseValidationError
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 import json
@@ -6,6 +8,15 @@ import traceback
 from gemini_api import generate_text
 
 app = FastAPI()
+
+@app.exception_handler(ResponseValidationError)
+async def response_validation_error_handler(request, exc):
+    # response_model 검증 실패 시 실제 오류 내용을 로그에 출력
+    print(f"[ResponseValidationError] {exc.errors()}")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"응답 검증 실패: {str(exc.errors())}"}
+    )
 
 # ─────────────────────────────────────────
 # 1. Request / Response Pydantic 모델 정의
