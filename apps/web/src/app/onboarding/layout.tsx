@@ -60,6 +60,7 @@ export default function OnboardingLayout({
 
       // 온보딩 내부 이동은 그냥 허용
       if (href.startsWith("/onboarding")) return;
+      if (href === "/dashboard/not-created") return;
 
       // 외부 이동 시도 → 모달
       e.preventDefault();

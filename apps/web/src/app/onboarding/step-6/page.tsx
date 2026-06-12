@@ -76,7 +76,6 @@ function TimeField({
         aria-label={label}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        required
       >
         <option value="" aria-label={`${unit} 선택`} />
         {options.map((option) => (
@@ -235,6 +234,7 @@ export default function OnboardingStepSixPage() {
           className={`${styles.card} ${styles.hoursCard}`}
           aria-labelledby="onboarding-question"
           data-node-id="148:2246"
+          noValidate
           onSubmit={handleSubmit}
         >
           <div
