@@ -289,6 +289,29 @@
   line-height: 1.5;
 }
 
+.existingStoreNotice {
+  display: flex;
+  box-sizing: border-box;
+  width: min(100%, 1155px);
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 14px;
+  border-radius: 14px;
+  background: rgba(255, 245, 210, 0.72);
+  color: #323232;
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 14px 18px;
+}
+
+.existingStoreNotice strong {
+  font-weight: 700;
+}
+
+.existingStoreNotice span {
+  font-weight: 400;
+}
+
 .saveErrorMessage {
   width: min(100%, 760px);
   margin: 34px auto 0;
