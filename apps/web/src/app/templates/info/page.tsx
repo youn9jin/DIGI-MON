@@ -10,7 +10,11 @@ import {
   type MarketPageSection,
   type TemplateType,
 } from "@/lib/api/market-page";
-import { createStores, type StoreCreateItem } from "@/lib/api/stores";
+import {
+  createStores,
+  getStores,
+  type StoreCreateItem,
+} from "@/lib/api/stores";
 import { uploadMarketPageImage } from "@/lib/firebase-storage";
 import styles from "./template-info.module.css";
 
@@ -42,6 +46,7 @@ const setupStorageKey = "market_page_setup_draft";
 const generatedPageIdStorageKey = "generated_market_page_id";
 const generationVersionStorageKey = "market_page_generation_version";
 const generationInProgressStorageKey = "market_page_generation_in_progress";
+const maxStoresPerMarket = 150;
 
 type PreviewTarget = "intro" | "history" | "stores";
 
@@ -393,9 +398,12 @@ export default function TemplateInfoPage() {
   const [representativeFileMessage, setRepresentativeFileMessage] = useState("");
   const [storeFileName, setStoreFileName] = useState("");
   const [storeUploadMessage, setStoreUploadMessage] = useState("");
+  const [existingStoreCount, setExistingStoreCount] = useState(0);
+  const [isLoadingExistingStores, setIsLoadingExistingStores] = useState(true);
   const [saveErrorMessage, setSaveErrorMessage] = useState("");
   const [stores, setStores] = useState<StoreCreateItem[]>([]);
   const needsStoreFile = setupDraft.selectedSections.includes("stores");
+  const hasStoreData = stores.length > 0 || existingStoreCount > 0;
   const previewConfig = previewTarget
     ? getPreviewConfig(setupDraft.templateType, previewTarget)
     : null;
@@ -405,7 +413,32 @@ export default function TemplateInfoPage() {
     marketContent.directionsText.trim().length > 0 &&
     logoFile != null &&
     representativeFiles.length > 0 &&
-    (!needsStoreFile || stores.length > 0);
+    (!needsStoreFile || hasStoreData);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadExistingStores() {
+      try {
+        const result = await getStores();
+        if (!isMounted) return;
+        setExistingStoreCount(result.total);
+      } catch {
+        if (!isMounted) return;
+        setExistingStoreCount(0);
+      } finally {
+        if (isMounted) {
+          setIsLoadingExistingStores(false);
+        }
+      }
+    }
+
+    loadExistingStores();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!previewTarget) return;
@@ -437,8 +470,18 @@ export default function TemplateInfoPage() {
         setStoreUploadMessage("읽을 수 있는 점포 정보가 없습니다.");
         return;
       }
+      if (parsedStores.length > maxStoresPerMarket) {
+        setStoreUploadMessage(
+          `점포는 최대 ${maxStoresPerMarket}개까지 등록할 수 있습니다. 현재 파일에는 ${parsedStores.length}개가 있습니다.`,
+        );
+        return;
+      }
       setStores(parsedStores);
-      setStoreUploadMessage(`${parsedStores.length}개 점포 정보를 읽었어요.`);
+      setStoreUploadMessage(
+        existingStoreCount > 0
+          ? `${parsedStores.length}개 점포 정보를 읽었어요. 저장하면 기존 ${existingStoreCount}개 점포가 이 목록으로 교체됩니다.`
+          : `${parsedStores.length}개 점포 정보를 읽었어요. 저장하면 이 목록으로 점포가 등록됩니다.`,
+      );
     } catch {
       setStoreUploadMessage("파일을 읽지 못했습니다. xlsx 또는 csv 파일인지 확인해주세요.");
     }
@@ -491,6 +534,15 @@ export default function TemplateInfoPage() {
 
   async function handleInfoComplete() {
     if (isSaving || !isInfoComplete) return;
+    if (
+      stores.length > 0 &&
+      existingStoreCount > 0 &&
+      !window.confirm(
+        `기존 ${existingStoreCount}개 점포를 삭제하고 새 파일의 ${stores.length}개 점포로 교체합니다. 계속할까요?`,
+      )
+    ) {
+      return;
+    }
 
     setIsSaving(true);
     setSaveErrorMessage("");
@@ -499,8 +551,9 @@ export default function TemplateInfoPage() {
         const result = await createStores(stores);
         if (result.failedItems?.length > 0) {
           const firstFailed = result.failedItems[0];
+          setExistingStoreCount(result.successCount);
           setSaveErrorMessage(
-            `${result.successCount}개 등록, ${result.failedItems.length}개 실패했습니다.\n${firstFailed.name ?? "점포"}: ${firstFailed.reason}`,
+            `기존 점포를 새 목록으로 교체하는 중 ${result.successCount}개 등록, ${result.failedItems.length}개 실패했습니다.\n${firstFailed.name ?? "점포"}: ${firstFailed.reason}`,
           );
           setIsSaving(false);
           return;
@@ -673,10 +726,22 @@ export default function TemplateInfoPage() {
               <input
                 type="file"
                 accept=".xlsx,.xls,.csv"
-                onChange={(event) => handleStoreFileChange(event.target.files?.[0])}
+                onChange={(event) => {
+                  handleStoreFileChange(event.target.files?.[0]);
+                  event.currentTarget.value = "";
+                }}
               />
               <span>{storeFileName || "파일 첨부"}</span>
             </label>
+            {!isLoadingExistingStores && existingStoreCount > 0 && (
+              <div className={styles.existingStoreNotice} role="status">
+                <strong>{existingStoreCount}개의 점포가 이미 등록되어 있습니다.</strong>
+                <span>
+                  파일을 새로 올리지 않으면 기존 점포 정보가 유지됩니다.
+                  새 파일을 올리고 저장하면 기존 점포 전체가 새 파일의 목록으로 교체됩니다.
+                </span>
+              </div>
+            )}
             {storeUploadMessage && (
               <p className={styles.storeUploadMessage}>{storeUploadMessage}</p>
             )}
